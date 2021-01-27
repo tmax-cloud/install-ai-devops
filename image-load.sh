@@ -11,18 +11,15 @@ else
 fi
 
 image_num=$(cat imagelist | wc -l)
-echo "[$0] Pull ${image_num} images & Save as tar files & Push to ${registry}"
-
-mkdir ./images
+echo "[$0] Load ${image_num} images & Push to ${registry}"
 
 i=1
 cat imagelist | while read line
 do
 	echo "[$0] [ ${i} / ${image_num} ] $line"
-	sudo docker pull $line
-	sudo docker tag $line ${registry}/$line
 	name=`echo $line |tr '/' '-'`
-	sudo docker save $line > ./images/${name}.tar
+	sudo docker load < ./images/${name}.tar
+	sudo docker tag $line ${registry}/$line
 	sudo docker push ${registry}/$line
 	let i+=1
 done
