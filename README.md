@@ -261,7 +261,3 @@
 |                     |                 **webhook**                 |             webhook             |      **20m**      |         **20Mi**         |      **200m**       |       **200Mi**        | gcr.io/knative-releases/knative.dev/serving/cmd/webhook@sha256:1ef3328282f31704b5802c1136bd117e8598fd9f437df8209ca87366c5ce9fcb |
 |  **istio-system**   |          **cluster-local-gateway**          |           istio-proxy           |      **10m**      |           40Mi           |          1          |         128Mi          |                docker.io/istio/proxyv2:1.5.1                 |
 |                     |        **kfserving-ingressgateway**         |           istio-proxy           |      **10m**      |         **40Mi**         |      **100m**       |       **128Mi**        |                docker.io/istio/proxyv2:1.5.1                 |
-|                     |                                             |        **기존리소스합**         |       2580m       |          2968Mi          |                     |                        |                                                              |
-|                     |                                             |       **설정후리소스합**        |       4450m       |         16258Mi          |                     |                        |                                                              |
-* 비고 :
-    * bold : demo 시나리오상 실제 사용되는 Pod, kubeflow/manifests에서 권장하는 resource
