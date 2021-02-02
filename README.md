@@ -263,3 +263,5 @@
 |                     |        **kfserving-ingressgateway**         | 1                        | istio-proxy                     |                docker.io/istio/proxyv2:1.5.1                 |      **10m**      |         **40Mi**         | **100m**            | **128Mi**              |
 |                     |                                             |                          |                                 |                       **기존리소스합**                       |       2580m       |          2968Mi          |                     |                        |
 |                     |                                             |                          |                                 |                      **설정후리소스합**                      |       4450m       |         16258Mi          |                     |                        |
+* 비고 :
+    * bold : demo 시나리오상 실제 사용되는 Pod, kubeflow/manifests에서 권장하는 resource
