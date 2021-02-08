@@ -385,12 +385,4 @@ spec:
         name: manifests
         path: seldon/seldon-core-operator
     name: seldon-core-operator
-  - kustomizeConfig:
-      parameters:
-      - name: namespace
-        value: monitoring
-      repoRef:
-        name: manifests
-        path: monitoring-resource
-    name: monitoring-resource
   version: v1.0.2
