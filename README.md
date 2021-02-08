@@ -46,8 +46,8 @@
         ```
     * 아래 명령어를 수행하여 Kubeflow 설치 시 필요한 이미지들을 위에서 구축한 registry에 push하고 이미지들을 tar 파일로 저장한다. tar 파일은 images 디렉토리에 저장된다.
         ```bash
-        $ wget https://raw.githubusercontent.com/tmax-cloud/hypercloud-install-guide/4.1/Kubeflow/image-push.sh
-        $ wget https://raw.githubusercontent.com/tmax-cloud/hypercloud-install-guide/4.1/Kubeflow/imagelist
+        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/4.1/image-push.sh
+        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/4.1/imagelist
         $ chmod +x ./image-push.sh
         $ ./image-push.sh ${REGISTRY_ADDRESS}
         ```
@@ -59,7 +59,7 @@
     * (Optional) 만약 설치에 필요한 이미지들을 pull받아서 tar 파일로 저장하는 작업과 로드하여 push하는 작업을 따로 수행하고자 한다면 image-push.sh이 아니라 image-save.sh, image-load.sh를 각각 실행하면 된다. 
        * image-save.sh을 실행하면 설치에 필요한 이미지들을 pull 받아서 images 디렉토리에 tar 파일로 저장한다.
            ```bash
-           $ wget https://raw.githubusercontent.com/tmax-cloud/hypercloud-install-guide/4.1/Kubeflow/image-save.sh
+           $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/4.1/image-save.sh
            $ chmod +x ./image-save.sh
            $ ./image-save.sh
            $ ls ./images
@@ -73,9 +73,9 @@
 2. Yaml 파일 및 script 파일 준비
     * 아래 명령어를 수행하여 Kubeflow 설치에 필요한 yaml 파일들과 script 파일들을 다운로드 받는다. 
         ```bash
-        $ wget https://raw.githubusercontent.com/tmax-cloud/hypercloud-install-guide/4.1/Kubeflow/sed.sh
-        $ wget https://raw.githubusercontent.com/tmax-cloud/hypercloud-install-guide/4.1/Kubeflow/kustomize_local.tar.gz
-        $ wget https://raw.githubusercontent.com/tmax-cloud/hypercloud-install-guide/4.1/Kubeflow/kfctl_hypercloud_kubeflow.v1.0.2_local.yaml
+        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/4.1/sed.sh
+        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/4.1/kustomize_local.tar.gz
+        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/4.1/kfctl_hypercloud_kubeflow.v1.0.2_local.yaml
         $ wget https://github.com/kubeflow/kfctl/releases/download/v1.2.0/kfctl_v1.2.0-0-gbc038f9_linux.tar.gz
         ```
 3. 앞으로의 진행
