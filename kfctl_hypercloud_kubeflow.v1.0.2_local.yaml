@@ -1,13 +1,29 @@
 apiVersion: kfdef.apps.kubeflow.org/v1
 kind: KfDef
 metadata:
-  clusterName: kubernetes
-  creationTimestamp: null
-  name: kubeflow
   namespace: kubeflow
 spec:
+  # applications:
+  # - kustomizeConfig:
+  #     parameters:
+  #     - name: namespace
+  #       value: istio-system
+  #     repoRef:
+  #       name: manifests
+  #       path: istio/istio-crds
+  #   name: istio-crds
+  # - kustomizeConfig:
+  #     parameters:
+  #     - name: namespace
+  #       value: istio-system
+  #     repoRef:
+  #       name: manifests
+  #       path: istio/istio-install
+  #   name: istio-install
   applications:
   - kustomizeConfig:
+      overlays:
+      - spec-configuration
       parameters:
       - name: namespace
         value: istio-system
@@ -16,6 +32,8 @@ spec:
         path: istio/cluster-local-gateway
     name: cluster-local-gateway
   - kustomizeConfig:
+      overlays:
+      - spec-configuration
       parameters:
       - name: namespace
         value: istio-system
@@ -47,6 +65,7 @@ spec:
   - kustomizeConfig:
       overlays:
       - application
+      - spec-configuration
       repoRef:
         name: manifests
         path: application/application
@@ -71,6 +90,7 @@ spec:
       overlays:
       - self-signed
       - application
+      - spec-configuration
       parameters:
       - name: namespace
         value: cert-manager
@@ -79,6 +99,8 @@ spec:
         path: cert-manager/cert-manager
     name: cert-manager
   - kustomizeConfig:
+      overlays:
+      - spec-configuration
       repoRef:
         name: manifests
         path: metacontroller
@@ -87,6 +109,7 @@ spec:
       overlays:
       - istio
       - application
+      - spec-configuration
       repoRef:
         name: manifests
         path: argo
@@ -100,6 +123,7 @@ spec:
       overlays:
       - istio
       - application
+      - spec-configuration
       repoRef:
         name: manifests
         path: common/centraldashboard
@@ -107,6 +131,7 @@ spec:
   - kustomizeConfig:
       overlays:
       - application
+      - spec-configuration
       repoRef:
         name: manifests
         path: admission-webhook/bootstrap
@@ -114,6 +139,7 @@ spec:
   - kustomizeConfig:
       overlays:
       - application
+      - spec-configuration
       repoRef:
         name: manifests
         path: admission-webhook/webhook
@@ -122,6 +148,7 @@ spec:
       overlays:
       - istio
       - application
+      - spec-configuration
       parameters:
       - name: userid-header
         value: kubeflow-userid
@@ -132,6 +159,7 @@ spec:
   - kustomizeConfig:
       overlays:
       - application
+      - spec-configuration
       repoRef:
         name: manifests
         path: spark/spark-operator
@@ -141,6 +169,7 @@ spec:
       - istio
       - application
       - db
+      - spec-configuration
       repoRef:
         name: manifests
         path: metadata
@@ -150,6 +179,7 @@ spec:
       - istio
       - application
       - hypercloud
+      - spec-configuration
       repoRef:
         name: manifests
         path: jupyter/notebook-controller
@@ -164,6 +194,7 @@ spec:
   - kustomizeConfig:
       overlays:
       - application
+      - spec-configuration
       repoRef:
         name: manifests
         path: pytorch-job/pytorch-operator
@@ -181,6 +212,7 @@ spec:
   - kustomizeConfig:
       overlays:
       - application
+      - spec-configuration
       parameters:
       - name: namespace
         value: knative-serving
@@ -198,6 +230,7 @@ spec:
   - kustomizeConfig:
       overlays:
       - application
+      - spec-configuration
       repoRef:
         name: manifests
         path: kfserving/kfserving-install
@@ -205,6 +238,7 @@ spec:
   - kustomizeConfig:
       overlays:
       - application
+      - spec-configuration
       parameters:
       - name: usageId
         value: <randomly-generated-id>
@@ -217,6 +251,7 @@ spec:
   - kustomizeConfig:
       overlays:
       - istio
+      - spec-configuration
       repoRef:
         name: manifests
         path: tensorboard
@@ -231,6 +266,7 @@ spec:
   - kustomizeConfig:
       overlays:
       - application
+      - spec-configuration
       repoRef:
         name: manifests
         path: tf-training/tf-job-operator
@@ -246,6 +282,7 @@ spec:
       overlays:
       - application
       - istio
+      - spec-configuration
       repoRef:
         name: manifests
         path: katib/katib-controller
@@ -253,6 +290,7 @@ spec:
   - kustomizeConfig:
       overlays:
       - application
+      - spec-configuration
       repoRef:
         name: manifests
         path: pipeline/api-service
@@ -260,6 +298,7 @@ spec:
   - kustomizeConfig:
       overlays:
       - application
+      - spec-configuration
       parameters:
       - name: minioPvcName
         value: minio-pv-claim
@@ -270,6 +309,7 @@ spec:
   - kustomizeConfig:
       overlays:
       - application
+      - spec-configuration
       parameters:
       - name: mysqlPvcName
         value: mysql-pv-claim
@@ -280,6 +320,7 @@ spec:
   - kustomizeConfig:
       overlays:
       - application
+      - spec-configuration
       repoRef:
         name: manifests
         path: pipeline/persistent-agent
@@ -295,6 +336,7 @@ spec:
       overlays:
       - istio
       - application
+      - spec-configuration
       repoRef:
         name: manifests
         path: pipeline/pipelines-ui
@@ -302,6 +344,7 @@ spec:
   - kustomizeConfig:
       overlays:
       - application
+      - spec-configuration
       repoRef:
         name: manifests
         path: pipeline/pipelines-viewer
@@ -309,6 +352,7 @@ spec:
   - kustomizeConfig:
       overlays:
       - application
+      - spec-configuration
       repoRef:
         name: manifests
         path: pipeline/scheduledworkflow
@@ -316,6 +360,7 @@ spec:
   - kustomizeConfig:
       overlays:
       - application
+      - spec-configuration
       repoRef:
         name: manifests
         path: pipeline/pipeline-visualization-service
@@ -324,6 +369,7 @@ spec:
       overlays:
       - application
       - istio
+      - spec-configuration
       parameters:
       - name: admin
         value: johnDoe@acme.com
@@ -334,6 +380,7 @@ spec:
   - kustomizeConfig:
       overlays:
       - application
+      - spec-configuration
       repoRef:
         name: manifests
         path: seldon/seldon-core-operator
@@ -347,4 +394,3 @@ spec:
         path: monitoring-resource
     name: monitoring-resource
   version: v1.0.2
-status: {}
