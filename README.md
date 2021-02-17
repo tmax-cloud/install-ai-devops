@@ -35,13 +35,16 @@
     * Kubernetes cluster 내 node에 GPU가 탑재되어 있으며 AI DevOps 기능을 사용할 때 GPU가 요구될 경우에 필요하다.
         * https://github.com/tmax-cloud/hypercloud-install-guide/tree/4.1/Pod_GPU%20plugin
 5. Console
-    * 초기 상태의 console deployment의 spec에는 kubeflow endpoint가 연동되어있지 않아 수정해 주어야 한다.
-    * 아래 명령어를 통해 endpoint를 확인한다.
+    * 아래 명령어를 통해 확인할 수 있는 초기 상태의 console deployment의 template에는 kubeflow endpoint가 연동되어있지 않아 수정해 주어야 한다.
+        ```bash
+        $ kubectl get deploy console -n console-system -o yaml
+        ```
+    * 아래 명령어를 통해 endpoint(CLUSTER-IP)를 확인한다.
         ```bash
         $ kubectl get svc istio-ingressgateway -n istio-system
         ```
-        ![스크린샷, 2021-02-17 17-14-16](https://user-images.githubusercontent.com/77767091/108175107-adf20900-7143-11eb-9bf1-0aab26802f10.png)
-
+        ![스크린샷, 2021-02-17 17-21-57](https://user-images.githubusercontent.com/77767091/108175926-b0089780-7144-11eb-882d-b515e21f897f.png)
+    * 확인한 CLUSTER-IP를 console deployment의 template 필드에 연동해 준다. 
 ## 폐쇄망 설치 가이드
 설치를 진행하기 전 아래의 과정을 통해 필요한 이미지 및 yaml 파일을 준비한다.
 1. 이미지 준비
