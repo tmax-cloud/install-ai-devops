@@ -35,7 +35,7 @@
     * Kubernetes cluster 내 node에 GPU가 탑재되어 있으며 AI DevOps 기능을 사용할 때 GPU가 요구될 경우에 필요하다.
         * https://github.com/tmax-cloud/hypercloud-install-guide/tree/4.1/Pod_GPU%20plugin
 5. Console
-    * 아래 명령어를 통해 확인할 수 있는 초기 상태의 console deployment의 template에는 kubeflow endpoint가 연동되어있지 않아 수정해 주어야 한다.
+    * 아래 명령어를 통해 확인할 수 있는 초기 상태의 console deployment의 template에는 kubeflow-endpoint가 연동되어있지 않아 수정해 주어야 한다.
         ```bash
         $ kubectl get deploy console -n console-system -o yaml
         ```
