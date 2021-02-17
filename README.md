@@ -44,7 +44,9 @@
         $ kubectl get svc istio-ingressgateway -n istio-system
         ```
         ![스크린샷, 2021-02-17 17-21-57](https://user-images.githubusercontent.com/77767091/108175926-b0089780-7144-11eb-882d-b515e21f897f.png)
-    * 확인한 CLUSTER-IP를 console deployment의 template 필드에 연동해 준다. 
+    * 확인한 CLUSTER-IP를 console deployment의 template 필드에 연동해 준다.
+        ![스크린샷, 2021-02-17 17-28-41](https://user-images.githubusercontent.com/77767091/108176706-b0edf900-7145-11eb-9d5d-3506e225b535.png)
+
 ## 폐쇄망 설치 가이드
 설치를 진행하기 전 아래의 과정을 통해 필요한 이미지 및 yaml 파일을 준비한다.
 1. 이미지 준비
