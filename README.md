@@ -43,7 +43,7 @@
         ```bash
         $ kubectl get svc istio-ingressgateway -n istio-system
         ```
-        ![스크린샷, 2021-02-17 17-21-57](https://user-images.githubusercontent.com/77767091/108175926-b0089780-7144-11eb-882d-b515e21f897f.png)
+        ![스크린샷, 2021-02-17 17-21-57](https://user-images.githubusercontent.com/77767091/108177831-0d054d00-7147-11eb-8064-ec7915fd2c7d.png)
     * 확인한 CLUSTER-IP를 console deployment의 template 필드에 연동해 준다.
         ![스크린샷, 2021-02-17 17-28-41](https://user-images.githubusercontent.com/77767091/108176706-b0edf900-7145-11eb-9d5d-3506e225b535.png)
 
