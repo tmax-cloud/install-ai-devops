@@ -40,6 +40,8 @@
         ```bash
         $ kubectl get svc istio-ingressgateway -n istio-system
         ```
+        ![스크린샷, 2021-02-17 17-14-16](https://user-images.githubusercontent.com/77767091/108175107-adf20900-7143-11eb-9bf1-0aab26802f10.png)
+
 ## 폐쇄망 설치 가이드
 설치를 진행하기 전 아래의 과정을 통해 필요한 이미지 및 yaml 파일을 준비한다.
 1. 이미지 준비
