@@ -7,4 +7,4 @@ spec:
   inferenceService: triton-mms
   model:
     framework: tensorflow
-    storageUri: "s3://triton/models/inception"
+    storageUri: "s3://triton/models/inception_graphdef"

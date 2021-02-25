@@ -48,11 +48,19 @@ minio-service
 kubectl apply -f s3_secret.yaml
 ```
 
+- 별도의 namespace에서 진행하는 경우 minoi-service 연결
+    - 본 예제에서는 mms라는 namespace에서 진행
+
+```
+kubectl apply -f extenral_service.yaml
+```
+
 
 # Inference Server 생성하기
 
 - Multi Model Serving을 위한 InferenceService (inferenceserver) 생성
     - 기존의 InferenceService와 다르게 `StorageUri`를 제외하고 생성
+    - s3 endpoint를 위한 serviceaccount 연결
     - ~~사진~~
 
 ```bash
@@ -73,7 +81,7 @@ triton-mms   http://triton-mms.default.35.229.120.99.xip.io   True    8h
 
 ```bash
 # INGRESS에서 인식할 수 있도록 SERVICE_HOSTNAME 설정
-SERVICE_HOSTNAME=$(kubectl get inferenceservices triton-mms -o jsonpath='{.status.url}' | cut -d "/" -f 3)
+SERVICE_HOSTNAME=$(kubectl get inferenceservices triton-mms -o jsonpath='{.status.url}' -n mms | cut -d "/" -f 3)
 # INGRESS LoadBalancer
 INGRESS_HOST=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="http2")].port}')
@@ -83,9 +91,17 @@ INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -o jsonp
     - 정상적으로 가지 않거나 다음과 같이 서버의 metadata가 나오지 않는다면 InferenceService pod의 `ClusterIP` 또는  service를 통해서 expose해서 해당 url을 사용해야함 (endpoint는 동일)
 
 ```bash
-kubectl expose pod triton-mms-predictor-default-dhrbj-deployment-5956c57575-9sb5q --type=NodePort --name serving-service 
-curl -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v2
+# INGRESS
+curl -v -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v2
 
+# Expose
+kubectl expose pod triton-mms-predictor-default-dhrbj-deployment-5956c57575-9sb5q --type=NodePort --name serving-service 
+curl -v http://${NODE_IP}:${TARGET_PORT}/v2 # curl -v  http://172.23.4.101:31582/v2
+
+# Or use CLUSTER IP
+curl -v http://${CLUSTER_IP}:${PORT}/v2 # curl -v http://10.0.147.0:8080/v2
+
+# Result
 {"name":"triton","version":"2.2.0","extensions":["classification","sequence","model_repository","schedule_policy","model_configuration","system_shared_memory","cuda_shared_memory","binary_tensor_data","statistics"]}
 ```
 
@@ -108,13 +124,22 @@ tar xfz gsutil.tar.gz -C .
 ```
 
 - 모델 다운로드 및 minio에 추가
-
+    - cifar10 모델 다운로드
 ```bash
+mkdir -p models
+cd gsutil
+
 # In gsutil binary path
 ./gsutil cp -r gs://kfserving-examples/models/torchscript/cifar10 ../models
-# Upload cifar10 model to minio server
-./mc cp -r ./models/cifar10 myminio/triton/torchscript
 
+# Upload cifar10 model to minio server
+cd ..
+./mc mb myminio/triton
+./mc cp -r models/cifar10 myminio/triton/torchscript
+```
+    - inception 모델 다운로드 (사용할 inception 모델은 output에서 label이
+            필요하여 config.pbtxt와 label을 미리 준비해둠. download url 참고)
+```bash
 # Tensorflow inception (Download code from https://github.com/triton-inference-server/server/blob/master/docs/examples/fetch_models.sh)
 mkdir -p ./models/inception_graphdef/1
 wget -O /tmp/inception_v3_2016_08_28_frozen.pb.tar.gz \
@@ -122,7 +147,7 @@ wget -O /tmp/inception_v3_2016_08_28_frozen.pb.tar.gz \
 (cd /tmp && tar xzf inception_v3_2016_08_28_frozen.pb.tar.gz)
 mv /tmp/inception_v3_2016_08_28_frozen.pb ./models/inception_graphdef/1/model.graphdef
 # Upload inception model to minio server
-./mc cp -r ./models/inception_graphdef myminio/triton/models
+./mc cp -r models/inception_graphdef myminio/triton/models
 ```
 
 - 모델이 정상적인 path에 있는지 확인
@@ -140,7 +165,9 @@ myminio
    └─ torchscript
       └─ cifar10
          └─ 1
+```
 
+```bash
 # Get minio server url
 ./mc config host ls
 ```
@@ -204,9 +231,8 @@ I1115 14:11:52.690479 1 model_repository_manager.cc:925] successfully loaded 'ci
 
 ```bash
 MODEL_NAME=cifar10
-INPUT_PATH=@./cifar10.json
 
-curl -v -X POST -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v2/models/$MODEL_NAME/infer -d $INPUT_PATH
+curl -v -X POST -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v2/models/$MODEL_NAME/infer -d @./${MODEL_NAME}
 
 {"model_name":"cifar10","model_version":"1","outputs":[{"name":"OUTPUT__0","datatype":"FP32","shape":[1,10],"data":[-2.0964813232421877,-0.1370079517364502,-0.509565532207489,2.795621395111084,-0.560547947883606,1.9934228658676148,1.1288189888000489,-1.4043134450912476,0.6004878282546997,-2.123708486557007]}]}
 ```
@@ -242,7 +268,7 @@ kubectl logs $SERVER agent
     - status code가 200이면 정상
 
 ```bash
-MODEL_NAME=inception-graphdef
+MODEL_NAME=inception
 curl -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v2/models/${MODEL_NAME}/ready
 ```
 
@@ -254,10 +280,9 @@ kubectl logs $SERVER kfserving-container
 - 모델 endpoint로 prediction 요청
 
 ```bash
-MODEL_NAME=inception-graphdef
-INPUT_PATH=@./inception.json
+MODEL_NAME=inception
 
-curl -v -X POST -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v2/models/$MODEL_NAME/infer -d $INPUT_PATH
+curl -v -X POST -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v2/models/$MODEL_NAME/infer -d @./${MODEL_NAME}.json
 
 ```
 
