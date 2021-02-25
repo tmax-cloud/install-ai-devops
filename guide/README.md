@@ -15,6 +15,14 @@
 
 # Multi Model Serving을 위한 세팅
 
+- 작업을 위한 namespace 생성
+
+![profile](./images/profile.yaml)
+
+```bash
+kubectl apply -f profile.yaml
+```
+
 - triton inference server image digest시 auth에 필요한 `[nvcr.io](http://nvcr.io)` tag resolution을 skip하기 위한 명령어
 
 ```bash
@@ -49,7 +57,6 @@ minio-service
     - 만약 이전 단계에서의 minio의 `MINIO_ACCESS_KEY` 또는 `MINIO_SECRET_KEY`가 다른 경우 변경해서 적용
 
 ```bash
-kubectl create namespace mms
 kubectl apply -f s3_secret.yaml
 ```
 
@@ -92,9 +99,7 @@ triton-mms   http://triton-mms.default.35.229.120.99.xip.io   True    8h
 ```bash
 # INGRESS에서 인식할 수 있도록 SERVICE_HOSTNAME 설정
 SERVICE_HOSTNAME=$(kubectl get inferenceservices triton-mms -o jsonpath='{.status.url}' -n mms | cut -d "/" -f 3)
-# INGRESS LoadBalancer
-INGRESS_HOST=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="http2")].port}')
+CLUSTER_IP=$(kubectl -n istio-system get service kfserving-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 ```
 
 - Request가 정상적으로 가는지 확인
@@ -102,14 +107,14 @@ INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -o jsonp
 
 ```bash
 # INGRESS
-curl -v -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v2
+curl -v -H "Host: ${SERVICE_HOSTNAME}" http://${CLUSTER_IP}/v2
 
 # Expose
 POD_NAME=$(kubectl get pods -l serving.kubeflow.org/inferenceservice=triton-mms -o name -n mms | cut -d "/" -f 2)
 kubectl expose pod ${POD_NAME} --type=NodePort --name serving-service -n mms
 curl -v http://${NODE_IP}:${TARGET_PORT}/v2 # curl -v  http://172.23.4.101:31582/v2
 
-# Or use CLUSTER IP
+# Or use POD CLUSTER IP
 curl -v http://${CLUSTER_IP}:${PORT}/v2 # curl -v http://10.0.147.0:8080/v2
 
 # Result
@@ -229,7 +234,7 @@ kubectl -n mms logs $SERVER agent
 
 ```bash
 MODEL_NAME=cifar10
-curl -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v2/models/${MODEL_NAME}/ready
+curl -H "Host: ${SERVICE_HOSTNAME}" http://${CLUSTER_IP}/v2/models/${MODEL_NAME}/ready
 ```
 
 ```bash
@@ -245,7 +250,7 @@ I1115 14:11:52.690479 1 model_repository_manager.cc:925] successfully loaded 'ci
 ```bash
 MODEL_NAME=cifar10
 
-curl -v -X POST -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v2/models/$MODEL_NAME/infer -d @./${MODEL_NAME}.json
+curl -v -X POST -H "Host: ${SERVICE_HOSTNAME}" http://${CLUSTER_IP}/v2/models/$MODEL_NAME/infer -d @./${MODEL_NAME}.json
 
 {"model_name":"cifar10","model_version":"1","outputs":[{"name":"OUTPUT__0","datatype":"FP32","shape":[1,10],"data":[-2.0964813232421877,-0.1370079517364502,-0.509565532207489,2.795621395111084,-0.560547947883606,1.9934228658676148,1.1288189888000489,-1.4043134450912476,0.6004878282546997,-2.123708486557007]}]}
 ```
@@ -294,7 +299,7 @@ kubectl logs $SERVER agent -n mms
 
 ```bash
 MODEL_NAME=inception
-curl -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v2/models/${MODEL_NAME}/ready
+curl -H "Host: ${SERVICE_HOSTNAME}" http://${CLUSTER_IP}/v2/models/${MODEL_NAME}/ready
 ```
 
 ```bash
@@ -307,7 +312,7 @@ kubectl logs $SERVER kfserving-container
 ```bash
 MODEL_NAME=inception
 
-curl -v -X POST -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v2/models/$MODEL_NAME/infer -d @./${MODEL_NAME}.json
+curl -v -X POST -H "Host: ${SERVICE_HOSTNAME}" http://${CLUSTER_IP}/v2/models/$MODEL_NAME/infer -d @./${MODEL_NAME}.json
 
 ```
 
