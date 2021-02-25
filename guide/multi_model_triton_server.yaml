@@ -1,0 +1,20 @@
+apiVersion: "serving.kubeflow.org/v1beta1"
+kind: "InferenceService"
+metadata:
+  name: "triton-mms"
+  namespace: mms
+
+spec:
+  predictor:
+    serviceAccountName: minio-serviceaccount
+    triton:
+      args:
+      - --log-verbose=2
+      resources:
+        limits:
+          cpu: "1"
+          memory: 8Gi
+        requests:
+          cpu: "1"
+          memory: 8Gi
+
