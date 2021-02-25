@@ -4,7 +4,11 @@
 
 - kfserving 0.5 버전 이상 필요
 - `inferenceservice.yaml` 의 Triton의 `multiModelServer` flag가 true로 세팅해야 multi-model serving을 사용 가능함 (또는 `kfserving/install/v0.5.0/kfserving.yaml`로 설치 시 해당 파일에서 수정)
-~~사진 추가~~
+
+![kfserving](./images/kfserving.png)
+![inferenceserver](./images/inferenceserver.png)
+
+
 - 0.5 버전 기준 multi-model serving InferenceService의 `agent`에서 s3, gs 프로토콜만을 지원하여 minio storage server 사용
     - 본 데모에서는 kubeflow에서 사용중인 minio storage server를 이용함
 
@@ -49,6 +53,8 @@ kubectl create namespace mms
 kubectl apply -f s3_secret.yaml
 ```
 
+![minio-service](./images/minio-service.png)
+
 - 별도의 namespace에서 진행하는 경우 minoi-service 연결
     - 본 예제에서는 mms라는 namespace에서 진행
 
@@ -56,17 +62,20 @@ kubectl apply -f s3_secret.yaml
 kubectl apply -f external_service.yaml
 ```
 
+![external-service](./images/external-service.png)
 
-# Inference Server 생성하기
+
+# InferenceService 생성하기
 
 - Multi Model Serving을 위한 InferenceService (inferenceserver) 생성
     - 기존의 InferenceService와 다르게 `StorageUri`를 제외하고 생성
     - s3 endpoint를 위한 serviceaccount 연결
-    - ~~사진~~
 
 ```bash
 kubectl apply -f multi_model_triton_server.yaml
 ```
+
+![multi-model-server](./images/multi-model-server.png)
 
 - InferenceService가 정상적으로 생성 되었는지 확인
     - 아래의 결과처럼 `READY`가 True이면 정상
@@ -141,7 +150,7 @@ cd ..
 ./mc cp -r models/cifar10 myminio/triton/torchscript
 ```
 
-- inception 모델 다운로드 (사용할 inception 모델은 output에서 label이 필요하여 config.pbtxt와 label을 미리 준비해둠. download url 참고)
+- inception 모델 다운로드 (**사용할 inception 모델은 output에서 label이 필요하여 config.pbtxt와 label을 미리 준비해둠. download url 참고**)
 
 ```bash
 # Tensorflow inception (Download code from https://github.com/triton-inference-server/server/blob/master/docs/examples/fetch_models.sh)
@@ -182,11 +191,11 @@ myminio
 
 - Trained Model 생성
 
-~~사진추가~~
-
 ```bash
 kubectl apply -f trained_model1.yaml
 ```
+
+![trained model 1](./images/trained_model1.png)
 
 - 정상적으로 생성되었는지 확인
 
@@ -249,6 +258,9 @@ curl -v -X POST -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_
 ```bash
 kubectl apply -f trained_model2.yaml
 ```
+
+![trained model 2](./images/trained_model2.png)
+
 
 - 정상적으로 생성되었는지 확인
 
