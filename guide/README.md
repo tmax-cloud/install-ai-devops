@@ -17,7 +17,7 @@
 
 - 작업을 위한 namespace 생성
 
-![profile](./images/profile.yaml)
+![profile](./images/profile.png)
 
 ```bash
 kubectl apply -f profile.yaml
