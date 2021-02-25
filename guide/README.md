@@ -45,6 +45,7 @@ minio-service
     - 만약 이전 단계에서의 minio의 `MINIO_ACCESS_KEY` 또는 `MINIO_SECRET_KEY`가 다른 경우 변경해서 적용
 
 ```bash
+kubectl create namespace mms
 kubectl apply -f s3_secret.yaml
 ```
 
@@ -52,7 +53,7 @@ kubectl apply -f s3_secret.yaml
     - 본 예제에서는 mms라는 namespace에서 진행
 
 ```
-kubectl apply -f extenral_service.yaml
+kubectl apply -f external_service.yaml
 ```
 
 
@@ -64,14 +65,14 @@ kubectl apply -f extenral_service.yaml
     - ~~사진~~
 
 ```bash
-kubectl apply -f multi_model_triton.yaml
+kubectl apply -f multi_model_triton_server.yaml
 ```
 
 - InferenceService가 정상적으로 생성 되었는지 확인
     - 아래의 결과처럼 `READY`가 True이면 정상
 
 ```bash
-kubectl get inferenceservice triton-mms
+kubectl get inferenceservice triton-mms -n mms
 
 NAME   URL                                                    READY   AGE
 triton-mms   http://triton-mms.default.35.229.120.99.xip.io   True    8h
@@ -95,7 +96,8 @@ INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -o jsonp
 curl -v -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v2
 
 # Expose
-kubectl expose pod triton-mms-predictor-default-dhrbj-deployment-5956c57575-9sb5q --type=NodePort --name serving-service 
+POD_NAME=$(kubectl get pods -l serving.kubeflow.org/inferenceservice=triton-mms -o name -n mms | cut -d "/" -f 2)
+kubectl expose pod ${POD_NAME} --type=NodePort --name serving-service -n mms
 curl -v http://${NODE_IP}:${TARGET_PORT}/v2 # curl -v  http://172.23.4.101:31582/v2
 
 # Or use CLUSTER IP
@@ -125,6 +127,7 @@ tar xfz gsutil.tar.gz -C .
 
 - 모델 다운로드 및 minio에 추가
     - cifar10 모델 다운로드
+
 ```bash
 mkdir -p models
 cd gsutil
@@ -137,8 +140,9 @@ cd ..
 ./mc mb myminio/triton
 ./mc cp -r models/cifar10 myminio/triton/torchscript
 ```
-    - inception 모델 다운로드 (사용할 inception 모델은 output에서 label이
-            필요하여 config.pbtxt와 label을 미리 준비해둠. download url 참고)
+
+- inception 모델 다운로드 (사용할 inception 모델은 output에서 label이 필요하여 config.pbtxt와 label을 미리 준비해둠. download url 참고)
+
 ```bash
 # Tensorflow inception (Download code from https://github.com/triton-inference-server/server/blob/master/docs/examples/fetch_models.sh)
 mkdir -p ./models/inception_graphdef/1
@@ -187,7 +191,7 @@ kubectl apply -f trained_model1.yaml
 - 정상적으로 생성되었는지 확인
 
 ```bash
-kubectl get trainedmodel
+kubectl get trainedmodel -n mms
 
 NAME            URL                                                                    READY   AGE
 cifar10         http://triton-mms.example.com/v2/models/cifar10/infer                 22h
@@ -196,8 +200,8 @@ cifar10         http://triton-mms.example.com/v2/models/cifar10/infer           
 - Agent에서 정상적으로 모델을 다운로드하였는지  확인
 
 ```bash
-SERVER=$(k get pod -l serving.kubeflow.org/inferenceservice=triton-mms -o name)
-kubectl logs $SERVER agent
+SERVER=$(k get pod -l serving.kubeflow.org/inferenceservice=triton-mms -o name -n mms)
+kubectl -n mms logs $SERVER agent
 
 {"level":"info","ts":1605449512.0457177,"logger":"Watcher","msg":"Processing event","event":"\"/mnt/configs/..data\": CREATE"}
 {"level":"info","ts":1605449512.0464094,"logger":"modelWatcher","msg":"removing model","modelName":"cifar10"}
@@ -232,7 +236,7 @@ I1115 14:11:52.690479 1 model_repository_manager.cc:925] successfully loaded 'ci
 ```bash
 MODEL_NAME=cifar10
 
-curl -v -X POST -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v2/models/$MODEL_NAME/infer -d @./${MODEL_NAME}
+curl -v -X POST -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v2/models/$MODEL_NAME/infer -d @./${MODEL_NAME}.json
 
 {"model_name":"cifar10","model_version":"1","outputs":[{"name":"OUTPUT__0","datatype":"FP32","shape":[1,10],"data":[-2.0964813232421877,-0.1370079517364502,-0.509565532207489,2.795621395111084,-0.560547947883606,1.9934228658676148,1.1288189888000489,-1.4043134450912476,0.6004878282546997,-2.123708486557007]}]}
 ```
@@ -249,7 +253,7 @@ kubectl apply -f trained_model2.yaml
 - 정상적으로 생성되었는지 확인
 
 ```bash
-kubectl get trainedmodel
+kubectl get trainedmodel -n mms
 
 NAME            URL                                                                    READY   AGE
 cifar10         http://triton-mms.example.com/v2/models/cifar10/infer                 22h
@@ -259,9 +263,18 @@ inception       http://triton-mms.example.com/v2/models/inception/infer         
 - Agent에서 정상적으로 모델을 다운로드하였는지 확인
 
 ```bash
-SERVER=$(k get pod -l serving.kubeflow.org/inferenceservice=triton-mms -o name)
-kubectl logs $SERVER agent
+SERVER=$(k get pod -l serving.kubeflow.org/inferenceservice=triton-mms -o name -n mms)
+kubectl logs $SERVER agent -n mms
 
+
+{"level":"info","ts":"2021-02-25T06:05:52.384Z","caller":"agent/watcher.go:103","msg":"Processing event \"/mnt/configs/..data\": CREATE"}
+{"level":"info","ts":"2021-02-25T06:05:52.385Z","caller":"agent/watcher.go:173","msg":"adding model inception"}
+{"level":"info","ts":"2021-02-25T06:05:52.386Z","caller":"agent/puller.go:121","msg":"Worker is started for inception"}
+{"level":"info","ts":"2021-02-25T06:05:52.386Z","caller":"agent/puller.go:129","msg":"Downloading model from s3://triton/models/inception_graphdef"}
+{"level":"info","ts":"2021-02-25T06:05:52.386Z","caller":"agent/downloader.go:47","msg":"Downloading s3://triton/models/inception_graphdef to model dir /mnt/models"}
+{"level":"info","ts":"2021-02-25T06:05:53.247Z","caller":"agent/downloader.go:67","msg":"Creating successFile /mnt/models/inception/SUCCESS.2dd30a2ec0f7f440768dac363ef1e4665de243ae961ff1a4dc63f881cc26c7cd"}
+{"level":"info","ts":"2021-02-25T06:05:54.767Z","caller":"agent/puller.go:146","msg":"Successfully loaded model inception"}
+{"level":"info","ts":"2021-02-25T06:05:54.767Z","caller":"agent/puller.go:114","msg":"completion event for model inception, in flight ops 0"}
 ```
 
 - InferenceService에서도 memory에 로드했는지 확인
