@@ -8,6 +8,7 @@
 - 0.5 버전 기준 multi-model serving InferenceService의 `agent`에서 s3, gs 프로토콜만을 지원하여 minio storage server 사용
     - 본 데모에서는 kubeflow에서 사용중인 minio storage server를 이용함
 
+
 # Multi Model Serving을 위한 세팅
 
 - triton inference server image digest시 auth에 필요한 `[nvcr.io](http://nvcr.io)` tag resolution을 skip하기 위한 명령어
@@ -21,6 +22,32 @@ kubectl patch cm config-deployment --patch '{"data":{"registriesSkippingTagResol
 ```bash
 kubectl patch cm config-deployment --patch '{"data":{"progressDeadline": "600s"}}' -n knative-serving
 ```
+
+### minio 설정
+
+- `MINIO_SECRET_KEY`와 `MINIO_ACCESS_KEY` 확인
+
+```bash
+kubectl get pods -l app=minio -o jsonpath={.items[0].spec.containers[0].env} -n kubeflow
+
+[{"name":"MINIO_ACCESS_KEY","value":"minio"},{"name":"MINIO_SECRET_KEY","value":"minio123"}]
+```
+
+- minio service 확인
+
+```bash
+kubectl get svc -l app=minio -o name -n kubeflow | cut -d "/" -f 2
+
+minio-service
+```
+
+- InferenceService의 `agent`에서 minio의 s3 endpoint에 접근할 수 있도록 설정
+    - 만약 이전 단계에서의 minio의 `MINIO_ACCESS_KEY` 또는 `MINIO_SECRET_KEY`가 다른 경우 변경해서 적용
+
+```bash
+kubectl apply -f s3_secret.yaml
+```
+
 
 # Inference Server 생성하기
 
@@ -65,31 +92,6 @@ curl -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v2
 # TrainedModel 생성하기
 
 ## 예제로 사용할 model 다운로드
-
-### minio 설정
-
-- `MINIO_SECRET_KEY`와 `MINIO_ACCESS_KEY` 확인
-
-```bash
-kubectl get pods -l app=minio -o jsonpath={.items[0].spec.containers[0].env} -n kubeflow
-
-[{"name":"MINIO_ACCESS_KEY","value":"minio"},{"name":"MINIO_SECRET_KEY","value":"minio123"}]
-```
-
-- minio service 확인
-
-```bash
-kubectl get svc -l app=minio -o name -n kubeflow | cut -d "/" -f 2
-
-minio-service
-```
-
-- InferenceService의 `agent`에서 minio의 s3 endpoint에 접근할 수 있도록 설정
-    - 만약 이전 단계에서의 minio의 `MINIO_ACCESS_KEY` 또는 `MINIO_SECRET_KEY`가 다른 경우 변경해서 적용
-
-```bash
-kubectl apply -f s3_secret.yaml
-```
 
 - 모델을 다운로드 받고 minio storage에 파일을 추가하기 위해 [minio client](https://docs.min.io/docs/minio-client-complete-guide.html)와 [gsutil](https://cloud.google.com/storage/docs/gsutil/?hl=ko)를 설치
 
