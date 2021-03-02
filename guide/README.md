@@ -1,4 +1,4 @@
-# Kfserving Multi Model Serving 가이드
+# Kfserving Multi Model Serving 시나리오 가이드
 
 주의 사항:
 
@@ -9,7 +9,7 @@
     - 다른 framework도 지원하지만 TensorFlow saved-model은 자동으로 세팅을
     지원해준다고 함
 
-# 가이드 요약
+# 시나리오 요약
 
 ML model들을 작성하고 하나의 ML server에서 model들을 추론할 수 있는 **Multi-Model Serving**이 가능한 ML service를 만든다.
 
@@ -19,9 +19,10 @@ ML model들을 작성하고 하나의 ML server에서 model들을 추론할 수 
 0. 작업을 위한 namespace, pvc 만들기
 1. ML 코드 작성을 위한 notebook 만들기
 2. ML model을 코딩하고, InferenceService에서 사용할 checkpoint 생성하기
-3. InferenceService에서 model을 로딩할 수 있도록 minio 세팅하고 InferenceService 생성하기
-4. 학습한 model들을 InferenceService에 로딩하기
-5. 학습한 model들을 이용한 inference 테스트
+3. InferenceService에서 model을 로딩할 수 있도록 minio 관련 설정 세팅
+4. InferenceService 생성하기
+5. 학습한 model들을 InferenceService에 로딩하기
+6. 학습한 model들을 이용한 inference 테스트
 
 
 # Step 0. 작업을 위한 namespace, pvc 만들기
@@ -34,7 +35,11 @@ ML model들을 작성하고 하나의 ML server에서 model들을 추론할 수 
 kubectl apply -f profile.yaml
 ```
 
-- 본 가이드의 작업을 위해 model-pvc(readWriteMany)를 생성
+- 본 시나리오의 작업을 위해 model-pvc(readWriteMany)를 생성
+
+![pvc](./images/pvc.png)
+
+- 참고: [0.pvc.yaml](0.pvc.yaml)
 
 
 # Step 1. ML 코드 작성을 위한 notebook 만들기
@@ -43,11 +48,11 @@ kubectl apply -f profile.yaml
 
 - 이전 단계에서 생성한 model-pvc를 마운트하는 model-notebook을 생성
 
-~~사진~~
+![notebook](./images/notebook.png)
 
-- 참고: [model-notebook.yaml](model-notebook.yaml)
+- 참고: [1.notebook.yaml](1.notebook.yaml)
 
-- 본 가이드에서는 TensorFlow만을 사용하여 TensorFlow를 지원하는 JupyterNotebook를 사용함
+- 본 시나리오에서는 TensorFlow만을 사용하여 TensorFlow를 지원하는 JupyterNotebook를 사용함
 
 - 배포가 정상적으로 되었으면 action->connect를 눌러 jupyter 진입
 
@@ -58,24 +63,21 @@ kubectl apply -f profile.yaml
 
 - 학습한 model의 checkpoint를 저장함
 
-- [tf-fashion.ipynb](tf-fashion.ipynb)와 [tf-mnist.ipynb](tf-mnist.ipynb)를 참고하여 model 코드 작성하고 학습을 진행함
+- [2.fashion.ipynb](2.fashion.ipynb)와 [2.mnist.ipynb](2.mnist.ipynb)를 참고하여 model 코드 작성하고 학습을 진행함
 
-- 본 시나리오는 Triton에서auto-generated model configuration을 지원하는  
+![notebook](./images/mnist_notebook.png)
 
-- 학습한 모델을 checkpoint API를 통해서 저장함
+- 본 시나리오는 Triton에서auto-generated model configuration을 지원하는 TensorFlow의savedmodel 방식을 사용함
 
-~~사진 추가
+![saved-model](./images/saved_model.png)
 
-
-# Step 3. InferenceService에서 model을 로딩할 수 있도록 minio 세팅하고 InferenceService 생성하기
-
-## S3 protocol 지원을 위한 minio storage server 설정
+# Step 3. InferenceService에서 model을 로딩할 수 있도록 minio 관련 설정 세팅
 
 - 현재 kfserving의 `agent`에서는 `StorageUri`로 `gs:`, `s3:` 프로토콜만을 지원하여 S3 호환성를 가진 minio storage server를 사용하여 진행
 
-- 본 가이드에서는 kubeflow에서 사용하는 mino storage server를 이용하여 진행
+- 본 시나리오에서는 kubeflow에서 사용하는 mino storage server를 이용하여 진행
 
-- kubeflow에서 사용하는 minio storage server의 `MINIO_SECRET_KEY`와 `MINIO_ACCESS_KEY` 확인
+- master node에서 kubeflow에서 사용하는 minio storage server의 `MINIO_SECRET_KEY`와 `MINIO_ACCESS_KEY` 확인
 
 ```bash
 kubectl get pods -l app=minio -o jsonpath={.items[0].spec.containers[0].env} -n kubeflow
@@ -83,7 +85,7 @@ kubectl get pods -l app=minio -o jsonpath={.items[0].spec.containers[0].env} -n 
 [{"name":"MINIO_ACCESS_KEY","value":"minio"},{"name":"MINIO_SECRET_KEY","value":"minio123"}]
 ```
 
-- minio service 확인
+- master node에서 minio service 확인
 
 ```bash
 kubectl get svc -l app=minio -o name -n kubeflow | cut -d "/" -f 2
@@ -92,44 +94,33 @@ minio-service
 ```
 
 - InferenceService의 `agent`에서 minio의 s3 endpoint에 접근할 수 있도록 설정
-    - 만약 이전 단계에서의 minio의 `MINIO_ACCESS_KEY` 또는 `MINIO_SECRET_KEY`가 다른 경우 변경해서 적용
+    - 만약 이전 단계에서의 minio의 `MINIO_ACCESS_KEY` 또는 `MINIO_SECRET_KEY`가 다른 경우 변경해서 적용 (BASE64 암호 사용)
 
-```bash
-kubectl apply -f s3_secret.yaml
-```
 
-![minio-service](./images/minio-service.png)
+![s3_secret](./images/s3_secret.png)
 
-- 본 가이드에서는 mms라는 namespace에서 진행하기 때문에 kubeflow namespace의 minio-service와 연결이 필요
+
+- 본 시나리오에서는 mms라는 namespace에서 진행하기 때문에 kubeflow namespace의 minio-service와 연결이 필요
 
     - 방법 1) service DNS의 full name을 `s3_secret`에 작성 후 secret 생성
 
-```bash
-kubectl apply -f s3_secret.yaml
-```
+![secret_conncet](./images/s3_secret_dns.png)
 
-![s3_secret.yaml](./images/s3_secret.yaml)
-
-    - 방법 2) `ExternalName`를 통해 kubeflow namespace에 존재하는 minoi-service 연결
-
-```bash
-kubectl apply -f external_service.yaml
-kubectl apply -f s3_secret.yaml
-```
+    - 방법 2) `ExternalName`를 통해 kubeflow namespace에 존재하는 minio-service 연결
 
 ![external-service](./images/external-service.png)
 ![external_s3_secret](./images/external_s3_secret.png)
 
 
 
-## InferenceService 생성하기
+# Step 4. InferenceService 생성하기
 
 - Multi Model Serving을 위한 InferenceService (inferenceserver) 생성
     - 기존의 InferenceService와 다르게 `StorageUri`를 제외하고 생성
     - s3 endpoint를 위한 serviceaccount 연결
 
 ```bash
-kubectl apply -f multi_model_triton_server.yaml
+kubectl apply -f 3.inferenceserver.yaml
 ```
 
 ![multi-model-server](./images/multi-model-server.png)
@@ -145,12 +136,11 @@ triton-mms   http://triton-mms.default.35.229.120.99.xip.io   True    8h
 ```
 
 
-# Step 4. 학습한 model들을 InferenceService에 로딩하기
+# Step 5. 학습한 model들을 InferenceService에 로딩하기
 
 ## minio client를 통한 minio storage server로 업로드
 
-- 이전 단계에서 만든 checkpoint를InferenceService에서 로딩할 수 있게하려면 minio
-storage server로 업로드를 해야함
+- 이전 단계에서 만든 checkpoint를 InferenceService에서 로딩할 수 있게하려면 minio storage server로 업로드를 해야함
 
 - minio client를 통해서 checkpoint를 업로드
 
@@ -161,6 +151,8 @@ wget https://dl.min.io/client/mc/release/linux-amd64/mc
 chmod +x mc
 ```
 
+![minio client](./images/minio_client.png)
+
 - minio storage server 접근을 위해 minio pod IP와 port를 알아야함
 
 - master node에서 다음 명령어 입력
@@ -170,6 +162,10 @@ chmod +x mc
 kubectl get pod -l app=minio -n kubeflow -o jsonpath='{.items[0].status.podIP}'
 # Port
 kubectl get pod -l app=minio -n kubeflow -o jsonpath='{.items[0].spec.containers[0].ports[0].containerPort}'
+
+
+10.0.6.87 # IP
+9000 # port
 ```
 
 - minio client 다운로드 받은 경로에서 위의 명령어에서 출력된 IP, port를 사용하여 kubeflow의 minio server 접근
@@ -190,33 +186,38 @@ kubectl get pod -l app=minio -n kubeflow -o jsonpath='{.items[0].spec.containers
 
 - 제대로 업로드 되었는지 확인
 
-~~사진~~
-
 ```bash
 ./mc tree myminio/
 ```
 
-- 만든 model을 통한 inference service를 제공할 TrainedModel 생성
-    - [fashion-model.yaml](fashion-model.yaml), [mnist-model.yaml](mnist-model.yaml) 참고
+![model upload](./images/model_upload.png)
 
-~~사진~~
 
-```bash
-kubectl apply -f fashion-model.yaml
-kubectl apply -f mnist-model.yaml
-```
+## TrainedModel 생성하기
 
-- Agent에서 정상적으로 모델을 다운로드하였는지  확인
+- InfereneceService에서는 model을 TrainedModel이라는 CRD를 통해서 관리함
 
+- 이전 단계에서 만든 model을 통한 InferenceService를 제공할 TrainedModel 생성
+
+![trained model](./images/trained_model.png)
+
+- [4.fashion.yaml](4.fashion.yaml), [4.mnist.yaml](4.mnist.yaml) 참고
+
+
+- master node에서 agent가 정상적으로 모델을 다운로드하였는지 확인
 ```bash
 SERVER=$(k get pod -l serving.kubeflow.org/inferenceservice=triton-mms -o name -n mms)
 kubectl -n mms logs $SERVER agent
 
-~~로그 추가 로그 추가~~
-~~로그 추가 로그 추가~~
-~~로그 추가 로그 추가~~
-~~로그 추가 로그 추가~~
-~~로그 추가 로그 추가~~
+
+{"level":"info","ts":"2021-03-02T06:02:23.468Z","caller":"agent/watcher.go:103","msg":"Processing event \"/mnt/configs/..data\": CREATE"}
+{"level":"info","ts":"2021-03-02T06:02:23.469Z","caller":"agent/watcher.go:173","msg":"adding model mnist"}
+{"level":"info","ts":"2021-03-02T06:02:23.469Z","caller":"agent/puller.go:121","msg":"Worker is started for mnist"}
+{"level":"info","ts":"2021-03-02T06:02:23.469Z","caller":"agent/puller.go:129","msg":"Downloading model from s3://triton/models/mnist"}
+{"level":"info","ts":"2021-03-02T06:02:23.469Z","caller":"agent/downloader.go:47","msg":"Downloading s3://triton/models/mnist to model dir /mnt/models"}
+{"level":"info","ts":"2021-03-02T06:02:23.610Z","caller":"agent/downloader.go:67","msg":"Creating successFile /mnt/models/mnist/SUCCESS.8b34ed0e1c8fb61008fe05590f36cd939ba74d0770df3ed1c9fcc235b3d4e5d1"}
+{"level":"info","ts":"2021-03-02T06:02:25.237Z","caller":"agent/puller.go:146","msg":"Successfully loaded model mnist"}
+{"level":"info","ts":"2021-03-02T06:02:25.237Z","caller":"agent/puller.go:114","msg":"completion event for model mnist, in flight ops 0"}
 ```
 
 - InferenceService에서도 memory에 로드했는지 확인 (master node에서 확인)
@@ -224,16 +225,69 @@ kubectl -n mms logs $SERVER agent
 ```bash
 kubectl logs $SERVER kfserving-container
 
-~~로그 추가 로그 추가~~
-~~로그 추가 로그 추가~~
-~~로그 추가 로그 추가~~
-~~로그 추가 로그 추가~~
-~~로그 추가 로그 추가~~
-~~로그 추가 로그 추가~~
+
+~~~~
+{
+    "name": "mnist",
+    "platform": "tensorflow_savedmodel",
+    "backend": "tensorflow",
+    "version_policy": {
+        "latest": {
+            "num_versions": 1
+        }
+    },
+    "max_batch_size": 1,
+    "input": [
+        {
+            "name": "INPUT_0_input",
+            "data_type": "TYPE_FP32",
+            "dims": [
+                28,
+                28,
+                1
+            ]
+        }
+    ],
+    "output": [
+        {
+            "name": "OUTPUT_0",
+            "data_type": "TYPE_FP32",
+            "dims": [
+                10
+            ]
+        }
+    ],
+    "optimization": {
+        "priority": "PRIORITY_DEFAULT",
+        "input_pinned_memory": {
+            "enable": true
+        },
+        "output_pinned_memory": {
+            "enable": true
+        }
+    },
+    "instance_group": [
+        {
+            "name": "mnist",
+            "kind": "KIND_GPU",
+            "count": 1,
+            "gpus": [
+                0
+            ],
+            "profile": []
+        }
+    ],
+    "default_model_filename": "model.savedmodel",
+    "cc_model_filenames": {},
+    "metric_tags": {},
+    "parameters": {},
+    "model_warmup": []
+}
+~~~
 ```
 
 
-# Step 5. 학습한 model들을 이용한 inference 테스트
+# Step 6. 학습한 model들을 이용한 inference 테스트
 
 - InferenceService로 request를 위한 환경 변수 설정 (master node에서 진행)
 
@@ -253,14 +307,15 @@ curl -v -H "Host: ${SERVICE_HOSTNAME}" http://${CLUSTER_IP}/v2
 ```
 
 
-- 모델 endpoint로 prediction 요청
+- 모델 endpoint로 inference 요청
 
 ```bash
-MODEL_NAME=cifar10
+MODEL_NAME=mnist
 
 curl -v -X POST -H "Host: ${SERVICE_HOSTNAME}" http://${CLUSTER_IP}/v2/models/$MODEL_NAME/infer -d @./${MODEL_NAME}.json
 
-{"model_name":"cifar10","model_version":"1","outputs":[{"name":"OUTPUT__0","datatype":"FP32","shape":[1,10],"data":[-2.0964813232421877,-0.1370079517364502,-0.509565532207489,2.795621395111084,-0.560547947883606,1.9934228658676148,1.1288189888000489,-1.4043134450912476,0.6004878282546997,-2.123708486557007]}]}
+
+{"model_name":"mnist","model_version":"1","outputs":[{"name":"OUTPUT_0","datatype":"FP32","shape":[1,10],"data":[5.710052656399123e-13,1.599723731260383e-8,3.309397755835164e-10,1.5357866800513876e-7,3.9533000517621988e-7,2.6684685017208667e-10,8.332194661878414e-14,0.9999977350234985,1.66733338247127e-9,0.0000017882068732433254]}]}
 ```
 
-- 이 과정까지 마쳤으면 Multi Model Serving이 된 것이다.
+- 두 개 모델에 대해서 inference가 가능하다면 Multi Model Serving이 된 것이다.

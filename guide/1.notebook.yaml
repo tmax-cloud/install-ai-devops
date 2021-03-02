@@ -1,0 +1,35 @@
+apiVersion: hyperflow.tmax.io/v1
+kind: Notebook
+metadata:
+  labels:
+    app: train-model
+  name: train-model
+  namespace: mms
+spec:
+  template:
+    spec:
+      containers:
+        - env: []
+          image: 'brightfly/kubeflow-jupyter-lab:tf2.0-gpu'
+          name: train-model
+          resources:
+            requests:
+              cpu: '1'
+              memory: '2'
+          volumeMounts:
+            - mountPath: /home/jovyan
+              name: model-pvc
+            - mountPath: /dev/shm
+              name: dshm
+      serviceAccountName: default-editor
+      ttlSecondsAfterFinished: 300
+      volumes:
+        - name: model-pvc
+          persistentVolumeClaim:
+            claimName: model-pvc
+        - emptyDir:
+            medium: Memory
+          name: dshm
+  volumeClaim:
+    - name: model-pvc
+      size: 20Gi
