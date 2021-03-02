@@ -3,19 +3,30 @@
 주의 사항:
 
 - kfserving 0.5 버전 이상 필요
-- `inferenceservice.yaml` 의 Triton의 `multiModelServer` flag가 true로 세팅해야 multi-model serving을 사용 가능함 (또는 `kfserving/install/v0.5.0/kfserving.yaml`로 설치 시 해당 파일에서 수정)
+- 0.5 버전 기준 Multi-Model InferenceService의 `agent`에서 s3, gs 프로토콜만을 지원하여 minio storage server 사용 (pvc 지원하지 않음)
+    - 본 시나리오에서는 kubeflow에서 사용중인 minio storage server를 이용함
+- 본 시나리오는 [auto-generated model configration](https://github.com/triton-inference-server/server/blob/master/docs/model_configuration.md#auto-generated-model-configuration)을 지원하는 TensorFlow saved-model을 사용함
+    - 다른 framework도 지원하지만 TensorFlow saved-model은 자동으로 세팅을
+    지원해준다고 함
 
-![kfserving](./images/kfserving.png)
-![inferenceserver](./images/inferenceserver.png)
+# 가이드 요약
+
+ML model들을 작성하고 하나의 ML server에서 model들을 추론할 수 있는 **Multi-Model Serving**이 가능한 ML service를 만든다.
 
 
-- 0.5 버전 기준 multi-model serving InferenceService의 `agent`에서 s3, gs 프로토콜만을 지원하여 minio storage server 사용
-    - 본 데모에서는 kubeflow에서 사용중인 minio storage server를 이용함
+## 구체적인 순서
+
+0. 작업을 위한 namespace, pvc 만들기
+1. ML 코드 작성을 위한 notebook 만들기
+2. ML model을 코딩하고, InferenceService에서 사용할 checkpoint 생성하기
+3. InferenceService에서 model을 로딩할 수 있도록 minio 세팅하고 InferenceService 생성하기
+4. 학습한 model들을 InferenceService에 로딩하기
+5. 학습한 model들을 이용한 inference 테스트
 
 
-# Multi Model Serving을 위한 세팅
+# Step 0. 작업을 위한 namespace, pvc 만들기
 
-- 작업을 위한 namespace 생성
+- master node에서 hyperflow 기능 사용을 위한 작업을 위한 profile (namespace) 생성
 
 ![profile](./images/profile.png)
 
@@ -23,21 +34,48 @@
 kubectl apply -f profile.yaml
 ```
 
-- triton inference server image digest시 auth에 필요한 `[nvcr.io](http://nvcr.io)` tag resolution을 skip하기 위한 명령어
+- 본 가이드의 작업을 위해 model-pvc(readWriteMany)를 생성
 
-```bash
-kubectl patch cm config-deployment --patch '{"data":{"registriesSkippingTagResolving":"nvcr.io"}}' -n knative-serving
-```
 
-- bert 같은 큰 모델 다운로드 시 timeout (default: 120s)을 방지하기 위해 progess deadline 증가
+# Step 1. ML 코드 작성을 위한 notebook 만들기
 
-```bash
-kubectl patch cm config-deployment --patch '{"data":{"progressDeadline": "600s"}}' -n knative-serving
-```
+- hyperflow에서 ML 코드 작성을 위한 JupyerNotebook 생성
 
-### minio 설정
+- 이전 단계에서 생성한 model-pvc를 마운트하는 model-notebook을 생성
 
-- `MINIO_SECRET_KEY`와 `MINIO_ACCESS_KEY` 확인
+~~사진~~
+
+- 참고: [model-notebook.yaml](model-notebook.yaml)
+
+- 본 가이드에서는 TensorFlow만을 사용하여 TensorFlow를 지원하는 JupyterNotebook를 사용함
+
+- 배포가 정상적으로 되었으면 action->connect를 눌러 jupyter 진입
+
+
+# Step 2. ML model을 코딩하고, InferenceService에서 사용할 checkpoint 생성하기
+
+- TensorFlow를 활용하여 ML 코드를 작성하고 학습을 진행
+
+- 학습한 model의 checkpoint를 저장함
+
+- [tf-fashion.ipynb](tf-fashion.ipynb)와 [tf-mnist.ipynb](tf-mnist.ipynb)를 참고하여 model 코드 작성하고 학습을 진행함
+
+- 본 시나리오는 Triton에서auto-generated model configuration을 지원하는  
+
+- 학습한 모델을 checkpoint API를 통해서 저장함
+
+~~사진 추가
+
+
+# Step 3. InferenceService에서 model을 로딩할 수 있도록 minio 세팅하고 InferenceService 생성하기
+
+## S3 protocol 지원을 위한 minio storage server 설정
+
+- 현재 kfserving의 `agent`에서는 `StorageUri`로 `gs:`, `s3:` 프로토콜만을 지원하여 S3 호환성를 가진 minio storage server를 사용하여 진행
+
+- 본 가이드에서는 kubeflow에서 사용하는 mino storage server를 이용하여 진행
+
+- kubeflow에서 사용하는 minio storage server의 `MINIO_SECRET_KEY`와 `MINIO_ACCESS_KEY` 확인
 
 ```bash
 kubectl get pods -l app=minio -o jsonpath={.items[0].spec.containers[0].env} -n kubeflow
@@ -62,17 +100,29 @@ kubectl apply -f s3_secret.yaml
 
 ![minio-service](./images/minio-service.png)
 
-- 별도의 namespace에서 진행하는 경우 minoi-service 연결
-    - 본 예제에서는 mms라는 namespace에서 진행
+- 본 가이드에서는 mms라는 namespace에서 진행하기 때문에 kubeflow namespace의 minio-service와 연결이 필요
 
+    - 방법 1) service DNS의 full name을 `s3_secret`에 작성 후 secret 생성
+
+```bash
+kubectl apply -f s3_secret.yaml
 ```
+
+![s3_secret.yaml](./images/s3_secret.yaml)
+
+    - 방법 2) `ExternalName`를 통해 kubeflow namespace에 존재하는 minoi-service 연결
+
+```bash
 kubectl apply -f external_service.yaml
+kubectl apply -f s3_secret.yaml
 ```
 
 ![external-service](./images/external-service.png)
+![external_s3_secret](./images/external_s3_secret.png)
 
 
-# InferenceService 생성하기
+
+## InferenceService 생성하기
 
 - Multi Model Serving을 위한 InferenceService (inferenceserver) 생성
     - 기존의 InferenceService와 다르게 `StorageUri`를 제외하고 생성
@@ -94,7 +144,98 @@ NAME   URL                                                    READY   AGE
 triton-mms   http://triton-mms.default.35.229.120.99.xip.io   True    8h
 ```
 
-- InferenceService로 request를 위한 환경 변수 설정
+
+# Step 4. 학습한 model들을 InferenceService에 로딩하기
+
+## minio client를 통한 minio storage server로 업로드
+
+- 이전 단계에서 만든 checkpoint를InferenceService에서 로딩할 수 있게하려면 minio
+storage server로 업로드를 해야함
+
+- minio client를 통해서 checkpoint를 업로드
+
+- minio client를 사용하기 위해 JupyterNoteBook에서 터미널을 열어 다음 명령어를 입력
+
+```bash
+wget https://dl.min.io/client/mc/release/linux-amd64/mc
+chmod +x mc
+```
+
+- minio storage server 접근을 위해 minio pod IP와 port를 알아야함
+
+- master node에서 다음 명령어 입력
+
+```
+# IP
+kubectl get pod -l app=minio -n kubeflow -o jsonpath='{.items[0].status.podIP}'
+# Port
+kubectl get pod -l app=minio -n kubeflow -o jsonpath='{.items[0].spec.containers[0].ports[0].containerPort}'
+```
+
+- minio client 다운로드 받은 경로에서 위의 명령어에서 출력된 IP, port를 사용하여 kubeflow의 minio server 접근
+    - access key와 secret key는 이전 단계에서 확인 했던 것을 사용
+
+```bash
+./mc config host add myminio http://${MINIO_IP}:${MINIO_PORT} ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KRY}
+```
+
+- 해당 minio server에서 bucket을 만들고 checkpoint 업로드
+
+```bash
+# bucket 생성
+./mc mb myminio/triton
+# 업로드
+./mc cp -r models/ myminio/triton/models
+```
+
+- 제대로 업로드 되었는지 확인
+
+~~사진~~
+
+```bash
+./mc tree myminio/
+```
+
+- 만든 model을 통한 inference service를 제공할 TrainedModel 생성
+    - [fashion-model.yaml](fashion-model.yaml), [mnist-model.yaml](mnist-model.yaml) 참고
+
+~~사진~~
+
+```bash
+kubectl apply -f fashion-model.yaml
+kubectl apply -f mnist-model.yaml
+```
+
+- Agent에서 정상적으로 모델을 다운로드하였는지  확인
+
+```bash
+SERVER=$(k get pod -l serving.kubeflow.org/inferenceservice=triton-mms -o name -n mms)
+kubectl -n mms logs $SERVER agent
+
+~~로그 추가 로그 추가~~
+~~로그 추가 로그 추가~~
+~~로그 추가 로그 추가~~
+~~로그 추가 로그 추가~~
+~~로그 추가 로그 추가~~
+```
+
+- InferenceService에서도 memory에 로드했는지 확인 (master node에서 확인)
+
+```bash
+kubectl logs $SERVER kfserving-container
+
+~~로그 추가 로그 추가~~
+~~로그 추가 로그 추가~~
+~~로그 추가 로그 추가~~
+~~로그 추가 로그 추가~~
+~~로그 추가 로그 추가~~
+~~로그 추가 로그 추가~~
+```
+
+
+# Step 5. 학습한 model들을 이용한 inference 테스트
+
+- InferenceService로 request를 위한 환경 변수 설정 (master node에서 진행)
 
 ```bash
 # INGRESS에서 인식할 수 있도록 SERVICE_HOSTNAME 설정
@@ -106,144 +247,11 @@ CLUSTER_IP=$(kubectl -n istio-system get service kfserving-ingressgateway -o jso
     - 정상적으로 가지 않거나 다음과 같이 서버의 metadata가 나오지 않는다면 InferenceService pod의 `ClusterIP` 또는  service를 통해서 expose해서 해당 url을 사용해야함 (endpoint는 동일)
 
 ```bash
-# INGRESS
 curl -v -H "Host: ${SERVICE_HOSTNAME}" http://${CLUSTER_IP}/v2
 
-# Expose
-POD_NAME=$(kubectl get pods -l serving.kubeflow.org/inferenceservice=triton-mms -o name -n mms | cut -d "/" -f 2)
-kubectl expose pod ${POD_NAME} --type=NodePort --name serving-service -n mms
-curl -v http://${NODE_IP}:${TARGET_PORT}/v2 # curl -v  http://172.23.4.101:31582/v2
-
-# Or use POD CLUSTER IP
-curl -v http://${CLUSTER_IP}:${PORT}/v2 # curl -v http://10.0.147.0:8080/v2
-
-# Result
 {"name":"triton","version":"2.2.0","extensions":["classification","sequence","model_repository","schedule_policy","model_configuration","system_shared_memory","cuda_shared_memory","binary_tensor_data","statistics"]}
 ```
 
-# TrainedModel 생성하기
-
-## 예제로 사용할 model 다운로드
-
-- 모델을 다운로드 받고 minio storage에 파일을 추가하기 위해 [minio client](https://docs.min.io/docs/minio-client-complete-guide.html)와 [gsutil](https://cloud.google.com/storage/docs/gsutil/?hl=ko)를 설치
-
-```bash
-# minio client
-wget https://dl.min.io/client/mc/release/linux-amd64/mc # Download minio client binary
-chmod +x mc
-MINIO_IP=$(kubectl get pod -l app=minio -n kubeflow -o jsonpath='{.items[0].status.podIP}')
-MINIO_PORT=$(kubectl get pod -l app=minio -n kubeflow -o jsonpath='{.items[0].spec.containers[0].ports[0].containerPort}') # 9000
-./mc config host add myminio http://$MINIO_IP:$MINIO_PORT minio minio123 # minio.yaml 에서 변경한 ACCESS_KEY_ID 와 SECRET_ACCESS_KEY 사용
-# gsutil
-wget https://storage.googleapis.com/pub/gsutil.tar.gz # Download gsutil binary
-tar xfz gsutil.tar.gz -C .
-```
-
-- 모델 다운로드 및 minio에 추가
-    - cifar10 모델 다운로드
-
-```bash
-mkdir -p models
-cd gsutil
-
-# In gsutil binary path
-./gsutil cp -r gs://kfserving-examples/models/torchscript/cifar10 ../models
-
-# Upload cifar10 model to minio server
-cd ..
-./mc mb myminio/triton
-./mc cp -r models/cifar10 myminio/triton/torchscript
-```
-
-- inception 모델 다운로드 (**사용할 inception 모델은 output에서 label이 필요하여 config.pbtxt와 label을 미리 준비해둠. download url 참고**)
-
-```bash
-# Tensorflow inception (Download code from https://github.com/triton-inference-server/server/blob/master/docs/examples/fetch_models.sh)
-mkdir -p ./models/inception_graphdef/1
-wget -O /tmp/inception_v3_2016_08_28_frozen.pb.tar.gz \
-     https://storage.googleapis.com/download.tensorflow.org/models/inception_v3_2016_08_28_frozen.pb.tar.gz
-(cd /tmp && tar xzf inception_v3_2016_08_28_frozen.pb.tar.gz)
-mv /tmp/inception_v3_2016_08_28_frozen.pb ./models/inception_graphdef/1/model.graphdef
-# Upload inception model to minio server
-./mc cp -r models/inception_graphdef myminio/triton/models
-```
-
-- 모델이 정상적인 path에 있는지 확인
-    - 브라우저를 통해서도 확인 가능
-
-```bash
-# In shell
-./mc tree myminio/
-
-myminio
-└─ triton
-   ├─ models
-   │  ├─ inception_graphdef
-   │  │  └─ 1
-   └─ torchscript
-      └─ cifar10
-         └─ 1
-```
-
-```bash
-# Get minio server url
-./mc config host ls
-```
-
-## Trained Model 생성 및 Multi Model Serving 테스트
-
-### Cifar10 model
-
-- Trained Model 생성
-
-```bash
-kubectl apply -f trained_model1.yaml
-```
-
-![trained model 1](./images/trained_model1.png)
-
-- 정상적으로 생성되었는지 확인
-
-```bash
-kubectl get trainedmodel -n mms
-
-NAME            URL                                                                    READY   AGE
-cifar10         http://triton-mms.example.com/v2/models/cifar10/infer                 22h
-```
-
-- Agent에서 정상적으로 모델을 다운로드하였는지  확인
-
-```bash
-SERVER=$(k get pod -l serving.kubeflow.org/inferenceservice=triton-mms -o name -n mms)
-kubectl -n mms logs $SERVER agent
-
-{"level":"info","ts":1605449512.0457177,"logger":"Watcher","msg":"Processing event","event":"\"/mnt/configs/..data\": CREATE"}
-{"level":"info","ts":1605449512.0464094,"logger":"modelWatcher","msg":"removing model","modelName":"cifar10"}
-{"level":"info","ts":1605449512.0464404,"logger":"modelWatcher","msg":"adding model","modelName":"cifar10"}
-{"level":"info","ts":1605449512.046505,"logger":"modelProcessor","msg":"worker is started for","model":"cifar10"}
-{"level":"info","ts":1605449512.0465908,"logger":"modelProcessor","msg":"unloading model","modelName":"cifar10"}
-{"level":"info","ts":1605449512.0487478,"logger":"modelProcessor","msg":"Downloading model","storageUri":"s3://triton/torchscript/cifar10"}
-{"level":"info","ts":1605449512.048788,"logger":"Downloader","msg":"Downloading to model dir","modelUri":"s3://triton/torchscript/cifar10","modelDir":"/mnt/models"}
-{"level":"info","ts":1605449512.0488636,"logger":"modelAgent","msg":"Download model ","modelName":"cifar10","storageUri":"s3://triton/torchscript/cifar10","modelDir":"/mnt/models"}
-{"level":"info","ts":1605449512.0488217,"logger":"modelOnComplete","msg":"completion event for model","modelName":"cifar10","inFlight":1}
-{"level":"info","ts":1605449512.6908782,"logger":"modelOnComplete","msg":"completion event for model","modelName":"cifar10","inFlight":0}
-```
-
-- InferenceService에서도 memory에 로드했는지 확인
-    - status code가 200이면 정상
-
-```bash
-MODEL_NAME=cifar10
-curl -H "Host: ${SERVICE_HOSTNAME}" http://${CLUSTER_IP}/v2/models/${MODEL_NAME}/ready
-```
-
-```bash
-kubectl logs $SERVER kfserving-container
-
-I1115 14:11:52.060489 1 model_repository_manager.cc:737] loading: cifar10:1
-I1115 14:11:52.061524 1 libtorch_backend.cc:217] Creating instance cifar10_0_0_cpu on CPU using model.pt
-I1115 14:11:52.690479 1 model_repository_manager.cc:925] successfully loaded 'cifar10' version 1
-```
 
 - 모델 endpoint로 prediction 요청
 
@@ -253,67 +261,6 @@ MODEL_NAME=cifar10
 curl -v -X POST -H "Host: ${SERVICE_HOSTNAME}" http://${CLUSTER_IP}/v2/models/$MODEL_NAME/infer -d @./${MODEL_NAME}.json
 
 {"model_name":"cifar10","model_version":"1","outputs":[{"name":"OUTPUT__0","datatype":"FP32","shape":[1,10],"data":[-2.0964813232421877,-0.1370079517364502,-0.509565532207489,2.795621395111084,-0.560547947883606,1.9934228658676148,1.1288189888000489,-1.4043134450912476,0.6004878282546997,-2.123708486557007]}]}
-```
-
-### Inception model
-
-- Trained Model 생성
-~~사진추가~~
-
-```bash
-kubectl apply -f trained_model2.yaml
-```
-
-![trained model 2](./images/trained_model2.png)
-
-
-- 정상적으로 생성되었는지 확인
-
-```bash
-kubectl get trainedmodel -n mms
-
-NAME            URL                                                                    READY   AGE
-cifar10         http://triton-mms.example.com/v2/models/cifar10/infer                 22h
-inception       http://triton-mms.example.com/v2/models/inception/infer               20h
-```
-
-- Agent에서 정상적으로 모델을 다운로드하였는지 확인
-
-```bash
-SERVER=$(k get pod -l serving.kubeflow.org/inferenceservice=triton-mms -o name -n mms)
-kubectl logs $SERVER agent -n mms
-
-
-{"level":"info","ts":"2021-02-25T06:05:52.384Z","caller":"agent/watcher.go:103","msg":"Processing event \"/mnt/configs/..data\": CREATE"}
-{"level":"info","ts":"2021-02-25T06:05:52.385Z","caller":"agent/watcher.go:173","msg":"adding model inception"}
-{"level":"info","ts":"2021-02-25T06:05:52.386Z","caller":"agent/puller.go:121","msg":"Worker is started for inception"}
-{"level":"info","ts":"2021-02-25T06:05:52.386Z","caller":"agent/puller.go:129","msg":"Downloading model from s3://triton/models/inception_graphdef"}
-{"level":"info","ts":"2021-02-25T06:05:52.386Z","caller":"agent/downloader.go:47","msg":"Downloading s3://triton/models/inception_graphdef to model dir /mnt/models"}
-{"level":"info","ts":"2021-02-25T06:05:53.247Z","caller":"agent/downloader.go:67","msg":"Creating successFile /mnt/models/inception/SUCCESS.2dd30a2ec0f7f440768dac363ef1e4665de243ae961ff1a4dc63f881cc26c7cd"}
-{"level":"info","ts":"2021-02-25T06:05:54.767Z","caller":"agent/puller.go:146","msg":"Successfully loaded model inception"}
-{"level":"info","ts":"2021-02-25T06:05:54.767Z","caller":"agent/puller.go:114","msg":"completion event for model inception, in flight ops 0"}
-```
-
-- InferenceService에서도 memory에 로드했는지 확인
-    - status code가 200이면 정상
-
-```bash
-MODEL_NAME=inception
-curl -H "Host: ${SERVICE_HOSTNAME}" http://${CLUSTER_IP}/v2/models/${MODEL_NAME}/ready
-```
-
-```bash
-kubectl logs $SERVER kfserving-container
-
-```
-
-- 모델 endpoint로 prediction 요청
-
-```bash
-MODEL_NAME=inception
-
-curl -v -X POST -H "Host: ${SERVICE_HOSTNAME}" http://${CLUSTER_IP}/v2/models/$MODEL_NAME/infer -d @./${MODEL_NAME}.json
-
 ```
 
 - 이 과정까지 마쳤으면 Multi Model Serving이 된 것이다.

@@ -1,0 +1,10 @@
+apiVersion: "serving.kubeflow.org/v1alpha1"
+kind: "TrainedModel"
+metadata:
+  name: "fashion"
+  namespace: mms
+spec:
+  inferenceService: triton-mms
+  model:
+    framework: tensorflow
+    storageUri: "s3://triton/models/fashion"
