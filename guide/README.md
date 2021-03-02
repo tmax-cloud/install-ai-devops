@@ -121,8 +121,10 @@ minio-service
     - s3 endpoint를 위한 serviceaccount 연결
 
 ```bash
-kubectl apply -f 3.inferenceserver.yaml
+kubectl apply -f 4.inferenceserver.yaml
 ```
+
+- 참고 [4.inferenceserver.yaml](4.inferenceserver.yaml)
 
 ![multi-model-server](./images/multi-model-server.png)
 
