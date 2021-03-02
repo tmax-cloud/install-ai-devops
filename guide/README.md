@@ -32,7 +32,7 @@ ML model들을 작성하고 하나의 ML server에서 model들을 추론할 수 
 ![profile](./images/profile.png)
 
 ```bash
-kubectl apply -f profile.yaml
+kubectl apply -f 0.profile.yaml
 ```
 
 - 본 시나리오의 작업을 위해 model-pvc(readWriteMany)를 생성
