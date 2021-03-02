@@ -75,7 +75,7 @@ kubectl apply -f profile.yaml
 
 # Step 3. InferenceService에서 model을 로딩할 수 있도록 minio 관련 설정 세팅
 
-- 현재 kfserving의 `agent`에서는 `StorageUri`로 `gs:`, `s3:` 프로토콜만을 지원하여 S3 호환성를 가진 minio storage server를 사용하여 진행
+- 현재 kfserving의 `agent`에서는 `StorageUri`로 `gs:`, `s3:` 프로토콜만을 지원하여 S3 호환성를 가진 minio storage server를 사용하여 진행 (pvc 지원 X)
 
 - 본 시나리오에서는 kubeflow에서 사용하는 mino storage server를 이용하여 진행
 
