@@ -81,19 +81,12 @@ kubectl apply -f 0.profile.yaml
 
 - master node에서 kubeflow에서 사용하는 minio storage server의 `MINIO_SECRET_KEY`와 `MINIO_ACCESS_KEY` 확인
 
-```bash
-kubectl get pods -l app=minio -o jsonpath={.items[0].spec.containers[0].env} -n kubeflow
-
-[{"name":"MINIO_ACCESS_KEY","value":"minio"},{"name":"MINIO_SECRET_KEY","value":"minio123"}]
-```
+![minio secret](./images/minio_secret.png)
 
 - master node에서 minio service 확인
 
-```bash
-kubectl get svc -l app=minio -o name -n kubeflow | cut -d "/" -f 2
+![minio service](./images/minio_service.png)
 
-minio-service
-```
 
 - InferenceService의 `agent`에서 minio의 s3 endpoint에 접근할 수 있도록 설정
     - 만약 이전 단계에서의 minio의 `MINIO_ACCESS_KEY` 또는 `MINIO_SECRET_KEY`가 다른 경우 변경해서 적용 (BASE64 암호 사용)
@@ -105,7 +98,7 @@ minio-service
 - 본 시나리오에서는 mms라는 namespace에서 진행하기 때문에 kubeflow namespace의 minio-service와 연결이 필요
 
     - 방법 1) service DNS의 full name을 `s3_secret`에 작성 후 secret 생성
-    ([3.s3_secret.yaml](3.se_secret.yaml) 9번째 line 참고)
+    ([3.s3_secret.yaml](3.s3_secret.yaml) 9번째 line 참고)
 
     - 방법 2) `ExternalName`를 통해 kubeflow namespace에 존재하는 minio-service 연결
 
@@ -115,6 +108,8 @@ minio-service
 
 
 # Step 4. InferenceService 생성하기
+
+- 이 단계에서는 UI 에러로 인해 master node에서 직접 작업함
 
 - Multi Model Serving을 위한 InferenceService (inferenceserver) 생성
     - 기존의 InferenceService와 다르게 `StorageUri`를 제외하고 생성
@@ -158,18 +153,14 @@ chmod +x mc
 
 - minio storage server 접근을 위해 minio pod IP와 port를 알아야함
 
-- master node에서 다음 명령어 입력
+- UI 환경에서 확인
 
-```
-# IP
-kubectl get pod -l app=minio -n kubeflow -o jsonpath='{.items[0].status.podIP}'
-# Port
-kubectl get pod -l app=minio -n kubeflow -o jsonpath='{.items[0].spec.containers[0].ports[0].containerPort}'
+![minio ip_1](./images/minio_ip_1.png)
 
+![minio ip_2](./images/minio_ip_2.png)
 
-10.0.6.87 # IP
-9000 # port
-```
+![minio ip_3](./images/minio_ip_3.png)
+
 
 - minio client 다운로드 받은 경로에서 위의 명령어에서 출력된 IP, port를 사용하여 kubeflow의 minio server 접근
     - access key와 secret key는 이전 단계에서 확인 했던 것을 사용
@@ -196,18 +187,18 @@ kubectl get pod -l app=minio -n kubeflow -o jsonpath='{.items[0].spec.containers
 ![model upload](./images/model_upload.png)
 
 
-## TrainedModel 생성하기
+## `TrainedModel` 생성하기
 
-- InfereneceService에서는 model을 TrainedModel이라는 CRD를 통해서 관리함
+- InfereneceService에서는 model을 `TrainedModel`이라는 CRD를 통해서 관리함
 
-- 이전 단계에서 만든 model을 통한 InferenceService를 제공할 TrainedModel 생성
+- 이전 단계에서 만든 model을 통한 InferenceService를 제공할 `TrainedModel` 생성
 
 ![trained model](./images/trained_model.png)
 
 - [5.fashion.yaml](5.fashion.yaml), [5.mnist.yaml](5.mnist.yaml) 참고
 
 
-- master node에서 agent가 정상적으로 모델을 다운로드하였는지 확인
+- UI 에러로 인해 master node에서 `agent`가 정상적으로 모델을 다운로드하였는지 확인
 ```bash
 SERVER=$(k get pod -l serving.kubeflow.org/inferenceservice=triton-mms -o name -n mms)
 kubectl -n mms logs $SERVER agent
@@ -314,7 +305,6 @@ curl -v -H "Host: ${SERVICE_HOSTNAME}" http://${CLUSTER_IP}/v2
 
 ```bash
 MODEL_NAME=mnist
-
 curl -v -X POST -H "Host: ${SERVICE_HOSTNAME}" http://${CLUSTER_IP}/v2/models/$MODEL_NAME/infer -d @./${MODEL_NAME}.json
 
 
