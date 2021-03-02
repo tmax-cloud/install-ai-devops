@@ -56,6 +56,8 @@ kubectl apply -f profile.yaml
 
 - 배포가 정상적으로 되었으면 action->connect를 눌러 jupyter 진입
 
+![connect](./images/jupyter-connect.png)
+
 
 # Step 2. ML model을 코딩하고, InferenceService에서 사용할 checkpoint 생성하기
 
@@ -103,8 +105,7 @@ minio-service
 - 본 시나리오에서는 mms라는 namespace에서 진행하기 때문에 kubeflow namespace의 minio-service와 연결이 필요
 
     - 방법 1) service DNS의 full name을 `s3_secret`에 작성 후 secret 생성
-
-![secret_conncet](./images/s3_secret_dns.png)
+    ([3.s3_secret.yaml](3.se_secret.yaml) 9번째 line 참고)
 
     - 방법 2) `ExternalName`를 통해 kubeflow namespace에 존재하는 minio-service 연결
 
@@ -201,7 +202,7 @@ kubectl get pod -l app=minio -n kubeflow -o jsonpath='{.items[0].spec.containers
 
 ![trained model](./images/trained_model.png)
 
-- [4.fashion.yaml](4.fashion.yaml), [4.mnist.yaml](4.mnist.yaml) 참고
+- [5.fashion.yaml](5.fashion.yaml), [5.mnist.yaml](5.mnist.yaml) 참고
 
 
 - master node에서 agent가 정상적으로 모델을 다운로드하였는지 확인
