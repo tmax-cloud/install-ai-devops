@@ -18,18 +18,18 @@ metadata:
       "model_version"}, {"name": "namespace"}], "name": "FMnistPipeline"}'
 spec:
   params:
-  - {name: learning_rate, value: ''}
-  - {name: dropout_rate, value: ''}
-  - {name: epoch, value: ''}
-  - {name: act, value: ''}
-  - {name: layer, value: ''}
-  - {name: checkpoint_dir, value: ''}
-  - {name: saved_model_dir, value: ''}
-  - {name: pvc_name, value: ''}
-  - {name: tensorboard_log, value: ''}
-  - {name: name, value: ''}
-  - {name: model_version, value: ''}
-  - {name: namespace, value: ''}
+  - {name: learning_rate, value: '0.001397'}
+  - {name: dropout_rate, value: '0.18'}
+  - {name: epoch, value: '11'}
+  - {name: act, value: 'sigmoid'}
+  - {name: layer, value: '2'}
+  - {name: checkpoint_dir, value: '/result/training_checkpoints'}
+  - {name: saved_model_dir, value: '/result/saved_model/'}
+  - {name: pvc_name, value: 'demo-pvc'}
+  - {name: tensorboard_log, value: '/result/log'}
+  - {name: name, value: 'kfserving-fmnist'}
+  - {name: model_version, value: '0001'}
+  - {name: namespace, value: 'demo'}
   pipelineSpec:
     params:
     - {name: learning_rate}
