@@ -1,15 +1,16 @@
 
-# Kubeflow 설치 가이드
+# ai-devops 설치 가이드
 
 ## 구성 요소 및 버전
-* Kubeflow v1.0.2 (https://github.com/kubeflow/kubeflow)
-* Argo v2.8 (https://github.com/argoproj/argo)
+* Kubeflow v1.2.0 (https://github.com/kubeflow/kubeflow)
+* Argo v2.12.10 (https://github.com/argoproj/argo)
 * Jupyter (https://github.com/jupyter/notebook)
-* Katib v0.8.0 (https://github.com/kubeflow/katib)
-* KFServing v0.4.0 (https://github.com/kubeflow/kfserving)
+* Katib v0.10.0 (https://github.com/kubeflow/katib)
+* KFServing v0.5.1 (https://github.com/kubeflow/kfserving)
 * Training Job
     * TFJob v1.0.0 (https://github.com/kubeflow/tf-operator)
     * PytorchJob v1.0.0 (https://github.com/kubeflow/pytorch-operator)
+* Notebook-controller b0.0.4
 * ...
 
 ## Prerequisites
@@ -19,7 +20,7 @@
         $ kubectl get storageclass
         ```
     * 만약 아무 storage class가 없다면 아래 링크로 이동하여 rook-ceph 설치한다.
-        * https://github.com/tmax-cloud/hypercloud-install-guide/tree/4.1/rook-ceph
+        * https://github.com/tmax-cloud/install-rookceph/blob/main/README.md
     * Storage class는 있지만 default로 설정된 것이 없다면 아래 명령어를 실행한다.
         ```bash
         $ kubectl patch storageclass csi-cephfs-sc -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
@@ -27,14 +28,17 @@
     * csi-cephfs-sc는 위 링크로 rook-ceph를 설치했을 때 생성되는 storage class이며 다른 storage class를 default로 사용해도 무관하다.
 2. Istio
     * v1.5.1
-        * https://github.com/tmax-cloud/hypercloud-install-guide/tree/4.1/Istio
+        * https://github.com/tmax-cloud/install-istio/blob/5.0/README.md
 3. Prometheus
-    * Kubeflow의 모니터링 정보를 제공하기 위해 필요하다.
-        * https://github.com/tmax-cloud/hypercloud-install-guide/blob/4.1/Prometheus/README.md
-4. (Optional) GPU plug-in
+    * ai-devops의 모니터링 정보를 제공하기 위해 필요하다.
+        * https://github.com/tmax-cloud/install-prometheus/blob/5.0/README.md
+4. OLM
+    * kubeflow operator를 관리하기 위해 toolkit으로 사용한.
+        * https://github.com/tmax-cloud/install-OLM/blob/main/README.md
+6. (Optional) GPU plug-in
     * Kubernetes cluster 내 node에 GPU가 탑재되어 있으며 AI DevOps 기능을 사용할 때 GPU가 요구될 경우에 필요하다.
-        * https://github.com/tmax-cloud/hypercloud-install-guide/tree/4.1/Pod_GPU%20plugin
-5. Console
+        * https://github.com/tmax-cloud/install-nvidia-gpu-infra/blob/5.0/README.md
+7. Console
     * 아래 명령어를 통해 확인할 수 있는 초기 상태의 console deployment의 template에는 kubeflow-endpoint가 연동되어있지 않아 수정해 주어야 한다.
         ```bash
         $ kubectl get deploy console -n console-system -o yaml
@@ -51,15 +55,15 @@
 설치를 진행하기 전 아래의 과정을 통해 필요한 이미지 및 yaml 파일을 준비한다.
 1. 이미지 준비
     * 아래 링크를 참고하여 폐쇄망에서 사용할 registry를 구축한다.
-        * https://github.com/tmax-cloud/hypercloud-install-guide/blob/4.1/Image_Registry/README.md
+        * https://github.com/tmax-cloud/install-registry/blob/5.0/README.md
     * 자신이 사용할 registry의 IP와 port를 입력한다.
         ```bash
         $ export REGISTRY_ADDRESS=1.1.1.1:5000
         ```
     * 아래 명령어를 수행하여 Kubeflow 설치 시 필요한 이미지들을 위에서 구축한 registry에 push하고 이미지들을 tar 파일로 저장한다. tar 파일은 images 디렉토리에 저장된다.
         ```bash
-        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/4.1/image-push.sh
-        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/4.1/imagelist
+        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/5/image-push.sh
+        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/5/imagelist
         $ chmod +x ./image-push.sh
         $ ./image-push.sh ${REGISTRY_ADDRESS}
         ```
@@ -71,7 +75,7 @@
     * (Optional) 만약 설치에 필요한 이미지들을 pull받아서 tar 파일로 저장하는 작업과 로드하여 push하는 작업을 따로 수행하고자 한다면 image-push.sh이 아니라 image-save.sh, image-load.sh를 각각 실행하면 된다. 
        * image-save.sh을 실행하면 설치에 필요한 이미지들을 pull 받아서 images 디렉토리에 tar 파일로 저장한다.
            ```bash
-           $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/4.1/image-save.sh
+           $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/5/image-save.sh
            $ chmod +x ./image-save.sh
            $ ./image-save.sh
            $ ls ./images
@@ -85,16 +89,16 @@
 2. Yaml 파일 및 script 파일 준비
     * 아래 명령어를 수행하여 Kubeflow 설치에 필요한 yaml 파일들과 script 파일들을 다운로드 받는다. 
         ```bash
-        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/4.1/sed.sh
-        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/4.1/kustomize_local.tar.gz
-        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/4.1/kfctl_hypercloud_kubeflow.v1.0.2_local.yaml
+        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/5/sed.sh
+        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/5/kustomize_local.tar.gz
+        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/5/kfctl_hypercloud_kubeflow.v1.0.2_local.yaml
         $ wget https://github.com/kubeflow/kfctl/releases/download/v1.2.0/kfctl_v1.2.0-0-gbc038f9_linux.tar.gz
         ```
 3. 앞으로의 진행
     * Step 0 ~ 4 중 Step 0, 2, 3은 비고를 참고하여 진행한다. 나머지는 그대로 진행하면 된다.
 
 ## Install Steps
-0. [kfctl 설치](https://github.com/tmax-cloud/hypercloud-install-guide/blob/4.1/Kubeflow/README.md#step-0-kfctl-%EC%84%A4%EC%B9%98)
+0. [olm 설치](https://github.com/tmax-cloud/install-OLM/blob/main/README.md)
 1. [설치 디렉토리 생성](https://github.com/tmax-cloud/hypercloud-install-guide/blob/4.1/Kubeflow/README.md#step-1-%EC%84%A4%EC%B9%98-%EB%94%94%EB%A0%89%ED%86%A0%EB%A6%AC-%EC%83%9D%EC%84%B1)
 2. [Kustomize 리소스 생성](https://github.com/tmax-cloud/hypercloud-install-guide/blob/4.1/Kubeflow/README.md#step-2-kustomize-%EB%A6%AC%EC%86%8C%EC%8A%A4-%EC%83%9D%EC%84%B1)
 3. [Kubeflow 배포](https://github.com/tmax-cloud/hypercloud-install-guide/blob/4.1/Kubeflow/README.md#step-3-kubeflow-%EB%B0%B0%ED%8F%AC)
