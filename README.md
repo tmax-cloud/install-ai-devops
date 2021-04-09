@@ -32,24 +32,9 @@
 3. Prometheus
     * ai-devops의 모니터링 정보를 제공하기 위해 필요하다.
         * https://github.com/tmax-cloud/install-prometheus/blob/5.0/README.md
-4. OLM
-    * kubeflow operator를 관리하기 위해 toolkit으로 사용한.
-        * https://github.com/tmax-cloud/install-OLM/blob/main/README.md
-6. (Optional) GPU plug-in
+4. (Optional) GPU plug-in
     * Kubernetes cluster 내 node에 GPU가 탑재되어 있으며 AI DevOps 기능을 사용할 때 GPU가 요구될 경우에 필요하다.
         * https://github.com/tmax-cloud/install-nvidia-gpu-infra/blob/5.0/README.md
-7. Console
-    * 아래 명령어를 통해 확인할 수 있는 초기 상태의 console deployment의 template에는 kubeflow-endpoint가 연동되어있지 않아 수정해 주어야 한다.
-        ```bash
-        $ kubectl get deploy console -n console-system -o yaml
-        ```
-    * 아래 명령어를 통해 endpoint(CLUSTER-IP)를 확인한다.
-        ```bash
-        $ kubectl get svc istio-ingressgateway -n istio-system
-        ```
-        ![스크린샷, 2021-02-17 17-21-57](https://user-images.githubusercontent.com/77767091/108177831-0d054d00-7147-11eb-8064-ec7915fd2c7d.png)
-    * 확인한 CLUSTER-IP를 console deployment의 template 필드에 연동해 준다.
-        ![스크린샷, 2021-02-17 17-28-41](https://user-images.githubusercontent.com/77767091/108177909-25756780-7147-11eb-92e4-59bef6b27ecb.png)
 
 ## 폐쇄망 설치 가이드
 설치를 진행하기 전 아래의 과정을 통해 필요한 이미지 및 yaml 파일을 준비한다.
@@ -104,16 +89,12 @@
 3. [Kubeflow 배포](https://github.com/tmax-cloud/hypercloud-install-guide/blob/4.1/Kubeflow/README.md#step-3-kubeflow-%EB%B0%B0%ED%8F%AC)
 4. [배포 확인 및 기타 작업](https://github.com/tmax-cloud/hypercloud-install-guide/blob/4.1/Kubeflow/README.md#step-4-%EB%B0%B0%ED%8F%AC-%ED%99%95%EC%9D%B8-%EB%B0%8F-%EA%B8%B0%ED%83%80-%EC%9E%91%EC%97%85)
 
-## Step 0. kfctl 설치
-* 목적 : `Kubeflow component를 배포 및 관리하기 위한 커맨드 라인툴인 kfctl을 설치한다.`
-* 생성 순서 : 아래 명령어를 수행하여 kfctl을 설치한다. (Kubeflow v1.0.2 기준)
-    ```bash
-    $ wget https://github.com/kubeflow/kfctl/releases/download/v1.2.0/kfctl_v1.2.0-0-gbc038f9_linux.tar.gz
-    $ tar xzvf kfctl_v1.2.0-0-gbc038f9_linux.tar.gz
-    $ sudo mv kfctl /usr/bin
-    ```
+## Step 0. OLM 설치
+* 목적 : `kubeflow operator를 관리하기 위한 toolkit으로 사용한다.`
+* 생성 순서 : 다음 Git Repository/가이드를 참고하여 OLM을 설치한다.
+            https://github.com/tmax-cloud/install-OLM/blob/main/README.md   
 * 비고 : 
-    * 폐쇄망 환경일 경우 kfctl_v1.2.0-0-gbc038f9_linux.tar.gz을 github에서 받는 것이 아니라 미리 다운로드 해둔 것을 사용하면 된다.
+    * 폐쇄망 환경일 경우 위 repository의 폐쇄망 구축 가이드를 참고한다.
 
 ## Step 1. 설치 디렉토리 생성
 * 목적 : `Kubeflow의 설치 yaml이 저장될 설치 디렉토리를 생성하고 해당 경로로 이동한다.`
@@ -128,10 +109,10 @@
         ```
     * ${KF_DIR}이 설치 디렉토리이며 ${KF_NAME}, ${BASE_DIR}은 임의로 변경 가능하다.
 
-## Step 2. Kustomize 리소스 생성
+## Step 3. kubeflow operator 설치
 * 목적 : `Kubeflow는 Kubernetes 리소스 배포 툴인 Kustomize를 통해 설치된다. 이를 위해 Kubeflow를 설치하는 Kustomize 리소스를 생성한다.`
 * 생성 순서 : 
-    * 아래 명령어를 수행하여 Kustomize 리소스를 생성한다.
+    * 아래 명령어를 수행하여 kubeflow operator를 생성한다.
         ```bash
         $ export CONFIG_URI="https://raw.githubusercontent.com/tmax-cloud/kubeflow-manifests/kubeflow-manifests-v1.0.2/kfctl_hypercloud_kubeflow.v1.0.2.yaml"
         $ kfctl build -V -f ${CONFIG_URI}
