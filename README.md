@@ -96,7 +96,28 @@
 * 비고 : 
     * 폐쇄망 환경일 경우 위 repository의 폐쇄망 구축 가이드를 참고한다.
 
-## Step 1. 설치 디렉토리 생성
+## Step 1. kubeflow operator 설치
+* 목적 : `Kubeflow operator는 kubeflow를 배포하고 모니터링 하는 등 lifecycle을 관리한다.`
+* 생성 순서 : 
+    * 아래 명령어를 수행하여 kubeflow operator를 생성한다.
+        ```bash
+        $ kubectl create -f https://operatorhub.io/install/kubeflow.yaml
+        ```
+    * 설치되기까지 시간이 10분가량 소요될 있으며 정상적으로 완료되었는지 확인하기 위해 아래 명령어를 수행하여 kubeflow operator pod의 정상 동작을 확인한다.
+        ```bash
+        $ kubectl get pod -n operators
+        ```
+      ![스크린샷, 2021-04-14 11-55-55](https://user-images.githubusercontent.com/77767091/114647647-69848300-9d18-11eb-92ac-ec543473c16c.png)  
+* 비고 : 
+    * 폐쇄망 환경일 경우 설치 디렉토리 ${KF_DIR}에 미리 다운로드받은 sed.sh, kustomize_local.tar.gz 파일을 옮긴다.
+    * 아래 명령어를 통해 Kustomize 리소스의 압축을 풀고 yaml 파일들에서 이미지들을 pull 받을 registry를 바꿔준다.
+        ```bash
+        $ tar xvfz kustomize_local.tar.gz
+        $ chmod +x ./sed.sh
+        $ ./sed.sh ${REGISTRY_ADDRESS} ${KF_DIR}/kustomize
+        ```
+        
+## Step 2. 설치 디렉토리 생성
 * 목적 : `Kubeflow의 설치 yaml이 저장될 설치 디렉토리를 생성하고 해당 경로로 이동한다.`
 * 생성 순서 : 
     * 아래 명령어를 수행하여 설치 디렉토리를 생성하고 해당 경로로 이동한다.
@@ -108,37 +129,31 @@
         $ cd ${KF_DIR}
         ```
     * ${KF_DIR}이 설치 디렉토리이며 ${KF_NAME}, ${BASE_DIR}은 임의로 변경 가능하다.
-
-## Step 3. kubeflow operator 설치
-* 목적 : `Kubeflow는 Kubernetes 리소스 배포 툴인 Kustomize를 통해 설치된다. 이를 위해 Kubeflow를 설치하는 Kustomize 리소스를 생성한다.`
-* 생성 순서 : 
-    * 아래 명령어를 수행하여 kubeflow operator를 생성한다.
-        ```bash
-        $ export CONFIG_URI="https://raw.githubusercontent.com/tmax-cloud/kubeflow-manifests/kubeflow-manifests-v1.0.2/kfctl_hypercloud_kubeflow.v1.0.2.yaml"
-        $ kfctl build -V -f ${CONFIG_URI}
-        ```
-    * 정상적으로 완료되면 kustomize라는 디렉토리가 생성된다.
-* 비고 : 
-    * 폐쇄망 환경일 경우 설치 디렉토리 ${KF_DIR}에 미리 다운로드받은 sed.sh, kustomize_local.tar.gz 파일을 옮긴다.
-    * 아래 명령어를 통해 Kustomize 리소스의 압축을 풀고 yaml 파일들에서 이미지들을 pull 받을 registry를 바꿔준다.
-        ```bash
-        $ tar xvfz kustomize_local.tar.gz
-        $ chmod +x ./sed.sh
-        $ ./sed.sh ${REGISTRY_ADDRESS} ${KF_DIR}/kustomize
-        ```
-
+   
 ## Step 3. Kubeflow 배포
-* 목적 : `Kustomize 리소스를 apply하여 Kubeflow를 배포한다.`
+* 목적 : `앞서 설치한 kubeflow operator를 통해 Kubeflow를 배포한다.`
 * 생성 순서 : 
-    * 아래 명령어를 수행하여 Kubeflow를 배포한다.
+    * kubeflow operator는 kfDef를 CR로 사용하기 때문에 아래 명령어를 수행하여 kfDef configuration을 준비한다.
         ```bash
-        $ export CONFIG_FILE=${KF_DIR}/kfctl_hypercloud_kubeflow.v1.0.2.yaml
-        $ kfctl apply -V -f ${CONFIG_FILE}
+        $ export KFDEF_URL=https://raw.githubusercontent.com/tmax-cloud/kubeflow-manifests/ck-v1.2-patch/kfDef-hypercloud.yaml
+        $ export KFDEF=$(echo "${KFDEF_URL}" | rev | cut -d/ -f1 | rev)
+        $ curl -L ${KFDEF_URL} > ${KFDEF}
         ```
-    * 아래와 같이, cert-manager 관련 오류가 계속 뜨는 현상이 있을 수 있는데, 이는 관련 컴포넌트들이 아직 로딩중이라 발생하는 것으로, 기다리자.
-    
-        ![pasted image 0](https://user-images.githubusercontent.com/63379907/90479302-6aedb380-e169-11ea-8c6c-9c1b4e15517a.png)
-    * 설치에는 약 10분 정도가 소요된다.
+    * 아래 명령어를 통해 kfDef manifest에 반드시 설정되어야 하는 metadata.name 필드를 추가한다.(추가하지 않으면 invalid error 발생)
+        ```bash
+        $ export KUBEFLOW_DEPLOYMENT_NAME=kubeflow
+        $ yq w ${KFDEF} 'metadata.name' ${KUBEFLOW_DEPLOYMENT_NAME} > ${KFDEF}.tmp && mv ${KFDEF}.tmp ${KFDEF}
+        ```
+    * https://github.com/mikefarah/yq를 참고하여 yq를 설치하거나 다음 명령어를 사용한다.
+        ```bash
+        $ perl -pi -e $'s@metadata:@metadata:\\\n  name: '"${KUBEFLOW_DEPLOYMENT_NAME}"'@' ${KFDEF}        
+        ```
+    * 아래 명령어를 통해 namespace를 생성하고 kfDef CR을 생성하여 kubeflow를 배포한다.
+        ```bash
+        $ KUBEFLOW_NAMESPACE=kubeflow
+        $ kubectl create ns ${KUBEFLOW_NAMESPACE}
+        $ kubectl create -f ${KFDEF} -n ${KUBEFLOW_NAMESPACE}
+        ```
 * 비고 :
     * 폐쇄망 환경일 경우 설치 디렉토리 ${KF_DIR}에 미리 다운로드받은 kfctl_hypercloud_kubeflow.v1.0.2_local.yaml 파일을 옮긴다.
     * 아래 명령어를 수행하여 Kubeflow를 배포한다.
@@ -171,11 +186,11 @@
         metadata:
           labels:
             app.kubernetes.io/component: katib
-            app.kubernetes.io/instance: katib-controller-0.8.0
+            app.kubernetes.io/instance: katib-controller-0.10.0
             app.kubernetes.io/managed-by: kfctl
             app.kubernetes.io/name: katib-controller
             app.kubernetes.io/part-of: kubeflow
-            app.kubernetes.io/version: 0.8.0
+            app.kubernetes.io/version: 0.10.0
           name: katib-mysql
           namespace: kubeflow
         spec:
