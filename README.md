@@ -103,7 +103,7 @@
         ```bash
         $ kubectl create -f https://operatorhub.io/install/kubeflow.yaml
         ```
-    * 설치되기까지 시간이 10분가량 소요될 있으며 정상적으로 완료되었는지 확인하기 위해 아래 명령어를 수행하여 kubeflow operator pod의 정상 동작을 확인한다.
+    * 설치되기까지 시간이 10분가량 소요될 수 있으며 정상적으로 완료되었는지 확인하기 위해 아래 명령어를 수행하여 kubeflow operator pod의 정상 동작을 확인한다.
         ```bash
         $ kubectl get pod -n operators
         ```
@@ -133,7 +133,7 @@
 ## Step 3. Kubeflow 배포
 * 목적 : `앞서 설치한 kubeflow operator를 통해 Kubeflow를 배포한다.`
 * 생성 순서 : 
-    * kubeflow operator는 kfDef를 CR로 사용하기 때문에 아래 명령어를 수행하여 kfDef configuration을 준비한다.
+    * kubeflow operator는 kfDef를 CR로 사용하기 때문에 아래 명령어를 수행하여 kfDef configuration을 repository에서 다운로드한다.
         ```bash
         $ export KFDEF_URL=https://raw.githubusercontent.com/tmax-cloud/kubeflow-manifests/ck-v1.2-patch/kfDef-hypercloud.yaml
         $ export KFDEF=$(echo "${KFDEF_URL}" | rev | cut -d/ -f1 | rev)
@@ -144,7 +144,7 @@
         $ export KUBEFLOW_DEPLOYMENT_NAME=kubeflow
         $ yq w ${KFDEF} 'metadata.name' ${KUBEFLOW_DEPLOYMENT_NAME} > ${KFDEF}.tmp && mv ${KFDEF}.tmp ${KFDEF}
         ```
-    * https://github.com/mikefarah/yq를 참고하여 yq를 설치하거나 다음 명령어를 사용한다.
+    * https://github.com/mikefarah/yq 를 참고하여 yq를 설치하거나 다음 명령어를 사용한다.
         ```bash
         $ perl -pi -e $'s@metadata:@metadata:\\\n  name: '"${KUBEFLOW_DEPLOYMENT_NAME}"'@' ${KFDEF}        
         ```
@@ -215,13 +215,7 @@
 * 생성 순서 : 
     * 아래 명령어를 수행하여 kubeflow 모듈을 삭제한다.
         ```bash
-        $ export CONFIG_URI="https://raw.githubusercontent.com/tmax-cloud/kubeflow-manifests/kubeflow-manifests-v1.0.2/kfctl_hypercloud_kubeflow.v1.0.2.yaml"
-        $ kfctl delete -V -f ${CONFIG_URI}
-        ```
-* 비고 :
-    * kfctl 1.1버전 이상부터 리소스의 삭제가 정상적으로 이루어진다. kfctl 버전은 다음명령어를 통해 확인할 수 있다.
-        ```bash
-        $ kfctl version
+        $ kubectl delete kfdef kubeflow -n kubeflow
         ```
 ## 기타2 : HyperCloud4.1 kubeflow Spec 정보
 |    **Namespace**    |                   **Pod**                   |          **Container**          | Request<br/>(CPU) | **Request**<br/>(Memory) | **Limit**<br/>(CPU) | **Limit<br/>(Memory)** |             **Container 이미지<br/> IMAGE:TAG**              |
