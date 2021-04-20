@@ -19,7 +19,7 @@
         $ kubectl get storageclass
         ```
     * 만약 아무 storage class가 없다면 아래 링크로 이동하여 rook-ceph 설치한다.
-        * https://github.com/tmax-cloud/hypercloud-install-guide/tree/4.1/rook-ceph
+        * https://github.com/tmax-cloud/install-rookceph/tree/4.1
     * Storage class는 있지만 default로 설정된 것이 없다면 아래 명령어를 실행한다.
         ```bash
         $ kubectl patch storageclass csi-cephfs-sc -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
@@ -27,13 +27,13 @@
     * csi-cephfs-sc는 위 링크로 rook-ceph를 설치했을 때 생성되는 storage class이며 다른 storage class를 default로 사용해도 무관하다.
 2. Istio
     * v1.5.1
-        * https://github.com/tmax-cloud/hypercloud-install-guide/tree/4.1/Istio
+        * https://github.com/tmax-cloud/install-istio/tree/4.1
 3. Prometheus
     * Kubeflow의 모니터링 정보를 제공하기 위해 필요하다.
-        * https://github.com/tmax-cloud/hypercloud-install-guide/blob/4.1/Prometheus/README.md
+        * https://github.com/tmax-cloud/install-prometheus/blob/4.1/README.md
 4. (Optional) GPU plug-in
     * Kubernetes cluster 내 node에 GPU가 탑재되어 있으며 AI DevOps 기능을 사용할 때 GPU가 요구될 경우에 필요하다.
-        * https://github.com/tmax-cloud/hypercloud-install-guide/tree/4.1/Pod_GPU%20plugin
+        * https://github.com/tmax-cloud/install-nvidia-gpu-infra/tree/4.1
 5. Console
     * 아래 명령어를 통해 확인할 수 있는 초기 상태의 console deployment의 template에는 kubeflow-endpoint가 연동되어있지 않아 수정해 주어야 한다.
         ```bash
@@ -51,7 +51,7 @@
 설치를 진행하기 전 아래의 과정을 통해 필요한 이미지 및 yaml 파일을 준비한다.
 1. 이미지 준비
     * 아래 링크를 참고하여 폐쇄망에서 사용할 registry를 구축한다.
-        * https://github.com/tmax-cloud/hypercloud-install-guide/blob/4.1/Image_Registry/README.md
+        *  https://github.com/tmax-cloud/install-registry/blob/4.1/README.md
     * 자신이 사용할 registry의 IP와 port를 입력한다.
         ```bash
         $ export REGISTRY_ADDRESS=1.1.1.1:5000
@@ -135,9 +135,10 @@
     * 정상적으로 완료되면 kustomize라는 디렉토리가 생성된다.
 * 비고 : 
     * 폐쇄망 환경일 경우 설치 디렉토리 ${KF_DIR}에 미리 다운로드받은 sed.sh, kustomize_local.tar.gz 파일을 옮긴다.
-    * 아래 명령어를 통해 Kustomize 리소스의 압축을 풀고 yaml 파일들에서 이미지들을 pull 받을 registry를 바꿔준다.
+    * 아래 명령어를 통해 kustomize 디렉토리를 생성 후 그안에 Kustomize 리소스의 압축을 풀고 yaml 파일들에서 이미지들을 pull 받을 registry를 바꿔준다.
         ```bash
-        $ tar xvfz kustomize_local.tar.gz
+        $ mkdir kustomize        
+        $ tar xvfz kustomize_local.tar.gz -C kustomize --strip-components=1
         $ chmod +x ./sed.sh
         $ ./sed.sh ${REGISTRY_ADDRESS} ${KF_DIR}/kustomize
         ```
