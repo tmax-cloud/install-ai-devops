@@ -138,7 +138,7 @@
     * 아래 명령어를 통해 kustomize 디렉토리를 생성 후 그안에 Kustomize 리소스의 압축을 풀고 yaml 파일들에서 이미지들을 pull 받을 registry를 바꿔준다.
         ```bash
         $ mkdir kustomize        
-        $ tar xvfz kustomize_local.tar.gz -C kustomize --strip-components=1
+        $ tar xvfz kustomize_local.tar.gz -C kustomize 
         $ chmod +x ./sed.sh
         $ ./sed.sh ${REGISTRY_ADDRESS} ${KF_DIR}/kustomize
         ```
