@@ -135,10 +135,9 @@
     * 정상적으로 완료되면 kustomize라는 디렉토리가 생성된다.
 * 비고 : 
     * 폐쇄망 환경일 경우 설치 디렉토리 ${KF_DIR}에 미리 다운로드받은 sed.sh, kustomize_local.tar.gz 파일을 옮긴다.
-    * 아래 명령어를 통해 kustomize 디렉토리를 생성 후 그안에 Kustomize 리소스의 압축을 풀고 yaml 파일들에서 이미지들을 pull 받을 registry를 바꿔준다.
-        ```bash
-        $ mkdir kustomize        
-        $ tar xvfz kustomize_local.tar.gz -C kustomize 
+    * 아래 명령어를 통해 Kustomize 리소스의 압축을 풀고 yaml 파일들에서 이미지들을 pull 받을 registry를 바꿔준다.
+        ```bash            
+        $ tar xvfz kustomize_local.tar.gz  
         $ chmod +x ./sed.sh
         $ ./sed.sh ${REGISTRY_ADDRESS} ${KF_DIR}/kustomize
         ```
