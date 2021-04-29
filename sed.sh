@@ -16,8 +16,8 @@ echo "[$0] Modify images in Kustomize manifest files"
 
 sed -i "s/newName: gcr.io\/ml-pipeline\/api-server/newName: ${registry}\/gcr.io\/ml-pipeline\/api-server/g" ${dir}/api-service/base/kustomization.yaml
 sed -i "s/newName: gcr.io\/kubeflow-images-public\/kubernetes-sigs\/application/newName: ${registry}\/gcr.io\/kubeflow-images-public\/kubernetes-sigs\/application/g" ${dir}/application/base/kustomization.yaml
-sed -i "s/image: argoproj\/argocli/image: ${registry}\/argoproj\/argocli/g" ${dir}/argo/base/deployment.yaml
-sed -i "s/image: argoproj\/workflow-controller/image: ${registry}\/argoproj\/workflow-controller/g" ${dir}/argo/base/deployment.yaml
+sed -i "s/image: argoproj\/argocli/image: ${registry}\/argoproj\/argocli/g" ${dir}/argo/base/deployment-argo-ui.yaml
+sed -i "s/image: argoproj\/workflow-controller/image: ${registry}\/argoproj\/workflow-controller/g" ${dir}/argo/base/deployment-workflow-controller.yaml
 sed -i "s/image: gcr.io\/kubeflow-images-public\/ingress-setup/image: ${registry}\/gcr.io\/kubeflow-images-public\/ingress-setup/g" ${dir}/bootstrap/base/stateful-set.yaml
 sed -i "s/newName: gcr.io\/kubeflow-images-public\/centraldashboard/newName: ${registry}\/gcr.io\/kubeflow-images-public\/centraldashboard/g" ${dir}/centraldashboard/base/kustomization.yaml
 sed -i "s/image: \"quay.io\/jetstack\/cert-manager-cainjector/image: \"${registry}\/quay.io\/jetstack\/cert-manager-cainjector/g" ${dir}/cert-manager/base/deployment.yaml
