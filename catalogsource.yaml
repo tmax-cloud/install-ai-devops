@@ -1,0 +1,11 @@
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: custom-catalog
+  namespace: olm
+spec:
+  sourceType: grpc
+  image: 192.168.6.100:5000/my-index:3.0.0
+  displayName: Private Operators
+  publisher: HyperCloud
