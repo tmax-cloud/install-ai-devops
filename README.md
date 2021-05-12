@@ -34,14 +34,60 @@
         * https://github.com/tmax-cloud/install-prometheus/blob/5.0/README.md
 4. (Optional) GPU plug-in
     * Kubernetes cluster 내 node에 GPU가 탑재되어 있으며 AI DevOps 기능을 사용할 때 GPU가 요구될 경우에 필요하다.
-        * https://github.com/tmax-cloud/install-nvidia-gpu-infra/blob/5.0/README.md
+        * https://github.com/tmax-cloud/install-nvidia-gpu-infra/blob/5.0/README.md        
+
+## 폐쇄망 설치 install step
+
+
+## Step 0. image 저장
+    * 아래 링크를 참고하여 폐쇄망에서 사용할 registry를 구축한다.
+        *  https://github.com/tmax-cloud/install-registry/blob/5.0/README.md
+    * 자신이 사용할 registry의 IP와 port를 입력한다.
+        ```bash
+        $ export REGISTRY_ADDRESS=1.1.1.1:5000
+        ```
+    * 아래 명령어를 수행하여 Kubeflow 설치 시 필요한 이미지들을 위에서 구축한 registry에 push하고 이미지들을 tar 파일로 저장한다. tar 파일은 images 디렉토리에 저장된다.
+        ```bash
+        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/5.0/image-push.sh
+        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/5.0/imagelist
+        $ chmod +x ./image-push.sh
+        $ ./image-push.sh ${REGISTRY_ADDRESS}
+        ```
+    * 아래 명령어를 수행하여 registry에 이미지들이 잘 push되었는지, 그리고 필요한 이미지들이 tar 파일로 저장되었는지 확인한다.
+        ```bash
+        $ curl -X GET ${REGISTRY_ADDRESS}/v2/_catalog
+        $ ls ./images
+        ```
+    * (Optional) 만약 설치에 필요한 이미지들을 pull받아서 tar 파일로 저장하는 작업과 로드하여 push하는 작업을 따로 수행하고자 한다면 image-push.sh이 아니라 image-save.sh, image-load.sh를 각각 실행하면 된다. 
+       * image-save.sh을 실행하면 설치에 필요한 이미지들을 pull 받아서 images 디렉토리에 tar 파일로 저장한다.
+           ```bash
+           $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/5.0/image-save.sh
+           $ chmod +x ./image-save.sh
+           $ ./image-save.sh
+           $ ls ./images
+           ```
+       * 위에서 저장한 images 디렉토리와 image-load.sh을 폐쇄망 환경으로 옮긴 후 실행하면 폐쇄망 내 구축한 registry에 이미지들을 push할 수 있다. image-load.sh은 images 디렉토리와 같은 경로에서 실행해야만 한다.
+           ```bash
+           $ chmod +x ./image-load.sh
+           $ ./image-load.sh ${REGISTRY_ADDRESS}
+           $ curl -X GET ${REGISTRY_ADDRESS}/v2/_catalog
+           ```
+## Step 2. Yaml 파일 및 script 파일 준비
+    * 아래 명령어를 수행하여 Kubeflow 설치에 필요한 yaml 파일들과 script 파일들을 다운로드 받는다. 
+        ```bash
+        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/5.0/sed.sh
+        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/.1/kustomize_local.tar.gz
+        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/4.1/kfctl_hypercloud_kubeflow.v1.0.2_local.yaml        
+        ```
+3. 앞으로의 진행
+    * Step 0 ~ 4 중 Step 0, 2, 3은 비고를 참고하여 진행한다. 나머지는 그대로 진행하면 된다.
 
 ## Install Steps
-0. [olm 설치](https://github.com/tmax-cloud/install-OLM/blob/main/README.md)
-1. [kubeflow operator 설치]
-2. [설치 디렉토리 생성]
-3. [Kubeflow 배포]
-4. [배포 확인 및 기타 작업]
+0. [olm 설치](https://github.com/tmax-cloud/install-ai-devops/tree/kt-patch#step-0-olm-%EC%84%A4%EC%B9%98)
+1. [kubeflow operator 설치](https://github.com/tmax-cloud/install-ai-devops/tree/kt-patch#step-1-kubeflow-operator-%EC%84%A4%EC%B9%98)
+2. [설치 디렉토리 생성](https://github.com/tmax-cloud/install-ai-devops/tree/kt-patch#step-2-%EC%84%A4%EC%B9%98-%EB%94%94%EB%A0%89%ED%86%A0%EB%A6%AC-%EC%83%9D%EC%84%B1)
+3. [Kubeflow 배포](https://github.com/tmax-cloud/install-ai-devops/tree/kt-patch#step-3-kubeflow-%EB%B0%B0%ED%8F%AC)
+4. [배포 확인 및 기타 작업](https://github.com/tmax-cloud/install-ai-devops/tree/kt-patch#step-4-%EB%B0%B0%ED%8F%AC-%ED%99%95%EC%9D%B8-%EB%B0%8F-%EA%B8%B0%ED%83%80-%EC%9E%91%EC%97%85)
 
 ## Step 0. OLM 설치
 * 목적 : `kubeflow operator를 관리하기 위한 toolkit으로 사용한다.`
