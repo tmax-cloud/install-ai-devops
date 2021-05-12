@@ -1,4 +1,4 @@
-apiVersion: hyperflow.tmax.io/v1
+apiVersion: kubeflow.tmax.io/v1
 kind: Notebook
 metadata:
   labels:
@@ -24,7 +24,6 @@ spec:
         - mountPath: /dev/shm
           name: dshm
       serviceAccountName: default-editor
-      ttlSecondsAfterFinished: 300
       ## 사용할 volume 정의
       volumes:
       - name: demo-pvc

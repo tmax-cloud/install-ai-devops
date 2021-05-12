@@ -174,7 +174,7 @@ metadata:
     support: Kubeflow
     repository: https://github.com/kubeflow/kfctl
     createdAt: '2020-03-19T00:00:00Z'
-    containerImage: aipipeline/kubeflow-operator:v1.2.0
+    containerImage: {registry}/kubeflow-operator:v1.2.0
     certified: 'False'
   name: kubeflow.v1.2.0
   namespace: placeholder
@@ -235,7 +235,7 @@ spec:
                       fieldPath: metadata.name
                 - name: OPERATOR_NAME
                   value: kubeflow-operator
-                image: aipipeline/kubeflow-operator:v1.2.0
+                image: {registry}/kubeflow-operator:v1.2.0
                 imagePullPolicy: Always
                 name: kubeflow-operator
                 resources: {}

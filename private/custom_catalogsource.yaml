@@ -6,6 +6,6 @@ metadata:
   namespace: olm
 spec:
   sourceType: grpc
-  image: 192.168.6.100:5000/my-index:3.0.0
+  image: {registry}/ai-devops-index-registry:1.2.0
   displayName: Private Operators
   publisher: HyperCloud
