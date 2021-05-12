@@ -40,16 +40,16 @@
         * https://github.com/tmax-cloud/install-nvidia-gpu-infra/blob/5.0/README.md        
 
 ## 폐쇄망 설치 install step
-0. [git clone 및 image 저장]
-1. [OLM 및 kubeflow-operator 설치]
-2. [Subscription 리소스 배포]
-3. [kubeflow-operator 배포]
-4. [kubeflow 배포]
-5. [배포 확인 및 기타 작업]
+0. [git clone 및 image 저장](https://github.com/tmax-cloud/install-ai-devops/tree/kt-patch#step-0-git-clone-%EB%B0%8F-image-%EC%A0%80%EC%9E%A5)
+1. [OLM 및 kubeflow-operator 설치](https://github.com/tmax-cloud/install-ai-devops/tree/kt-patch#step-1-olm-%EB%B0%8F-kubeflow-operator-%EC%84%A4%EC%B9%98)
+2. [Subscription 리소스 배포](https://github.com/tmax-cloud/install-ai-devops/tree/kt-patch#step-2-subscription-%EB%A6%AC%EC%86%8C%EC%8A%A4-%EB%B0%B0%ED%8F%AC)
+3. [kubeflow-operator 배포](https://github.com/tmax-cloud/install-ai-devops/tree/kt-patch#step-3-kubeflow-operator-%EB%B0%B0%ED%8F%AC)
+4. [kubeflow 배포](https://github.com/tmax-cloud/install-ai-devops/tree/kt-patch#step-4-kubeflow-%EB%B0%B0%ED%8F%AC)
+5. [배포 확인 및 기타 작업](https://github.com/tmax-cloud/install-ai-devops/tree/kt-patch#step-5-%EB%B0%B0%ED%8F%AC-%ED%99%95%EC%9D%B8-%EB%B0%8F-%EA%B8%B0%ED%83%80-%EC%9E%91%EC%97%85)
 
 ## Step 0. git clone 및 image 저장
     * 아래 링크를 참고하여 폐쇄망에서 사용할 registry를 구축한다.
-        *  https://github.com/tmax-cloud/install-registry/blob/5.0/README.md
+    * https://github.com/tmax-cloud/install-registry/blob/5.0/README.md
     * 자신이 사용할 registry의 IP와 port를 입력한다.
         ```bash
         $ export REGISTRY_ADDRESS=XXX.XXX.XXX.XXX:XXXX (e.g.192.168.6.181:5000)
