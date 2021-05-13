@@ -48,25 +48,25 @@
 5. [배포 확인 및 기타 작업](https://github.com/tmax-cloud/install-ai-devops/tree/kt-patch#step-5-%EB%B0%B0%ED%8F%AC-%ED%99%95%EC%9D%B8-%EB%B0%8F-%EA%B8%B0%ED%83%80-%EC%9E%91%EC%97%85)
 
 ## Step 0. git clone 및 image 저장
-    * 아래 링크를 참고하여 폐쇄망에서 사용할 registry를 구축한다.
-    * https://github.com/tmax-cloud/install-registry/blob/5.0/README.md
-    * 자신이 사용할 registry의 IP와 port를 입력한다.
-        ```bash
-        $ export REGISTRY_ADDRESS=XXX.XXX.XXX.XXX:XXXX (e.g.192.168.6.181:5000)
-        ```
-    * 아래 명령어를 수행하여 clone을 수행하고, Kubeflow 설치 시 필요한 이미지들을 위에서 구축한 registry에 push하고 이미지들을 tar 파일로 저장한다. tar 파일은 images 디렉토리에 저장된다.
-        ```bash         
-        $ git clone -b 5.0 https://github.com/tmax-cloud/install-ai-devops.git 
-        $ cd install-ai-devops
-        $ chmod +x ./image-push.sh
-        $ ./image-push.sh ${REGISTRY_ADDRESS}
-        ```
-    * 아래 명령어를 수행하여 registry에 이미지들이 잘 push되었는지, 그리고 필요한 이미지들이 tar 파일로 저장되었는지 확인한다.
-        ```bash
-        $ curl -X GET ${REGISTRY_ADDRESS}/v2/_catalog
-        $ ls ./images
-        ```
-    * (Optional) 만약 설치에 필요한 이미지들을 pull받아서 tar 파일로 저장하는 작업과 로드하여 push하는 작업을 따로 수행하고자 한다면 image-push.sh이 아니라 image-save.sh, image-load.sh를 각각 실행하면 된다. 
+   * 아래 링크를 참고하여 폐쇄망에서 사용할 registry를 구축한다.
+   * https://github.com/tmax-cloud/install-registry/blob/5.0/README.md
+   * 자신이 사용할 registry의 IP와 port를 입력한다.
+      ```bash
+      $ export REGISTRY_ADDRESS=XXX.XXX.XXX.XXX:XXXX (e.g.192.168.6.181:5000)
+      ```
+   * 아래 명령어를 수행하여 clone을 수행하고, Kubeflow 설치 시 필요한 이미지들을 위에서 구축한 registry에 push하고 이미지들을 tar 파일로 저장한다. tar 파일은 images 디렉토리에 저장된다.
+      ```bash         
+      $ git clone -b 5.0 https://github.com/tmax-cloud/install-ai-devops.git 
+      $ cd install-ai-devops
+      $ chmod +x ./image-push.sh
+      $ ./image-push.sh ${REGISTRY_ADDRESS}
+      ```
+   * 아래 명령어를 수행하여 registry에 이미지들이 잘 push되었는지, 그리고 필요한 이미지들이 tar 파일로 저장되었는지 확인한다.
+      ```bash
+      $ curl -X GET ${REGISTRY_ADDRESS}/v2/_catalog
+      $ ls ./images
+      ```
+   * (Optional) 만약 설치에 필요한 이미지들을 pull받아서 tar 파일로 저장하는 작업과 로드하여 push하는 작업을 따로 수행하고자 한다면 image-push.sh이 아니라 image-save.sh, image-load.sh를 각각 실행하면 된다. 
        * image-save.sh을 실행하면 설치에 필요한 이미지들을 pull 받아서 images 디렉토리에 tar 파일로 저장한다.
            ```bash           
            $ chmod +x ./image-save.sh
