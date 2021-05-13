@@ -124,7 +124,8 @@
         ```
       ![스크린샷, 2021-04-14 11-55-55](https://user-images.githubusercontent.com/77767091/114647647-69848300-9d18-11eb-92ac-ec543473c16c.png)
 ## Step 4. kubeflow 배포
-    * kfdef CR을 이용하여 kubeflow를 배포한다. 먼저 설치 디렉토리를 생성하고 그 안에 앞서 다운받은 ai-devops-5.0.tar.gz 파일을 이동시킨다.
+    * kfdef CR을 이용하여 kubeflow를 배포한다. 먼저 설치 디렉토리를 생성하고 그 안에 앞서 다운받은 ai-devops-5.0.tar.gz 파일을 이동시킨 후 압축을 해제한다.
+    * 압축 해제된 yaml 파일들에서 이미지를 pull 받을 레지스트리를 변경한다.
     * kfDef-hypercloud_local.yaml의 {repos_address} 부분을 변경하고 kubeflow namespace와 kfdef를 생성하여 kubeflow를 배포한다.
     * ${KF_DIR}이 설치 디렉토리이며 ${KF_NAME}, ${BASE_DIR}은 임의로 변경 가능하다. 
       ```bash
@@ -132,7 +133,8 @@
       $ export BASE_DIR=/home/${USER}
       $ export KF_DIR=${BASE_DIR}/${KF_NAME}
       $ mkdir -p ${KF_DIR}
-      $ export REPOS_ADDRESS=현재디렉토리경로/ai-devops-5.0.tar.gz (pwd 명령어를 통해 현재 디렉토리 경로 부분을 채워넣는다. e.g /home/ck/ai-devops/ai-devops-5.0.tar.gz)
+      $ tar xvfz ai-devops-5.0.tar.gz (이 명령어 실행전 생성한 디렉토리로 ai-devops-5.0.tar.gz 파일을 이동시킨다.)
+      $ export REPOS_ADDRESS=현재디렉토리경로/ai-devops-5.0 (pwd 명령어를 통해 현재 디렉토리 경로 부분을 채워넣는다. e.g /home/ck/ai-devops/ai-devops-5.0)
       $ sed -i 's/{repos_address}/'${REPOS_ADDRESS}'/g' kfDef-hypercloud_local.yaml
       $ KUBEFLOW_NAMESPACE=kubeflow
       $ kubectl create ns ${KUBEFLOW_NAMESPACE}
