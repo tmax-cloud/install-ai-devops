@@ -168,9 +168,9 @@
 ## Step 1. kubeflow operator 설치
 * 목적 : `Kubeflow operator는 kubeflow를 배포하고 모니터링 하는 등 lifecycle을 관리한다.`
 * 생성 순서 : 
-    * subscription yaml 파일을 apply하여 kubeflow operator를 생성한다.
+    * 아래 명령어를 실행하여 kubeflow operator를 생성한다.
         ```bash
-        $ kubectl apply -f kubeflow_subscription.yaml
+        $ kubectl create -f https://operatorhub.io/install/kubeflow.yaml
         ```
     * 설치되기까지 시간이 10분가량 소요될 수 있으며 정상적으로 완료되었는지 확인하기 위해 아래 명령어를 수행하여 kubeflow operator pod의 정상 동작을 확인한다.
         ```bash
