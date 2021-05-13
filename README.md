@@ -102,32 +102,32 @@
       $ kubectl apply -f custom_catalogsource.yaml      
       ```    
 ## Step 2. Subscription 리소스 배포
-    * 해당 Custom Catalog 내에 kubeflow-operator를 설치하기 위해 subscription 리소스를 배포한다.
+   * 해당 Custom Catalog 내에 kubeflow-operator를 설치하기 위해 subscription 리소스를 배포한다.
       ```bash
       $ cd ..
       $ kubectl kubeflow_subscription.yaml
       ```
-    * 설치되기까지 시간이 10분가량 소요될 수 있으며 정상적으로 완료되었는지 확인하기 위해 아래 명령어를 수행하여 kubeflow operator pod의 정상 동작을 확인한다.
-        ```bash
-        $ kubectl get pod -n operators
-        ```
+   * 설치되기까지 시간이 10분가량 소요될 수 있으며 정상적으로 완료되었는지 확인하기 위해 아래 명령어를 수행하여 kubeflow operator pod의 정상 동작을 확인한다.
+      ```bash
+      $ kubectl get pod -n operators
+      ```
       ![스크린샷, 2021-04-14 11-55-55](https://user-images.githubusercontent.com/77767091/114647647-69848300-9d18-11eb-92ac-ec543473c16c.png) 
 ## Step 3. kubeflow-operator 배포
-    * 해당 Custom Catalog 내에 kubeflow-operator를 설치하기 위해 subscription 리소스를 배포한다.
+   * 해당 Custom Catalog 내에 kubeflow-operator를 설치하기 위해 subscription 리소스를 배포한다.
       ```bash
       $ cd ..
       $ kubectl kubeflow_subscription.yaml
       ```
-    * 설치되기까지 시간이 10분가량 소요될 수 있으며 정상적으로 완료되었는지 확인하기 위해 아래 명령어를 수행하여 kubeflow operator pod의 정상 동작을 확인한다.
-        ```bash
-        $ kubectl get pod -n operators
-        ```
+   * 설치되기까지 시간이 10분가량 소요될 수 있으며 정상적으로 완료되었는지 확인하기 위해 아래 명령어를 수행하여 kubeflow operator pod의 정상 동작을 확인한다.
+      ```bash
+      $ kubectl get pod -n operators
+      ```
       ![스크린샷, 2021-04-14 11-55-55](https://user-images.githubusercontent.com/77767091/114647647-69848300-9d18-11eb-92ac-ec543473c16c.png)
 ## Step 4. kubeflow 배포
-    * kfdef CR을 이용하여 kubeflow를 배포한다. 먼저 설치 디렉토리를 생성하고 그 안에 앞서 다운받은 ai-devops-5.0.tar.gz 파일을 이동시킨 후 압축을 해제한다.
-    * 압축 해제된 yaml 파일들에서 이미지를 pull 받을 레지스트리를 변경한다.
-    * kfDef-hypercloud_local.yaml의 {repos_address} 부분을 변경하고 kubeflow namespace와 kfdef를 생성하여 kubeflow를 배포한다.
-    * ${KF_DIR}이 설치 디렉토리이며 ${KF_NAME}, ${BASE_DIR}은 임의로 변경 가능하다. 
+   * kfdef CR을 이용하여 kubeflow를 배포한다. 먼저 설치 디렉토리를 생성하고 그 안에 앞서 다운받은 ai-devops-5.0.tar.gz 파일을 이동시킨 후 압축을 해제한다.
+   * 압축 해제된 yaml 파일들에서 이미지를 pull 받을 레지스트리를 변경한다.
+   * kfDef-hypercloud_local.yaml의 {repos_address} 부분을 변경하고 kubeflow namespace와 kfdef를 생성하여 kubeflow를 배포한다.
+   * ${KF_DIR}이 설치 디렉토리이며 ${KF_NAME}, ${BASE_DIR}은 임의로 변경 가능하다. 
       ```bash
       $ export KF_NAME=ai-devops
       $ export BASE_DIR=/home/${USER}
