@@ -183,7 +183,7 @@
 * 생성 순서 : 
     * 아래 명령어를 수행하여 설치 디렉토리를 생성하고 해당 경로로 이동한다.
         ```bash
-        $ export KF_NAME=kubeflow
+        $ export KF_NAME=
         $ export BASE_DIR=/home/${USER}
         $ export KF_DIR=${BASE_DIR}/${KF_NAME}
         $ mkdir -p ${KF_DIR}
