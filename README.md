@@ -220,6 +220,7 @@
 * 목적 : `Kubeflow 배포를 확인하고 문제가 있을 경우 정상화한다.`
 * 생성 순서 : 
     * 아래 명령어를 수행하여 kubeflow namespace의 모든 pod가 정상적인지 확인한다.
+    * katib-db-manager와 katib-mysql pod만 running 상태가 아니라면 20분가량 시간을 두고 기다리면 running 상태도 바뀔 가능성이 높음 참고(내부 로직 문제로 여러번 restarts)  
         ```bash
         $ kubectl get pod -n kubeflow
         ```
