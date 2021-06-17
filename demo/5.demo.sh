@@ -2,7 +2,7 @@ MODEL_NAME=demo-inferenceservice
 echo MODEL_NAME = $MODEL_NAME
 INPUT_PATH=@./input.json
 echo INPUT_PATH = $INPUT_PATH
-CLUSTER_IP=$(kubectl -n istio-system get service kfserving-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+CLUSTER_IP=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 echo CLUSTER_IP = $CLUSTER_IP
 SERVICE_HOSTNAME=$(kubectl get inferenceservice ${MODEL_NAME} -n demo -o jsonpath='{.status.url}' | cut -d "/" -f 3)
 echo SERVICE_HOSTNAME = $SERVICE_HOSTNAME

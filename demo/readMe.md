@@ -1,8 +1,7 @@
-# Hyperflow를 사용한 AI 개발 시나리오 가이드
-가이드 문의 CK1-4팀
+# ai-devops를 사용한 AI 개발 시나리오 가이드
 
 주의 사항 : 
- - notebook-controller-go image b0.0.2 이상 버전, hypercloud-console image 4.1.2.3.0 이상 버전에서 notebook이 UI에 정상 표기
+ - notebook-controller-go image b0.0.4 이상 버전, hypercloud-console image 5.0.14.0 이상 버전에서 notebook이 UI에 정상 표기
  - image 버전 확인 방법 : HyperCloud 마스터 노드에서 다음의 커맨드를 입력하여 나오는 image 정보 확인
 ```
 kubectl get deploy -n kubeflow notebook-controller-deployment -o wide
@@ -34,8 +33,8 @@ Fashion-MNIST 데이터를 활용하여 Image가 어떤 Fashion Item인지 추�
 ---
 
 ## Step 0. 작업을 위한 namespace, pvc 만들기
-  - hyperflow에서는 작업하려는 namespace를 profile이라는 crd를 통해 관리한다.
-  - hyperflow 기능을 사용하기 위한 role, rolebinding등의 k8s리소스 배포 뿐만아니라 istio-injection 활성화와 같은 작업을 자동으로 진행한다.
+  - ai-devops에서는 작업하려는 namespace를 profile이라는 crd를 통해 관리한다.
+  - ai-devops 기능을 사용하기 위한 role, rolebinding등의 k8s리소스 배포 뿐만아니라 istio-injection 활성화와 같은 작업을 자동으로 진행한다.
   - master node에서 kubectl create 커맨드를 활용하여 demo profile을 생성한다. 
   ```
   $ kubectl apply -f 0.profile.yaml
@@ -50,7 +49,7 @@ Fashion-MNIST 데이터를 활용하여 Image가 어떤 Fashion Item인지 추�
   - 참고 : [0.pvc.yaml](./0.pvc.yaml)
 
 ## Step 1. python 코드 작성을 위한 notebook 만들기 (Notebook Server 메뉴)
-  - hyperflow에서는 ML Model 코딩을 위한 web 기반의 python IDE인 JupyterNotebook을 사용할 수 있다.
+  - ai-devops에서는 ML Model 코딩을 위한 web 기반의 python IDE인 JupyterNotebook을 사용할 수 있다.
   - 위에서 생성한 demo-pvc를 마운트하는 demo-notebook을 생성한다. 
 
 ![1.notebook.PNG](./img/1.notebook.PNG)
@@ -135,13 +134,13 @@ pip install kubeflow-fairing --upgrade
 ![3.katib-experiment.PNG](./img/3.katib-experiment.PNG)
   - 참고 : [3.katib-experiment.yaml](3.katib-experiment.yaml)
   - 모든 작업이 완료된다면, status 항목에서 ML 모델의 정확도가 가장 높은 hyper-parameter를 알려준다.
-  - 아래 결과를 해석하자면 validation-accuracy가 최대로 나온 수치는 0.8392이고, 이때의 learningRate는 0.01393... dropoutRate는 0.84807...를 의미한다.
+  - 아래 결과를 해석하자면 validation-accuracy가 최대로 나온 수치는 0.8456이고, 이때의 learningRate는 0.01116... dropoutRate는 0.83610...를 의미한다.
 
 ![3.katib-result.PNG](./img/3.katib-result.PNG)
 
 ## Step 4. Model 학습을 위한 tfjob 생성하기 (Training Jobs 메뉴)
   - hyper-parameter 탐색까지 끝났다면, 본격적인 Model 학습을 위해 tfJob을 생성한다.
-  - Step 3에서 도출된 learningRate와 dropoutRate를 사용하여 모델을 학습한다. (learningRate 0.01393, dropoutRate 0.84807)
+  - Step 3에서 도출된 learningRate와 dropoutRate를 사용하여 모델을 학습한다. (learningRate 0.01116, dropoutRate 0.83610)
   - 시나리오에서는, 모델이 저장될 pvc를 notebook이 사용하는 pvc와 동일한 demo-pvc로 지정하였다.
 
 ![4.tfjob.PNG](./img/4.tfjob.PNG)
@@ -158,7 +157,7 @@ pip install kubeflow-fairing --upgrade
   - demo-inferenceservice가 성공적으로 생성되었다면, curl 을 이용하여 inference 응답이 오는지 확인하자. (마스터 노드에서 테스트 진행)
   ```
   MODEL_NAME=demo-inferenceservice
-  CLUSTER_IP=$(kubectl -n istio-system get service kfserving-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  CLUSTER_IP=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
   SERVICE_HOSTNAME=$(kubectl get inferenceservice ${MODEL_NAME} -n demo -o jsonpath='{.status.url}' | cut -d "/" -f 3)
   curl -v -H "Host: ${SERVICE_HOSTNAME}" http://$CLUSTER_IP/v1/models/$MODEL_NAME:predict -d '{
     "instances":[
@@ -185,7 +184,7 @@ pip install kubeflow-fairing --upgrade
   ```
 
   - 참고 : [5.demo.sh](5.demo.sh)
-  - 아래와 같은 응답이 오게 되는데, 간단하게 해석하자면 inference를 요청한 데이터는 class5(Sandal)일 확률이 0.988이라는 응답이다.
+  - 아래와 같은 응답이 오게 되는데, 간단하게 해석하자면 inference를 요청한 데이터는 class5(Sandal)일 확률이 0.961이라는 응답이다.
 
 ![5.curl.PNG](./img/5.curl.PNG)
 
@@ -196,9 +195,9 @@ pip install kubeflow-fairing --upgrade
   ```
   sudo docker run -p19000:5000 brightfly/fminst-webui:latest 
   ```
-  - 웹브라우저 주소창에 http://{node IP}:19000/?model=demo-inferenceservice&name=demo-inferenceservice.demo.example.com&addr={istio-system nameSpace의 kfserving-ingressgateway ExternalIP}를 입력하여 접속
+  - 웹브라우저 주소창에 http://{node IP}:19000/?model=demo-inferenceservice&name=demo-inferenceservice.demo.example.com&addr={istio-system nameSpace의 istio-ingressgateway ExternalIP}를 입력하여 접속
 
-*kfserving-ingressgateway의 ExternalIP는 HyperCloud UI Network-service 메뉴에서 확인하거나 마스터 노드에서 다음 커맨드를 입력하여 확인한다.
+*istio-ingressgateway의 ExternalIP는 HyperCloud UI Network-service 메뉴에서 확인하거나 마스터 노드에서 다음 커맨드를 입력하여 확인한다.
 
 ```
 kubectl get service -n istio-system kfserving-ingressgateway
@@ -207,15 +206,8 @@ kubectl get service -n istio-system kfserving-ingressgateway
 
 ![5.web.PNG](./img/5.web.PNG)
 
-## Step 6. process 자동화를 위한 workflow 생성하기 (Workflow 메뉴)
+## Step 6. process 자동화를 위한 pipeline 생성하기 (tekton)
   - 실제 운영과정에서는 새로운 데이터를 통해 모델을 다시 학습하고 배포하는 일련의 작업들을 해야할 경우가 생기는데, 이를 자동화 해주는 메뉴이다.
-  - 시나리오에서는 Step4와 Step5를 자동화 해주는 demo-workflow를 생성하였다.
-
-*시나리오의 yaml을 배포하기 전에 이전에 만들어 두었던 trainingJob과 KFServing을 삭제하자
-
-![5.workflow.PNG](./img/5.workflow.PNG)
-
-  - 참고 : [6.workflow.yaml](6.workflow.yaml)
-  - Tekton backend 사용할 경우 : [6.workflow_tekton.yaml](6.workflow_tekton.yaml)
+  - Tekton backend 사용하여 pipeline을 생성한다 : [6.workflow_tekton.yaml](6.workflow_tekton.yaml)
 
 *serving 같은 경우 kfp python module을 사용하여 image로 만들고, 이를 workflow task로 등록하여 생성하였다. 참고 : [KFServing-fairing.ipynb](KFServing-fairing.ipynb)

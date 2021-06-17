@@ -32,7 +32,13 @@
     * v1.5.1
         * https://github.com/tmax-cloud/install-istio/blob/5.0/README.md
 3. Cert-manager
-    * ai-devops에서 사용하는 certificate와 cluster-issuer와 같은 CR 관리를 위해 필요하다.        
+    * ai-devops에서 사용하는 certificate와 cluster-issuer와 같은 CR 관리를 위해 필요하다.         
+        ```bash
+        # cert-manager namespace 생성 
+        $ kubectl create namespace cert-manager
+        # CRD, Cert-manager 설치
+        $ kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v0.11.1/cert-manager.yaml
+        ```      
 4. (Optional) GPU plug-in
     * Kubernetes cluster 내 node에 GPU가 탑재되어 있으며 AI DevOps 기능을 사용할 때 GPU가 요구될 경우에 필요하다.
         * https://github.com/tmax-cloud/install-nvidia-gpu-infra/blob/5.0/README.md   
@@ -56,7 +62,7 @@
         ```bash
         $ kubectl create -f https://operatorhub.io/install/kubeflow.yaml
         ```
-    * 설치되기까지 시간이 10분가량 소요될 수 있으며 정상적으로 완료되었는지 확인하기 위해 아래 명령어를 수행하여 kubeflow operator pod의 정상 동작을 확인한다.
+    * 설치되기까지 시간이 5분가량 소요될 수 있으며 정상적으로 완료되었는지 확인하기 위해 아래 명령어를 수행하여 kubeflow operator pod의 정상 동작을 확인한다.
         ```bash
         $ kubectl get pod -n operators
         ```
@@ -113,12 +119,33 @@
         $ echo '{"apiVersion":"security.istio.io/v1beta1","kind":"PeerAuthentication","metadata":{"annotations":{},"name":"default","namespace":"istio-system"},"spec":{"mtls":{"mode":"DISABLE"}}}' |cat > disable-mtls.json
         $ kubectl apply -f disable-mtls.json
         ```
+## Step 5. Structural Schema 적용
+* 목적 : `operator가 Structural Schema를 반영하지 못하는 CRD들에 대해 스크립트를 실행해 반영한다.`
+* 생성 순서 : 
+    * 아래 명령어를 수행하여 기존 crd를 삭제하고 새로운 crd schema를 create 한다.
+        ```bash
+        $ chmod +x structural_schema.sh
+        $ ./structural_schema.sh
+        ```   
+    * I18N 국문화 적용을 원한다면 위 명령어 대신 아래 명령어를 수행하여 crd를 삭제 후 create한다.
+        ```bash
+        $ chmod +x structural_schema_ko-en.sh
+        $ ./structural_schema_ko-en.sh
+        ```        
+
 ## 기타 : kubeflow 삭제
 * 목적 : `kubeflow 설치 시에 배포된 모든 리소스를 삭제 한다.`
 * 생성 순서 : 
     * 아래 명령어를 수행하여 kubeflow 모듈을 삭제한다.
         ```bash
+        # kubeflow 리소스 삭제(환경에 따라 20분 이상 소요될 수 있다.)
         $ kubectl delete kfdef kubeflow -n kubeflow
+        # kubeflow namespace 삭제(리소스 완전 삭제후 진행)
+        $ kubectl delete ns kubeflow
+        # kubeflow-operator 삭제
+        $ kubectl delete subscription my-kubeflow -n operators
+        $ kubectl delete svc kubeflow-operator-metrics -n operators
+        $ kubectl delete deploy kubeflow-operator -n operators
         ```     
 
 ## 폐쇄망 설치 install step(가이드 작성중)

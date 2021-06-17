@@ -18,17 +18,13 @@ spec:
           - command:
             - python
             - /app/fmnist-save-model-renew.py
-            - "--learning_rate=0.01393"
-            - "--dropout_rate=0.84807"
+            - "--learning_rate=0.01116"
+            - "--dropout_rate=0.83610"
             env:
             - name: FAIRING_RUNTIME
               value: "1"
             image: rhojw/sample-job:3C8CE2EE
-            name: tensorflow
-            resources:
-              limits:
-                cpu: 1
-                memory: 1.86Gi
+            name: tensorflow            
             securityContext:
               runAsUser: 0
             volumeMounts:
