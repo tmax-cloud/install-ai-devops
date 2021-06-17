@@ -27,7 +27,7 @@ Fashion-MNIST 데이터를 활용하여 Image가 어떤 Fashion Item인지 추�
   3. hyper-parameter tuning을 위한 katib 사용하기
   4. Model 학습을 위한 tfjob 생성하기
   5. Model 서빙을 위한 kfserving 사용하기
-  6. process 자동화를 위한 workflow 생성하기
+  6. process 자동화를 위한 pipeline 생성하기
 
 
 ---
