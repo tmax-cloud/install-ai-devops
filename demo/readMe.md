@@ -200,7 +200,7 @@ pip install kubeflow-fairing --upgrade
 *istio-ingressgateway의 ExternalIP는 HyperCloud UI Network-service 메뉴에서 확인하거나 마스터 노드에서 다음 커맨드를 입력하여 확인한다.
 
 ```
-kubectl get service -n istio-system kfserving-ingressgateway
+kubectl get service -n istio-system istio-ingressgateway
 ```
   - 아래와 같이, 그림이 어떤 Fashion Item인지 유추해주는 간단한 webApp이다.
 
