@@ -20055,9 +20055,11 @@ spec:
     status: {}
   validation:
     openAPIV3Schema:
+      type: object
       properties:
         spec:
           description: PyTorchJobSpec is a desired state description of the PyTorchJob.
+          type: object
           properties:
             activeDeadlineSeconds:
               description: Specifies the duration (in seconds) since startTime during which the job can remain active before it is terminated. Must be a positive integer. This setting applies only to pods where restartPolicy is OnFailure or Always.
@@ -20076,10 +20078,13 @@ spec:
               format: int32
             pytorchReplicaSpecs:
               description: 'A map of PyTorchReplicaType (type) to ReplicaSpec (value). Specifies the PyTorch cluster configuration. For example,\n  {\n    \"Master\": PyTorchReplicaSpec,\n    \"Worker\": PyTorchReplicaSpec,\n  }'
+              type: object
               properties:
                 Master:
+                  type: object
                   additionalProperties:                  
                     description: ReplicaSpec is a description of the replica
+                    type: object
                     properties:
                       replicas:
                         description: 'Replicas is the desired number of replicas of the given template. If unspecified, defaults to 1.'
@@ -20091,6 +20096,7 @@ spec:
                         type: string
                       template:
                         description: Template is the object that describes the pod that will be created for this replica. RestartPolicy in PodTemplateSpec will be overide by RestartPolicy in ReplicaSpec
+                        type: object
                         properties:
                           metadata:
                             description: 'Standard object''s metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata'
@@ -20230,6 +20236,7 @@ spec:
                                 type: string
                           spec:
                             description: 'Specification of the desired behavior of the pod. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status'                      
+                            type: object
                             required:
                               - containers
                             properties:
@@ -20589,8 +20596,9 @@ spec:
                               containers:
                                 description: List of containers belonging to the pod. Containers cannot currently be added or removed. There must be at least one container in a Pod. Cannot be updated.
                                 type: array
-                                items:
+                                items:                                  
                                   description: A single application container that you want to run within a pod.
+                                  type: object
                                   required:
                                     - name
                                     - image
@@ -21166,6 +21174,7 @@ spec:
                                 type: array
                                 items:
                                   description: HostAlias holds the mapping between IP and hostnames that will be injected as an entry in the pod's hosts file.
+                                  type: object
                                   properties:
                                     hostnames:
                                       description: Hostnames for the above IP address.
@@ -21194,6 +21203,7 @@ spec:
                                 type: array
                                 items:
                                   description: LocalObjectReference contains enough information to let you locate the referenced object inside the same namespace.
+                                  type: object
                                   properties:
                                     name:
                                       description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
@@ -21205,6 +21215,7 @@ spec:
                                 type: array
                                 items:
                                   description: A single application container that you want to run within a pod.
+                                  type: object
                                   required:
                                     - name
                                     - image
@@ -21788,6 +21799,7 @@ spec:
                                 type: string
                               securityContext:
                                 description: PodSecurityContext holds pod-level security attributes and common container settings. Some fields are also present in container.securityContext.  Field values of container.securityContext take precedence over field values of PodSecurityContext.
+                                type: object 
                                 properties:
                                   fsGroup:
                                     description: |-
@@ -21807,6 +21819,7 @@ spec:
                                     format: int64
                                   seLinuxOptions:
                                     description: SELinuxOptions are the labels to be applied to the container
+                                    type: object
                                     properties:
                                       level:
                                         description: Level is SELinux level label that applies to the container.
@@ -21844,6 +21857,7 @@ spec:
                                 type: array
                                 items:
                                   description: 'The pod this Toleration is attached to tolerates any taint that matches the triple <key,value,effect> using the matching operator <operator>.'
+                                  type: object
                                   properties:
                                     effect:
                                       description: 'Effect indicates the taint effect to match. Empty means match all taint effects. When specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.'
@@ -22626,9 +22640,11 @@ spec:
                                 x-kubernetes-patch-merge-key: name
                                 x-kubernetes-patch-strategy: merge                 
                 Worker:
+                  type: object
                   additionalProperties:                  
                     description: ReplicaSpec is a description of the replica
-                    properties:
+                    type: object
+                    properties:                      
                       replicas:
                         description: 'Replicas is the desired number of replicas of the given template. If unspecified, defaults to 1.'                      
                         minimum: 1
@@ -22638,6 +22654,7 @@ spec:
                         type: string
                       template:
                         description: Template is the object that describes the pod that will be created for this replica. RestartPolicy in PodTemplateSpec will be overide by RestartPolicy in ReplicaSpec
+                        type: object
                         properties:
                           metadata:
                             description: 'Standard object''s metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata'
@@ -22777,6 +22794,7 @@ spec:
                                 type: string
                           spec:
                             description: 'Specification of the desired behavior of the pod. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status'                      
+                            type: object
                             required:
                               - containers
                             properties:
@@ -23138,6 +23156,7 @@ spec:
                                 type: array
                                 items:
                                   description: A single application container that you want to run within a pod.
+                                  type: object
                                   required:
                                     - name
                                     - image
@@ -23713,6 +23732,7 @@ spec:
                                 type: array
                                 items:
                                   description: HostAlias holds the mapping between IP and hostnames that will be injected as an entry in the pod's hosts file.
+                                  type: object
                                   properties:
                                     hostnames:
                                       description: Hostnames for the above IP address.
@@ -23741,6 +23761,7 @@ spec:
                                 type: array
                                 items:
                                   description: LocalObjectReference contains enough information to let you locate the referenced object inside the same namespace.
+                                  type: object
                                   properties:
                                     name:
                                       description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
@@ -23752,6 +23773,7 @@ spec:
                                 type: array
                                 items:
                                   description: A single application container that you want to run within a pod.
+                                  type: object
                                   required:
                                     - name
                                     - image
@@ -24335,6 +24357,7 @@ spec:
                                 type: string
                               securityContext:
                                 description: PodSecurityContext holds pod-level security attributes and common container settings. Some fields are also present in container.securityContext.  Field values of container.securityContext take precedence over field values of PodSecurityContext.
+                                type: object
                                 properties:
                                   fsGroup:
                                     description: |-
@@ -24354,6 +24377,7 @@ spec:
                                     format: int64
                                   seLinuxOptions:
                                     description: SELinuxOptions are the labels to be applied to the container
+                                    type: object
                                     properties:
                                       level:
                                         description: Level is SELinux level label that applies to the container.
@@ -24391,6 +24415,7 @@ spec:
                                 type: array
                                 items:
                                   description: 'The pod this Toleration is attached to tolerates any taint that matches the triple <key,value,effect> using the matching operator <operator>.'
+                                  type: object
                                   properties:
                                     effect:
                                       description: 'Effect indicates the taint effect to match. Empty means match all taint effects. When specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.'
