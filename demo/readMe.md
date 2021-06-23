@@ -208,6 +208,13 @@ kubectl get service -n istio-system istio-ingressgateway
 
 ## Step 6. process 자동화를 위한 pipeline 생성하기 (tekton)
   - 실제 운영과정에서는 새로운 데이터를 통해 모델을 다시 학습하고 배포하는 일련의 작업들을 해야할 경우가 생기는데, 이를 자동화 해주는 메뉴이다.
-  - Tekton backend 사용하여 pipeline을 생성한다 : [6.workflow_tekton.yaml](6.workflow_tekton.yaml)
+  - 코드 Run을 통해 생성된 fmnist_pipeline.yaml을 통해 pipeline을 생성한다. : [6.workflow_tekton.yaml](6.workflow_tekton.yaml)  
 
-*serving 같은 경우 kfp python module을 사용하여 image로 만들고, 이를 workflow task로 등록하여 생성하였다. 참고 : [KFServing-fairing.ipynb](KFServing-fairing.ipynb)
+![6.tekton-pipeline.PNG](./img/6.tekton-pipeline.PNG)
+
+*AttributeError: 'Container' object has no attribute 'openapi_types'라는 에러 메시지가 뜬다면, 다음 커맨드를 입력하여 kubernetes python pakage를 업그레이드 한다.
+```
+pip install --upgrade kubernetes
+```
+*serving 같은 경우 kfp python module을 사용하여 image로 만들고, 이를 task로 이용하여 생성하였다. 참고 : KFServing-fairing.ipynb
+
