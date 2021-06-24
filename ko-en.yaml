@@ -29380,6 +29380,7 @@ spec:
       properties:
         spec:
           description: "%tfjob_original.yaml.spec.validation.openAPIV3Schema.properties.spec"
+          type: "object"
           required:
           - "tfReplicaSpecs"
           properties:
