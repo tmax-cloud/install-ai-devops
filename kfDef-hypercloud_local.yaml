@@ -1,7 +1,6 @@
 apiVersion: kfdef.apps.kubeflow.org/v1
 kind: KfDef
 metadata:
-  name: kubeflow
   namespace: kubeflow
 spec:
   applications:
@@ -39,22 +38,22 @@ spec:
   #       name: manifests
   #       path: stacks/ibm/application/bootstrap
   #   name: bootstrap
-  # cert-manager
-  #  - kustomizeConfig:
-  #      repoRef:
-  #        name: manifests
-  #       path: stacks/ibm/application/cert-manager-crds
-  #  name: cert-manager-crds
-  # - kustomizeConfig:
-  #    repoRef:
-  #      name: manifests
-  #      path: stacks/ibm/application/cert-manager-kube-system-resources
-  #  name: cert-manager-kube-system-resources
-  #- kustomizeConfig:
-  #    repoRef:
-  #      name: manifests
-  #      path: stacks/ibm/application/cert-manager
-  #  name: cert-manager
+    # cert-manager
+ #- kustomizeConfig:
+ #    repoRef:
+ #      name: manifests
+ #      path: stacks/ibm/application/cert-manager-crds
+ #  name: cert-manager-crds
+ # - kustomizeConfig:
+ #     repoRef:
+ #       name: manifests
+ #       path: stacks/ibm/application/cert-manager-kube-system-resources
+ #   name: cert-manager-kube-system-resources
+ # - kustomizeConfig:
+ #     repoRef:
+ #       name: manifests
+ #       path: stacks/ibm/application/cert-manager
+ #   name: cert-manager
   # Tekton
 #  - kustomizeConfig:
 #      repoRef:
@@ -108,6 +107,11 @@ spec:
   - kustomizeConfig:
       repoRef:
         name: manifests
+        path: pipeline/minio/installs/generic
+    name: minio
+  - kustomizeConfig:
+      repoRef:
+        name: manifests
         path: stacks/ibm/application/notebooks2
     name: notebooks
   - kustomizeConfig:
@@ -153,7 +157,4 @@ spec:
   #       name: manifests
   #       path: stacks/ibm/application/spark-operator
   #   name: spark-operator
-  repos:
-  - name: manifests
-    uri: https://github.com/tmax-cloud/kubeflow-manifests/archive/kt-test.tar.gz
-  version: kt-test
+  version: kt_test
