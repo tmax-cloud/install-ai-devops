@@ -89,11 +89,12 @@
     * Step 0 ~ 4 중 Step 0, 2, 3은 비고를 참고하여 진행한다. 나머지는 그대로 진행하면 된다.
 
 ## Install Steps
-0. [kfctl 설치]
-1. [설치 디렉토리 생성]
-2. [Kustomize 리소스 생성]
-3. [Kubeflow 배포]
-4. [배포 확인 및 기타 작업]
+0. [kfctl 설치](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-0-kfctl-%EC%84%A4%EC%B9%98)
+1. [설치 디렉토리 생성](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-1-%EC%84%A4%EC%B9%98-%EB%94%94%EB%A0%89%ED%86%A0%EB%A6%AC-%EC%83%9D%EC%84%B1)
+2. [Kustomize 리소스 생성](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-2-kustomize-%EB%A6%AC%EC%86%8C%EC%8A%A4-%EC%83%9D%EC%84%B1)
+3. [Kubeflow 배포](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-3-kubeflow-%EB%B0%B0%ED%8F%AC)
+4. [배포 확인 및 기타 작업](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-4-%EB%B0%B0%ED%8F%AC-%ED%99%95%EC%9D%B8-%EB%B0%8F-%EA%B8%B0%ED%83%80-%EC%9E%91%EC%97%85)
+4. [Structural Schema 적용]
 
 ## Step 0. kfctl 설치
 * 목적 : `Kubeflow component를 배포 및 관리하기 위한 커맨드 라인툴인 kfctl을 설치한다.`
@@ -171,6 +172,22 @@
         $ echo '{"apiVersion":"security.istio.io/v1beta1","kind":"PeerAuthentication","metadata":{"annotations":{},"name":"default","namespace":"istio-system"},"spec":{"mtls":{"mode":"DISABLE"}}}' |cat > disable-mtls.json
         $ kubectl apply -f disable-mtls.json
         ```
+
+## Step 5. Structural Schema 적용
+* 목적 : `kfctl 로직상 Structural Schema를 반영하지 못하는 CRD들에 대해 스크립트를 실행해 반영한다.`
+* 생성 순서 : 
+    * 아래 명령어를 수행하여 기존 crd를 삭제하고 새로운 crd schema를 create 한다.
+        ```bash
+        $ chmod +x structural_schema.sh
+        $ ./structural_schema.sh
+        ```   
+    * I18N 국문화 적용을 원한다면 위 명령어 대신 아래 명령어를 수행하여 crd를 삭제 후 create한다.
+        ```bash
+        $ chmod +x structural_schema_ko-en.sh
+        $ ./structural_schema_ko-en.sh
+        ```        
+        ```
+
 ## 기타 : kubeflow 삭제
 * 목적 : `kubeflow 설치 시에 배포된 모든 리소스를 삭제 한다.`
 * 생성 순서 : 
@@ -183,7 +200,7 @@
     * kfctl 1.1버전 이상부터 리소스의 삭제가 정상적으로 이루어진다. kfctl 버전은 다음명령어를 통해 확인할 수 있다.
         ```bash
         $ kfctl version
-
+        ```
 
 
 
