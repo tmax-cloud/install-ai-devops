@@ -94,7 +94,7 @@
 2. [Kustomize 리소스 생성](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-2-kustomize-%EB%A6%AC%EC%86%8C%EC%8A%A4-%EC%83%9D%EC%84%B1)
 3. [Kubeflow 배포](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-3-kubeflow-%EB%B0%B0%ED%8F%AC)
 4. [배포 확인 및 기타 작업](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-4-%EB%B0%B0%ED%8F%AC-%ED%99%95%EC%9D%B8-%EB%B0%8F-%EA%B8%B0%ED%83%80-%EC%9E%91%EC%97%85)
-4. [Structural Schema 적용]
+4. [Structural Schema 적용](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-5-structural-schema-%EC%A0%81%EC%9A%A9)
 
 ## Step 0. kfctl 설치
 * 목적 : `Kubeflow component를 배포 및 관리하기 위한 커맨드 라인툴인 kfctl을 설치한다.`
