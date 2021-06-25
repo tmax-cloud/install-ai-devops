@@ -1,7 +1,7 @@
 gcr.io/ml-pipeline/api-server:0.2.5
 gcr.io/kubeflow-images-public/kubernetes-sigs/application:1.0-beta
-argoproj/argocli:v2.8.0	
-argoproj/workflow-controller:v2.8.0
+argoproj/argocli:v2.11.7	
+argoproj/workflow-controller:v2.11.7
 gcr.io/kubeflow-images-public/ingress-setup:latest
 gcr.io/kubeflow-images-public/centraldashboard:v1.0.0-g3ec0de71
 quay.io/jetstack/cert-manager-cainjector:v0.11.0
