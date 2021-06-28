@@ -119,5 +119,14 @@ spec:
         - {name: namespace}
         - {name: pvc_name}
       runAfter: [list-list]
-      timeout: 0s    
+      timeout: 0s
+    finally:
+    - name: echo
+      taskSpec:
+        steps:
+        - name: main
+          args: [echo "$0", Done!]
+          command: [sh, -c]
+          image: library/bash:4.4.23
+      timeout: 0s
   timeout: 0s
