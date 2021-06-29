@@ -186,8 +186,7 @@
         $ chmod +x structural_schema_ko-en.sh
         $ ./structural_schema_ko-en.sh
         ```        
-        ```
-
+        
 ## 기타 : kubeflow 삭제
 * 목적 : `kubeflow 설치 시에 배포된 모든 리소스를 삭제 한다.`
 * 생성 순서 : 
