@@ -3,6 +3,8 @@
 echo "==============================================================="
 echo "STEP 1. DELETE EXISTING CRD"
 echo "==============================================================="
+# Delete tfjobs.kubeflow.org
+kubectl delete crd tfjobs.kubeflow.org  
 # Delete pytorchjobs.kubeflow.org 
 kubectl delete crd pytorchjobs.kubeflow.org 
 # Delete inferenceservices.serving.kubeflow.org 

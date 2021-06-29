@@ -60,5 +60,8 @@ spec:
                   - "python"
                   - "/app/fmnist-save-model-renew.py"    
                   - "--learning_rate=${trialParameters.learningRate}"
-                  - "--dropout_rate=${trialParameters.dropoutRate}"             
+                  - "--dropout_rate=${trialParameters.dropoutRate}"    
+                resources:
+                  limits:
+                    nvidia.com/gpu: 1           
             restartPolicy: Never
