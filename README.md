@@ -5,7 +5,7 @@
 * Kubeflow v1.2.0 (https://github.com/kubeflow/kubeflow)
 * Argo v2.12.10 (https://github.com/argoproj/argo)
 * Jupyter (https://github.com/jupyter/notebook)
-* Katib v0.10.0 (https://github.com/kubeflow/katib)
+* Katib v0.11.0 (https://github.com/kubeflow/katib)
 * KFServing v0.5.1 (https://github.com/kubeflow/kfserving)
 * Training Job
     * TFJob v1.0.0 (https://github.com/kubeflow/tf-operator)
