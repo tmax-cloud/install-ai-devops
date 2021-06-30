@@ -88,7 +88,7 @@
         $ wget https://github.com/kubeflow/kfctl/releases/download/v1.2.0/kfctl_v1.2.0-0-gbc038f9_linux.tar.gz
         ```
 3. 앞으로의 진행
-    * Step 0 ~ 4 중 Step 0, 2, 3은 비고를 참고하여 진행한다. 나머지는 그대로 진행하면 된다.
+    * Step 0 ~ 5 중 Step 0, 2, 3, 5은 비고를 참고하여 진행한다. 나머지는 그대로 진행하면 된다.
 
 ## Install Steps
 0. [kfctl 설치](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-0-kfctl-%EC%84%A4%EC%B9%98)
@@ -168,7 +168,7 @@
         $ kubectl get pod -n kubeflow
         ```
     * katib-db-manager와 katib-mysql pod만 running 상태가 아니라면 10분가량 시간을 두고 기다리면 running 상태도 바뀔 가능성이 높음 (내부 liveness probe 로직 문제로 여러번 restarts)  
-* 비고 :
+* 참고 :
     * KFServing과 Istio 1.5.1과의 호환을 위해 istio namespace의 mtls를 disable처리 하였음.    
 
 ## Step 5. Structural Schema 적용
