@@ -19,13 +19,12 @@
         ```bash
         $ kubectl get storageclass
         ```
-    * 만약 아무 storage class가 없다면 아래 링크로 이동하여 rook-ceph 설치한다.
-        * https://github.com/tmax-cloud/install-rookceph/blob/main/README.md
-    * Storage class는 있지만 default로 설정된 것이 없다면 아래 명령어를 실행한다.
+    * 만약 storage class가 없다면 storage class를 설치해준다.
+    * Storage class는 있지만 default로 설정된 것이 없다면 아래 명령어를 실행한다.(storage class로 rook-ceph이 설치되어 있을 경우에만 해당)
         ```bash
         $ kubectl patch storageclass csi-cephfs-sc -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
         ```
-    * csi-cephfs-sc는 위 링크로 rook-ceph를 설치했을 때 생성되는 storage class이며 다른 storage class를 default로 사용해도 무관하다.
+    * csi-cephfs-sc는 rook-ceph를 설치했을 때 생성되는 storage class이며 다른 storage class를 default로 사용해도 무관하다.
 2. Istio
     * v1.5.1
         * https://github.com/tmax-cloud/install-istio/blob/5.0/README.md
@@ -82,6 +81,9 @@
         ```bash
         $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/5.0/sed.sh
         $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/5.0/kustomize_local.tar.gz
+        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/5.0/crd-for-hypercloud.tar.gz
+        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/5.0/structural_schema.sh
+        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/5.0/structural_schema_ko-en.sh
         $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/5.0/kfDef-hypercloud.yaml
         $ wget https://github.com/kubeflow/kfctl/releases/download/v1.2.0/kfctl_v1.2.0-0-gbc038f9_linux.tar.gz
         ```
@@ -94,7 +96,7 @@
 2. [Kustomize 리소스 생성](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-2-kustomize-%EB%A6%AC%EC%86%8C%EC%8A%A4-%EC%83%9D%EC%84%B1)
 3. [Kubeflow 배포](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-3-kubeflow-%EB%B0%B0%ED%8F%AC)
 4. [배포 확인 및 기타 작업](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-4-%EB%B0%B0%ED%8F%AC-%ED%99%95%EC%9D%B8-%EB%B0%8F-%EA%B8%B0%ED%83%80-%EC%9E%91%EC%97%85)
-4. [Structural Schema 적용](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-5-structural-schema-%EC%A0%81%EC%9A%A9)
+5. [Structural Schema 적용](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-5-structural-schema-%EC%A0%81%EC%9A%A9)
 
 ## Step 0. kfctl 설치
 * 목적 : `Kubeflow component를 배포 및 관리하기 위한 커맨드 라인툴인 kfctl을 설치한다.`
@@ -125,7 +127,7 @@
 * 생성 순서 : 
     * 아래 명령어를 수행하여 Kustomize 리소스를 생성한다.
         ```bash
-        $ export CONFIG_URI="https://raw.githubusercontent.com/tmax-cloud/kubeflow-manifests/kt_test/kfDef-hypercloud.yaml"
+        $ export CONFIG_URI="https://raw.githubusercontent.com/tmax-cloud/kubeflow-manifests/ai_devops.v1.2.5.0/kfDef-hypercloud.yaml"
         $ kfctl build -V -f ${CONFIG_URI}
         ```
     * 정상적으로 완료되면 kustomize라는 디렉토리가 생성된다.
@@ -166,24 +168,36 @@
         $ kubectl get pod -n kubeflow
         ```
     * katib-db-manager와 katib-mysql pod만 running 상태가 아니라면 10분가량 시간을 두고 기다리면 running 상태도 바뀔 가능성이 높음 (내부 liveness probe 로직 문제로 여러번 restarts)  
-   
-    * 모든 pod의 상태가 정상이라면 KFServing과 Istio 1.5.1과의 호환을 위해 아래 명령어를 수행하여 Istio의 mTLS 기능을 disable한다.
-        ```bash
-        $ echo '{"apiVersion":"security.istio.io/v1beta1","kind":"PeerAuthentication","metadata":{"annotations":{},"name":"default","namespace":"istio-system"},"spec":{"mtls":{"mode":"DISABLE"}}}' |cat > disable-mtls.json
-        $ kubectl apply -f disable-mtls.json
-        ```
+* 비고 :
+    * KFServing과 Istio 1.5.1과의 호환을 위해 istio namespace의 mtls를 disable처리 하였음.    
 
 ## Step 5. Structural Schema 적용
-* 목적 : `kfctl 로직상 Structural Schema를 반영하지 못하는 CRD들에 대해 스크립트를 실행해 반영한다.`
+* 목적 : `Hypercloud Console의 form editor기능과 다국어 지원을 위해 Structural Schema를 적용한다.`
 * 생성 순서 : 
-    * 아래 명령어를 수행하여 기존 crd를 삭제하고 새로운 crd schema를 create 한다.
+    * form editor 사용을 원한다면 아래 명령어를 수행하여 기존 crd를 삭제하고 새로운 crd schema를 create 한다.
         ```bash
         $ chmod +x structural_schema.sh
         $ ./structural_schema.sh
         ```   
-    * I18N 국문화 적용을 원한다면 위 명령어 대신 아래 명령어를 수행하여 crd를 삭제 후 create한다.
+    * 다국어 지원을 원한다면 위 명령어 대신 아래 명령어를 수행하여 crd를 삭제 후 create한다.
         ```bash
         $ chmod +x structural_schema_ko-en.sh
+        $ ./structural_schema_ko-en.sh
+        ```        
+* 비고 : 
+    * 폐쇄망 환경일 경우 설치 디렉토리 ${KF_DIR}에 미리 다운로드받은 structural_schema.sh, structural_schema_ko-en.sh, crd-for-hypercloud.tar.gz 파일을 옮긴다.
+    * 아래 명령어를 통해 CRD 스키마의 압축을 풀고 스크립트를 실행하여 structural schema를 적용한다.
+        ```bash            
+        $ tar -zxvf crd-for-hypercloud.tar.gz  
+        $ chmod +x structural_schema.sh
+        $ chmod +x structural_schema_ko-en.sh
+        ``` 
+    * form-editor 사용을 원하는 경우
+        ```bash
+        $ ./structural_schema.sh
+        ``` 
+    * 다국어 지원을 원하는 경우    
+        ``` bash
         $ ./structural_schema_ko-en.sh
         ```        
         
@@ -192,7 +206,7 @@
 * 생성 순서 : 
     * 아래 명령어를 수행하여 kubeflow 모듈을 삭제한다.
         ```bash
-        $ export CONFIG_URI="https://raw.githubusercontent.com/tmax-cloud/kubeflow-manifests/kt_test/kfDef-hypercloud.yaml"
+        $ export CONFIG_URI="https://raw.githubusercontent.com/tmax-cloud/kubeflow-manifests/ai_devops.v1.2.5.0/kfDef-hypercloud.yaml"
         $ kfctl delete -V -f ${CONFIG_URI}
         ```
 * 비고 :

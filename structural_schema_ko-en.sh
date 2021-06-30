@@ -18,5 +18,13 @@ echo "==============================================================="
 echo "STEP 2. CREATE CRD"
 echo "==============================================================="
 
-# Create CRD 
-kubectl create -f ko-en.yaml
+# Create experiments.kubeflow.org
+kubectl create -f ./crd-for-hypercloud/experiments/experiment_key.yaml
+# Create notebooks.kubeflow.tmax.io
+kubectl create -f ./crd-for-hypercloud/notebooks/notebooks_key.yaml
+# Create tfjobs.kubeflow.org
+kubectl create -f ./crd-for-hypercloud/tfjobs/tfjob_key.yaml
+# Create pytorchjobs.kubeflow.org 
+kubectl create -f ./crd-for-hypercloud/pytorchjobs/pytorchjob_key.yaml
+# Create inferenceservices.serving.kubeflow.org
+kubectl create -f ./crd-for-hypercloud/inferenceservices/inferenceservice_key.yaml

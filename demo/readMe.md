@@ -35,13 +35,9 @@ Fashion-MNIST 데이터를 활용하여 Image가 어떤 Fashion Item인지 추�
 ## Step 0. 작업을 위한 namespace, pvc 만들기
   - ai-devops에서는 작업하려는 namespace를 profile이라는 crd를 통해 관리한다.
   - ai-devops 기능을 사용하기 위한 role, rolebinding등의 k8s리소스 배포 뿐만아니라 istio-injection 활성화와 같은 작업을 자동으로 진행한다.
-  - master node에서 kubectl create 커맨드를 활용하여 demo profile을 생성한다. 
-  ```
-  $ kubectl apply -f 0.profile.yaml
-  ```
+  - UI의 Import YAML 버튼을 활용하여 demo profile을 생성한다. 
+![0.profile.PNG](./img/0.profile.PNG) 
   - 참고 : [0.profile.yaml](./0.profile.yaml)
-
-*현재, hyperCloud Console상에는 해당 리소스를 배포할 수 있는 UI가 없다. 추 후, 유저 권한관리와 엮어 기능 업데이트 예정이다.
 
   - 본 시나리오의 작업을 위해 demo-pvc(readWriteMany)를 생성한다.
 
@@ -55,6 +51,7 @@ Fashion-MNIST 데이터를 활용하여 Image가 어떤 Fashion Item인지 추�
 ![1.notebook.PNG](./img/1.notebook.PNG)
   - 참고 : [1.notebook.yaml](./1.notebook.yaml)
   - 폐쇄망 환경의 경우 : [1.notebook_closednw.yaml](./1.notebook_closednw.yaml)
+    * 폐쇄망 환경의 경우에는 1.notebook_closednw.yaml 파일의 image registry 부분을 수정한다.(필수)
 
 *시나리오에서는 여러 커스텀 패키지가 포함된 custom jupyterNotebook image를 사용하였다. (brightfly/kubeflow-jupyter-lab:tf2.0-gpu)
 
