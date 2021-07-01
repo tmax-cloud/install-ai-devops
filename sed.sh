@@ -76,7 +76,7 @@ sed -i "s/\"image\": \"kfserving\/lgbserver/\"image\": \"${registry}\/kfserving\
 sed -i "s/\"image\" : \"gcr.io\/kfserving\/storage-initializer/\"image\" : \"${registry}\/gcr.io\/kfserving\/storage-initializer/g" ${dir}/kfserving\/upstream\/kfserving.yaml
 sed -i "s/image: gcr.io\/kfserving\/kfserving-controller/image: '${registry}\/gcr.io\/kfserving\/kfserving-controller/g" ${dir}/kfserving\/upstream\/kfserving.yaml
 sed -i "s/image: gcr.io\/kubebuilder\/kube-rbac-proxy/image: '${registry}\/gcr.io\/kubebuilder\/kube-rbac-proxy/g" ${dir}/kfserving\/upstream\/kfserving.yaml
-sed -i "s/image: tmaxcloudck\/wf-webhook/image: '${registry}\/tmaxcloudck\/wf-webhook/g" ${dir}/kfserving\/upstream\/kfserving.yaml
+sed -i "s/newName: tmaxcloudck\/wf-webhook/newName: ${registry}\/tmaxcloudck\/wf-webhook/g" ${dir}/argo/base_v3/kustomization.yaml
 sed -i "s/gcr.io\/kubeflow-images-public\/tensorflow-1.15.2-notebook-cpu/${registry}\/gcr.io\/kubeflow-images-public\/tensorflow-1.15.2-notebook-cpu/g" ${dir}/jupyter/jupyter-web-app/base/configs/spawner_ui_config.yaml
 sed -i "s/gcr.io\/kubeflow-images-public\/tensorflow-1.15.2-notebook-gpu/${registry}\/gcr.io\/kubeflow-images-public\/tensorflow-1.15.2-notebook-gpu/g" ${dir}/jupyter/jupyter-web-app/base/configs/spawner_ui_config.yaml
 sed -i "s/gcr.io\/kubeflow-images-public\/tensorflow-2.1.0-notebook-cpu/${registry}\/gcr.io\/kubeflow-images-public\/tensorflow-2.1.0-notebook-cpu/g" ${dir}/jupyter/jupyter-web-app/base/configs/spawner_ui_config.yaml
