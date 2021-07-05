@@ -13,6 +13,8 @@ kubectl delete crd tfjobs.kubeflow.org
 kubectl delete crd pytorchjobs.kubeflow.org 
 # Delete inferenceservices.serving.kubeflow.org 
 kubectl delete crd inferenceservices.serving.kubeflow.org 
+# Delete trainedmodels.serving.kubeflow.org 
+kubectl delete crd trainedmodels.serving.kubeflow.org 
 
 echo "==============================================================="
 echo "STEP 2. CREATE CRD"
@@ -28,3 +30,5 @@ kubectl create -f ./crd-for-hypercloud/tfjobs/tfjob_key.yaml
 kubectl create -f ./crd-for-hypercloud/pytorchjobs/pytorchjob_key.yaml
 # Create inferenceservices.serving.kubeflow.org
 kubectl create -f ./crd-for-hypercloud/inferenceservices/inferenceservice_key.yaml
+# Create trainedmodels.serving.kubeflow.org 
+kubectl create -f ./crd-for-hypercloud/trainedmodels/trainedmodel_key.yaml
