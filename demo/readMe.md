@@ -105,6 +105,7 @@ cp $HOME/.docker/config.json /home/jovyan/.docker/config.json
 ```
 
   - 위의 작업이 끝났다면, 코드 내 DOCKER_REGISTRY를 자신이 사용할 registry로 변경한다.
+  - gpu를 사용할 수 없는 환경이라면 코드 내 base image를 brightfly/kubeflow-jupyter-lab:tf2.0-cpu 로 변경한다.
   - 폐쇄망 환경의 경우 fairing에서 사용할 base_image 또한 폐쇄망 내 registry에서 받아오도록 변경한다.
   - Run을 하여 이미지를 배포하자. (UI는 jupyter 버전에 따라 다를 수 있음)
   
