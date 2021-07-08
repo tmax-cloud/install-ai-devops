@@ -134,10 +134,12 @@
 * 비고 : 
     * 폐쇄망 환경일 경우 설치 디렉토리 ${KF_DIR}에 미리 다운로드받은 sed.sh, kustomize_local.tar.gz 파일을 옮긴다.
     * 아래 명령어를 통해 Kustomize 리소스의 압축을 풀고 yaml 파일들에서 이미지들을 pull 받을 registry를 바꿔준다.
+    * 그 후 registry를 바꿔준 kustomize 리소스를 tar.gz 형식으로 재압축한다.
         ```bash            
         $ tar xvfz kustomize_local.tar.gz  
         $ chmod +x ./sed.sh
         $ ./sed.sh ${REGISTRY_ADDRESS} ${KF_DIR}/kustomize
+        $ tar -zcvf kustomize_local.tar.gz ${KF_DIR}/kustomize
         ```
 
 ## Step 3. Kubeflow 배포
@@ -148,16 +150,16 @@
         $ export CONFIG_FILE=${KF_DIR}/kfDef-hypercloud.yaml
         $ kfctl apply -V -f ${CONFIG_FILE}
         ```
-    * 아래와 같이, cert-manager 관련 오류가 계속 뜨는 현상이 있을 수 있는데, 이는 관련 컴포넌트들이 아직 로딩중이라 발생하는 것으로, 기다리자.
-    
-        ![pasted image 0](https://user-images.githubusercontent.com/63379907/90479302-6aedb380-e169-11ea-8c6c-9c1b4e15517a.png)
     * 설치에는 약 10분 정도가 소요된다.
 * 비고 :
     * 폐쇄망 환경일 경우 설치 디렉토리 ${KF_DIR}에 미리 다운로드받은 kfDef-hypercloud_local.yaml 파일을 옮긴다.
-    * 아래 명령어를 수행하여 Kubeflow를 배포한다.
+    * 아래 명령어를 수행하여 kfDef-hypercloud_local.yaml 파일의 repo를 이전 단계에서 압축한 kustomize_local.tar.gz 파일의 경로로 변경한다.
+    * 아래 명령어를 수행하여 Kubeflow를 배포한다.    
         ```bash
         $ export CONFIG_FILE=${KF_DIR}/kfDef-hypercloud_local.yaml
-        $ kfctl apply -V -f ${CONFIG_FILE}
+        $ export LOCAL_REPO=${KF_DIR}/kustomize_local.tar.gz
+        $ sed -i 's/{local_repo}/'${LOCAL_REPO}'/g' ${CONFIG_FILE}
+        $ kfctl apply -V -f ${CONFIG_FILE}        
         ```
    
 ## Step 4. 배포 확인 및 기타 작업

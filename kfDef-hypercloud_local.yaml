@@ -69,4 +69,7 @@ spec:
         name: manifests
         path: kfserving/installs/generic
     name: kfserving  
+  repos:
+  - name: manifests
+    uri: file:{local_repo}
   version: ai_devops.v1.2.5.0
