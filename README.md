@@ -214,6 +214,10 @@
         ```bash
         $ kfctl version
         ```
+    * cluster name doesn"t match 라는 에러가 발생한다면 다음 명령어를 통해 clusterName을 확인하고 kfdef-hypercloud.yaml에 필드를 추가한다.    
+        ```bash
+        $ kubectl config view
+        ```
 
 
 
