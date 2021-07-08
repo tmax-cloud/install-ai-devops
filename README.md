@@ -219,8 +219,8 @@
         $ kubectl config view
         ```
       
-![스크린샷, 2021-07-08 10-31-59](https://user-images.githubusercontent.com/77767091/124864928-b9f83d80-dff4-11eb-9001-4cbdf7dbaed5.png)  
-![스크린샷, 2021-07-08 10-34-05](https://user-images.githubusercontent.com/77767091/124864860-9a611500-dff4-11eb-84af-68a9dde419ee.png)
+      ![스크린샷, 2021-07-08 10-31-59](https://user-images.githubusercontent.com/77767091/124864928-b9f83d80-dff4-11eb-9001-4cbdf7dbaed5.png)  
+      ![스크린샷, 2021-07-08 10-34-05](https://user-images.githubusercontent.com/77767091/124864860-9a611500-dff4-11eb-84af-68a9dde419ee.png)
   
 
 
