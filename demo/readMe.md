@@ -231,16 +231,16 @@ pip install --upgrade kubernetes
       - 'MINIO_ACCESS_KEY'와 'MINIO_SECRET_KEY' 확인(BASE64)
       - minio s3 endpoint 접근 설정
   ![7.minio-key.PNG](./img/7.minio-key.PNG)     
-  ![7.minio-secret.PNG](./img/7.minio-sercret.PNG) 
-  - 참고 : [7.s3_secret.yaml](./7.s3_secret.yaml)    
+  ![7.minio-secret.PNG](./img/7.minio-secret.PNG) 
+  참고 : [7.s3_secret.yaml](./7.s3_secret.yaml)    
   ![7.minio-sa.PNG](./img/7.minio-sa.PNG) 
-  - 참고 : [7.service-account.yaml](./7.service-account.yaml)    
+  참고 : [7.service-account.yaml](./7.service-account.yaml)    
     3. InferenceService 생성
       - multi-model serving을 위한 inference server 생성
       - 기존의 inferenceservice와 달리 storageuri 제거 및 s3 endpoint 연동
       - READY가 True 상태라면 정상동작 하는 것이고 생성시 5분가량 시간이 소요될 수 있다. 
   ![7.inferenceservice.PNG](./img/7.inferenceservice.PNG) 
-  - 참고 : [7.inferenceservice.yaml](./7.inferenceservice.yaml)        
+  참고 : [7.inferenceservice.yaml](./7.inferenceservice.yaml)        
     4. minio storage server에 업로드
       - minio-client 이용 checkpoint upload
       1) Notebook에서 terminal을 열고 아래 명령어를 통해 minio client 설치      
