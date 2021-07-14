@@ -242,20 +242,21 @@ pip install --upgrade kubernetes
   ![7.inferenceservice.PNG](./img/7.inferenceservice.PNG) 
   참고 : [7.inferenceservice.yaml](./7.inferenceservice.yaml)        
     4. minio storage server에 업로드
-      - minio-client 이용 checkpoint upload
-      1) Notebook에서 terminal을 열고 아래 명령어를 통해 minio client 설치      
-```
+   - minio-client 이용 checkpoint upload
+   - Notebook에서 terminal을 열고 아래 명령어를 통해 minio client 설치      
+```bash
 wget https://dl.min.io/client/mc/release/linux-amd64/mc
 chmod +x mc
 ```
-      2) minio pod IP와 port 확인
+   - minio pod IP와 port 확인       
   ![7.minio-podip.PNG](./img/7.minio-podip.PNG)     
   ![7.minio-port.PNG](./img/7.minio-port.PNG)     
-      3) minio client를 다운로드 받은 터미널 경로에서 확인한 IP, port를 사용하여 minio server 접근(access key와 secret key는 이전 단계에서 확인 했던 것을 사용)        
+   - minio client를 다운로드 받은 터미널 경로에서 확인한 IP, port를 사용하여 minio server 접근(access key와 secret key는 이전 단계에서 확인 했던 것을 사용)        
 ```bash
 ./mc config host add myminio http://${MINIO_IP}:${MINIO_PORT} ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KRY}
 ```
-      4) 해당 minio server에서 bucket을 만들고 checkpoint 업로드 후 정상 업로드 확인
+   - 해당 minio server에서 bucket을 만들고 checkpoint 업로드 후 정상 업로드 확인
+
 ```bash
 # bucket 생성
 ./mc mb myminio/triton
@@ -267,9 +268,9 @@ chmod +x mc
   ![7.minio-terminal.PNG](./img/7.minio-terminal.PNG)    
    5. trainedmodel 생성
   ![7.trainedmodel.PNG](./img/7.trainedmodel.PNG)
-  - 참고 : [7.fashion.yaml](7.fashion.yaml) 
+  참고 : [7.fashion.yaml](7.fashion.yaml) 
           [7.mnist.yaml](7.mnist.yaml) 
-   6. 학습한 model들을 이용한 inference test 
+   - 학습한 model들을 이용한 inference test 
     - InferenceService로 request를 위한 환경 변수 설정 (master node에서 진행)
 
 ```bash
