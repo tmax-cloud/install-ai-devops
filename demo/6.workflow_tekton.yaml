@@ -58,9 +58,6 @@ spec:
     - name: namespace
     tasks:
     - name: fmnist
-      params:
-      - name: pvc_name
-        value: $(params.pvc_name)
       taskSpec:
         steps:
         - name: main
@@ -86,16 +83,14 @@ spec:
           command:
           - python
           - /app/fmnist-save-model-renew.py
-          image: rhojw/katib-job:8E825523
+          image: rhojw/sample-job:3C8CE2EE
           volumeMounts:
           - mountPath: /result
-            name: pvolume-e819e39f92a888af338a32082ea85feaa488e4a0aabfacc858d718b
-        params:
-        - name: pvc_name
+            name: pvolume-05c5c4b5bf273771eb5cf834db4bf0f1642568810e135c7afcef651
         volumes:
-        - name: pvolume-e819e39f92a888af338a32082ea85feaa488e4a0aabfacc858d718b
+        - name: pvolume-05c5c4b5bf273771eb5cf834db4bf0f1642568810e135c7afcef651
           persistentVolumeClaim:
-            claimName: $(inputs.params.pvc_name)
+            claimName: demo-pvc
         metadata:
           labels:
             pipelines.kubeflow.org/pipelinename: ''
@@ -105,9 +100,6 @@ spec:
             tekton.dev/template: ''
       timeout: 0s
     - name: list-list
-      params:
-      - name: pvc_name
-        value: $(params.pvc_name)
       taskSpec:
         steps:
         - name: main
@@ -118,13 +110,11 @@ spec:
           image: library/bash:4.4.23
           volumeMounts:
           - mountPath: /result
-            name: pvolume-e819e39f92a888af338a32082ea85feaa488e4a0aabfacc858d718b
-        params:
-        - name: pvc_name
+            name: pvolume-05c5c4b5bf273771eb5cf834db4bf0f1642568810e135c7afcef651
         volumes:
-        - name: pvolume-e819e39f92a888af338a32082ea85feaa488e4a0aabfacc858d718b
+        - name: pvolume-05c5c4b5bf273771eb5cf834db4bf0f1642568810e135c7afcef651
           persistentVolumeClaim:
-            claimName: $(inputs.params.pvc_name)
+            claimName: demo-pvc
         metadata:
           labels:
             pipelines.kubeflow.org/pipelinename: ''
@@ -182,3 +172,4 @@ spec:
             tekton.dev/template: ''
       timeout: 0s
   timeout: 0s
+
