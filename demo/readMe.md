@@ -209,6 +209,9 @@ kubectl get service -n istio-system istio-ingressgateway
   - 코드 Run을 통해 생성된 fmnist_pipeline.yaml을 통해 pipelinerun을 배포한다. : [6.workflow_tekton.yaml](6.workflow_tekton.yaml)    
 ![6.tekton-pipeline.PNG](./img/6.tekton-pipeline.PNG)
 
+*demo 네임스페이스의 service account가 isvc를 생성할수 있도록 다음 yaml을 이용하여 rolebinding을 적용한다.
+참고 : [6.kfserving-rolebinding.yaml](./6.kfserving-rolebinding.yaml)
+
 *kfp_tekton 패키지가 설치되어 있지 않다면 아래 명령어를 통해 kfp_tekton pakage를 install한다.
 ```
 pip install kfp_tekton
