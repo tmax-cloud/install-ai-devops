@@ -2,6 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
   name: fmnistpipeline
+  namespace: demo
   annotations:
     tekton.dev/output_artifacts: '{}'
     tekton.dev/input_artifacts: '{}'
@@ -18,44 +19,44 @@ metadata:
       "model_version"}, {"name": "namespace"}], "name": "FMnistPipeline"}'
 spec:
   params:
-  - name: learning_rate
+  - name: act
+    value: ''
+  - name: checkpoint_dir
     value: ''
   - name: dropout_rate
     value: ''
   - name: epoch
     value: ''
-  - name: act
-    value: ''
   - name: layer
     value: ''
-  - name: checkpoint_dir
-    value: ''
-  - name: saved_model_dir
-    value: ''
-  - name: pvc_name
-    value: ''
-  - name: tensorboard_log
-    value: ''
-  - name: name
+  - name: learning_rate
     value: ''
   - name: model_version
     value: ''
+  - name: name
+    value: ''
   - name: namespace
+    value: ''
+  - name: pvc_name
+    value: ''
+  - name: saved_model_dir
+    value: ''
+  - name: tensorboard_log
     value: ''
   pipelineSpec:
     params:
-    - name: learning_rate
+    - name: act
+    - name: checkpoint_dir
     - name: dropout_rate
     - name: epoch
-    - name: act
     - name: layer
-    - name: checkpoint_dir
-    - name: saved_model_dir
-    - name: pvc_name
-    - name: tensorboard_log
-    - name: name
+    - name: learning_rate
     - name: model_version
+    - name: name
     - name: namespace
+    - name: pvc_name
+    - name: saved_model_dir
+    - name: tensorboard_log
     tasks:
     - name: fmnist
       taskSpec:
@@ -83,7 +84,7 @@ spec:
           command:
           - python
           - /app/fmnist-save-model-renew.py
-          image: rhojw/sample-job:3C8CE2EE
+          image: kitaeyoo777/sample-job:CA8279D2
           volumeMounts:
           - mountPath: /result
             name: pvolume-05c5c4b5bf273771eb5cf834db4bf0f1642568810e135c7afcef651
@@ -132,7 +133,7 @@ spec:
         - name: main
           args:
           - --namespace
-          - kubeflow
+          - demo
           - --storage_uri
           - pvc://demo-pvc/saved_model
           - --name
@@ -140,7 +141,7 @@ spec:
           command:
           - python
           - /app/KFServing-fairing.py
-          image: rhojw/kfserving:6962115B
+          image: kitaeyoo777/kfserving:56F6F7C1
         metadata:
           labels:
             pipelines.kubeflow.org/pipelinename: ''
@@ -172,4 +173,3 @@ spec:
             tekton.dev/template: ''
       timeout: 0s
   timeout: 0s
-
