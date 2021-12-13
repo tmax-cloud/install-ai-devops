@@ -84,7 +84,7 @@
         $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/5.0/crd-for-hypercloud.tar.gz
         $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/5.0/structural_schema.sh
         $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/5.0/structural_schema_ko-en.sh
-        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/5.0/kfDef-hypercloud.yaml
+        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/5.0/kfDef-hypercloud_local.yaml
         $ wget https://github.com/kubeflow/kfctl/releases/download/v1.2.0/kfctl_v1.2.0-0-gbc038f9_linux.tar.gz
         ```
 3. 앞으로의 진행
