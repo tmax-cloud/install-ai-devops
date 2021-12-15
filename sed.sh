@@ -14,10 +14,11 @@ fi
 
 echo "[$0] Modify images in Kustomize manifest files"
 
+sed -i "s/image: \"gcr.io\/ml-pipeline\/minio/image: \"${registry}\/gcr.io\/ml-pipeline\/minio/g" ${dir}/pipeline\/upstream\/env\/platform-agnostic\/minio\/minio-deployment.yaml
 sed -i "s/image: \"docker.io\/istio\/proxyv2/image: \"${registry}\/docker.io\/istio\/proxyv2/g" ${dir}/istio-1-3-1\/cluster-local-gateway-1-3-1\/base\/deployment.yaml
-sed -i "s/newName: gcr.io\/kubeflow-images-public\/kubernetes-sigs\/application/newName: ${registry}\/gcr.io\/kubeflow-images-public\/kubernetes-sigs\/application/g" ${dir}/application/application/base/kustomization.yaml
-sed -i "s/newName: gcr.io\/kubeflow-images-public\/profile-controller/newName: ${registry}\/gcr.io\/kubeflow-images-public\/profile-controller/g" ${dir}/profiles/base/kustomization.yaml
-sed -i "s/newName: gcr.io\/kubeflow-images-public\/kfam/newName: ${registry}\/gcr.io\/kubeflow-images-public\/kfam/g" ${dir}/profiles/base/kustomization.yaml
+sed -i "s/newName: gcr.io\/kubeflow-images-public\/kubernetes-sigs\/application/newName: ${registry}\/gcr.io\/kubeflow-images-public\/kubernetes-sigs\/application/g" ${dir}/application/v3/kustomization.yaml
+sed -i "s/newName: gcr.io\/kubeflow-images-public\/profile-controller/newName: ${registry}\/gcr.io\/kubeflow-images-public\/profile-controller/g" ${dir}/stacks/ibm/application/profiles/base/kustomization.yaml
+sed -i "s/newName: gcr.io\/kubeflow-images-public\/kfam/newName: ${registry}\/gcr.io\/kubeflow-images-public\/kfam/g" ${dir}/stacks/ibm/application/profiles/base/kustomization.yaml
 sed -i "s/\"image\": \"docker.io\/kubeflowkatib\/file-metrics-collector/\"image\": \"${registry}\/docker.io\/kubeflowkatib\/file-metrics-collector/g" ${dir}/katib\/components\/controller\/katib-config.yaml
 sed -i "s/\"image\": \"docker.io\/kubeflowkatib\/tfevent-metrics-collector/\"image\": \"${registry}\/docker.io\/kubeflowkatib\/tfevent-metrics-collector/g" ${dir}/katib\/components\/controller\/katib-config.yaml
 sed -i "s/\"image\": \"docker.io\/kubeflowkatib\/suggestion-hyperopt/\"image\": \"${registry}\/docker.io\/kubeflowkatib\/suggestion-hyperopt/g" ${dir}/katib\/components\/controller\/katib-config.yaml
@@ -74,8 +75,8 @@ sed -i "s/\"image\": \"nvcr.io\/nvidia\/tritonserver/\"image\": \"${registry}\/n
 sed -i "s/\"image\": \"kfserving\/pmmlserver/\"image\": \"${registry}\/kfserving\/pmmlserver/g" ${dir}/kfserving\/upstream\/kfserving.yaml
 sed -i "s/\"image\": \"kfserving\/lgbserver/\"image\": \"${registry}\/kfserving\/lgbserver/g" ${dir}/kfserving\/upstream\/kfserving.yaml
 sed -i "s/\"image\" : \"gcr.io\/kfserving\/storage-initializer/\"image\" : \"${registry}\/gcr.io\/kfserving\/storage-initializer/g" ${dir}/kfserving\/upstream\/kfserving.yaml
-sed -i "s/image: gcr.io\/kfserving\/kfserving-controller/image: '${registry}\/gcr.io\/kfserving\/kfserving-controller/g" ${dir}/kfserving\/upstream\/kfserving.yaml
-sed -i "s/image: gcr.io\/kubebuilder\/kube-rbac-proxy/image: '${registry}\/gcr.io\/kubebuilder\/kube-rbac-proxy/g" ${dir}/kfserving\/upstream\/kfserving.yaml
+sed -i "s/image: gcr.io\/kfserving\/kfserving-controller/image: ${registry}\/gcr.io\/kfserving\/kfserving-controller/g" ${dir}/kfserving\/upstream\/kfserving.yaml
+sed -i "s/image: gcr.io\/kubebuilder\/kube-rbac-proxy/image: ${registry}\/gcr.io\/kubebuilder\/kube-rbac-proxy/g" ${dir}/kfserving\/upstream\/kfserving.yaml
 sed -i "s/gcr.io\/kubeflow-images-public\/tensorflow-1.15.2-notebook-cpu/${registry}\/gcr.io\/kubeflow-images-public\/tensorflow-1.15.2-notebook-cpu/g" ${dir}/jupyter/jupyter-web-app/base/configs/spawner_ui_config.yaml
 sed -i "s/gcr.io\/kubeflow-images-public\/tensorflow-1.15.2-notebook-gpu/${registry}\/gcr.io\/kubeflow-images-public\/tensorflow-1.15.2-notebook-gpu/g" ${dir}/jupyter/jupyter-web-app/base/configs/spawner_ui_config.yaml
 sed -i "s/gcr.io\/kubeflow-images-public\/tensorflow-2.1.0-notebook-cpu/${registry}\/gcr.io\/kubeflow-images-public\/tensorflow-2.1.0-notebook-cpu/g" ${dir}/jupyter/jupyter-web-app/base/configs/spawner_ui_config.yaml

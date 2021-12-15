@@ -30,6 +30,7 @@ docker.io/kubeflowkatib/pytorch-mnist:v1beta1-45c5727
 docker.io/kubeflowkatib/pytorch-mnist:v1beta1-45c5727
 mysql:5.6  
 mysql:8.0
+mysql:8.0.27
 argoproj/argoui:v2.12.10
 argoproj/workflow-controller:v2.12.10
 argoproj/argocli:v2.12.10 
