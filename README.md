@@ -30,12 +30,7 @@
         * https://github.com/tmax-cloud/install-istio/blob/5.0/README.md
 3. Cert-manager
     * ai-devops에서 사용하는 certificate와 cluster-issuer와 같은 CR 관리를 위해 필요하다.         
-        ```bash
-        # cert-manager namespace 생성 
-        $ kubectl create namespace cert-manager
-        # CRD, Cert-manager 설치
-        $ kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v0.11.1/cert-manager.yaml
-        ```      
+        * https://github.com/tmax-cloud/install-cert-manager/blob/main/README.md
 4. (Optional) GPU plug-in
     * Kubernetes cluster 내 node에 GPU가 탑재되어 있으며 AI DevOps 기능을 사용할 때 GPU가 요구될 경우에 필요하다.
         * https://github.com/tmax-cloud/install-nvidia-gpu-infra/blob/5.0/README.md   
