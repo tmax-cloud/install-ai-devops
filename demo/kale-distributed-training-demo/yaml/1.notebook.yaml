@@ -1,0 +1,35 @@
+apiVersion: kubeflow.tmax.io/v1
+kind: Notebook
+metadata:
+  labels:
+    app: kale-distribute-demo-notebook
+  name: kale-distribute-demo-notebook
+  namespace: demo
+spec:
+  template:
+    spec:
+      containers:
+      - env: []
+        image: 'docker.io/tmaxcloudck/kale-tekton-standalone:21122122'
+        imagePullPolicy: Always
+        name: kale-distribute-demo
+        resources:
+          requests:
+            cpu: "0.5"
+            memory: 1.0Gi
+        volumeMounts:
+        - mountPath: /home/jovyan
+          name: kale-distribute-demo-pvc
+        - mountPath: /dev/shm
+          name: dshm
+      serviceAccountName: default-editor
+      volumes:
+      - name: kale-distribute-demo-pvc
+        persistentVolumeClaim:
+          claimName: kale-distribute-demo-pvc
+      - emptyDir:
+          medium: Memory
+        name: dshm 
+  volumeClaim:
+  - name: kale-distribute-demo-pvc
+    size: 10Gi

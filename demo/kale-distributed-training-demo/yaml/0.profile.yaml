@@ -1,0 +1,10 @@
+apiVersion: kubeflow.org/v1
+kind: Profile
+metadata:
+  name: kale-distribute-demo
+  namespace: demo
+spec:
+  owner:
+    kind: User
+    name: anonymous@kubeflow.org
+  resourceQuotaSpec: {}
