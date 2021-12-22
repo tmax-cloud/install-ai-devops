@@ -8,7 +8,7 @@
 - [0.profile.yaml](./yaml/0.profile.yaml), [1.notebook.yaml](./yaml/1.notebook.yaml) 파일을 참고하여 profile과 노트북을 생성한다.
   - 노트북을 재생성하려는 경우, 기존 노트북을 삭제하고 여기에 연결된 pvc도 같이 삭제해주는 것을 권장한다.
 
-## 2. kale 노트북에서 코드 작성
+## 2. kale 노트북에서 코드 작성 및 kale 설정
 
 - 노트북에 접속하여 [kale-distributed-training-demo.ipynb](./examples/kale-distributed-training-demo.ipynb) 파일을 업로드하거나, 해당 파일을 참고하여 새로운 ipynb 파일을 작성한다.
   - distributed training이 필요한 부분은 별도의 cell로 분리하여 작성한다.
@@ -28,17 +28,17 @@
     따라서, model을 저장할 때는 변수 대신 `model.save`와 `tf.keras.models.load_model`을 사용하는 것을 권장한다.
     - TensorFlow Core > Guide > [Save and load Keras models](https://www.tensorflow.org/guide/keras/save_and_serialize?hl=ko)
     - TensorFlow Core > API Docs > [tf.keras.models.load_model](https://www.tensorflow.org/api_docs/python/tf/keras/models/load_model?hl=ko)
-- 코드 작성이 끝나면, 좌측 메뉴에서 kale panel(Kubeflow Pipelines Deployment Panel)을 열고 enable한 후, pipeline name, pipeline description, advanced settings > docker image를 설정한다.
+- 코드 작성이 끝나면, 좌측 메뉴에서 kale panel(Kubeflow Pipelines Deployment Panel)을 열고 enable한 후, Pipeline Name, Pipeline Description, Advanced Settings > Docker Image를 설정한다.
   - 이때 docker image로는 해당 kale 노트북과 동일한 image를 사용하는 것을 권장한다.
 - kale이 enable된 상태에서 노트북 각 cell의 우측 상단 버튼을 사용하여 type, name, dependency를 설정한다.
 
 ## 3. text editor로 ipynb 파일 수정
 
-- 좌측 메뉴에서 탐색기(File Browser)를 열고, 코드 작성 및 설정이 끝난 ipynb 파일을 우클릭하여 Open With > Editor 를 선택하면, json 형식으로 되어있는 파일 정보를 열람하거나 수정할 수 있다.
+- 좌측 메뉴에서 탐색기(File Browser)를 열고, 코드 작성 및 kale 설정이 끝난 ipynb 파일을 우클릭하여 Open With > Editor 를 선택하면, json 형식으로 되어있는 파일 정보를 열람하거나 수정할 수 있다.
   - 파일 정보 텍스트 속에는 metadata와 cell들에 대한 정보가 들어있으며, kale을 통해 설정된 정보도 여기에 포함되어 있다.
-    - kale panel에서 설정한 내용은 아래에 저장되어 있다.
+    - kale panel에서 설정한 내용(name, description, image)은 아래에 저장되어 있다.
       - metadata > kubeflow_노트북 > pipeline_name, pipeline_description, docker_image
-    - cell들에 대해 설정한 내용은 아래에 저장되어 있다.
+    - cell들에 대해 설정한 내용(type, name, dependency)은 아래에 저장되어 있다.
       - cells > metadata > tags
 - distributed training이 필요한 cell의 metadata > tags에 "distribute", "workers:n" 태그를 추가한 후 저장한다.
   - "distribute" 태그를 가진 cell은 "workers:n" 태그도 가져야 한다.
