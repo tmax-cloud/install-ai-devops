@@ -28,9 +28,9 @@
     따라서, model을 저장할 때는 변수 대신 `model.save`와 `tf.keras.models.load_model`을 사용하는 것을 권장한다.
     - TensorFlow Core > Guide > [Save and load Keras models](https://www.tensorflow.org/guide/keras/save_and_serialize?hl=ko)
     - TensorFlow Core > API Docs > [tf.keras.models.load_model](https://www.tensorflow.org/api_docs/python/tf/keras/models/load_model?hl=ko)
-- 코드 작성이 끝나면, 좌측 메뉴에서 kale panel(Kubeflow Pipelines Deployment Panel)을 열고 enable한 후, pipeline name, pipeline description, advanced settings - docker image를 설정한다.
+- 코드 작성이 끝나면, 좌측 메뉴에서 kale panel(Kubeflow Pipelines Deployment Panel)을 열고 enable한 후, pipeline name, pipeline description, advanced settings > docker image를 설정한다.
   - 이때 docker image로는 해당 kale 노트북과 동일한 image를 사용하는 것을 권장한다.
-- kale이 enable된 상태에서 노트북 각 cell의 우측 상단 버튼을 사용하여 각 cell의 type, name, dependency를 설정한다.
+- kale이 enable된 상태에서 노트북 각 cell의 우측 상단 버튼을 사용하여 type, name, dependency를 설정한다.
 
 ## 3. text editor로 ipynb 파일 수정
 
