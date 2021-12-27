@@ -1,6 +1,6 @@
 # Kale Distributed Training Guide & Demo Scenario
 
-- `docker.io/tmaxcloudck/kale-tekton-standalone:211222` 이미지로 생성된 kale 노트북에서는 `tf.distribute.experimental.MultiWorkerMirroredStrategy`를 통한 분산 훈련을 지원한다.
+- `docker.io/tmaxcloudck/kale-tekton-standalone:211227` 이미지로 생성된 kale 노트북에서는 `tf.distribute.experimental.MultiWorkerMirroredStrategy`를 통한 분산 훈련을 지원한다.
 - 아래에서 그 사용 방법을 소개한다.
 
 ## 1. distributed training을 위한 kale 노트북 생성
