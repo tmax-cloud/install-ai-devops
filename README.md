@@ -227,6 +227,33 @@
       ![스크린샷, 2021-07-08 10-31-59](https://user-images.githubusercontent.com/77767091/124864928-b9f83d80-dff4-11eb-9001-4cbdf7dbaed5.png)  
       ![스크린샷, 2021-07-08 10-34-05](https://user-images.githubusercontent.com/77767091/124864860-9a611500-dff4-11eb-84af-68a9dde419ee.png)
   
+## 기타3 : HyperCloud5.0 ai-devops Spec 정보
+|Namespace|Pod|Container 수|Container|Container image|Request| |Limit| |
+|:----|:----|:----|:----|:----|:----|:----|:----|:----|
+| | | | | |cpu|memory|cpu|memory|
+|istio-system|cluster-local-gateway|1|istio-proxy|istio/proxyv2:1.3.1|10m|40Mi|1|128Mi|
+|kubeflow|application-controller|1|manager|gcr.io/kubeflow-images-public/kubernetes-sigs/application:1.0-beta|70m|200Mi|1|2Gi|
+| |argo-server|1|argo-server|argoproj/argocli:v2.12.10|20m|200Mi|1|2Gi|
+| |katib-controller|1|katib-controller|docker.io/kubeflowkatib/katib-controller:v0.11.0|30m|400Mi|1|4Gi|
+| |katib-db-manager|1|katib-db-manager|docker.io/kubeflowkatib/katib-db-manager:v0.11.0|20m|100Mi|1|2Gi|
+| |katib-mysql|1|katib-mysql|mysql:8.0.27|1|2Gi|1|4Gi|
+| |katib-ui|1|katib-ui|docker.io/kubeflowkatib/katib-ui:v0.11.0|20m|100Mi|1|1Gi|
+| |kfserving-controller-manager|2|manager|gcr.io/kfserving/kfserving-controller:v0.5.1|100m|200Mi|100m|300Mi|
+| | | |kube-rbac-proxy|gcr.io/kubebuilder/kube-rbac-proxy:v0.4.0|10m|40Mi|1|400Mi|
+| |minio|1|minio|gcr.io/ml-pipeline/minio:RELEASE.2019-08-14T20-37-41Z-license-compliance|20m|100Mi|1|1Gi|
+| |notebook-controller-deployment|1|notebook-controller|tmaxcloudck/notebook-controller-go:b0.1.0|20m|300Mi|1|3Gi|
+| |profiles-deployment|2|manager|gcr.io/kubeflow-images-public/profile-controller:vmaster-ga49f658f|20m|250Mi|1|2.5Gi|
+| | | |kfam|gcr.io/kubeflow-images-public/kfam:vmaster-g9f3bfd00|20m|250Mi|1|2.5Gi|
+| |pytorch-operator|1|pytorch-operator|gcr.io/kubeflow-images-public/pytorch-operator:vmaster-g518f9c76|20m|150Mi|1|1.5Gi|
+| |tf-job-operator|1|tf-job-operator|gcr.io/kubeflow-images-public/tf_operator:vmaster-gda226016|20m|150Mi|1|1.5Gi|
+| |workflow-controller|1|workflow-controller|argoproj/workflow-controller:v2.12.10|20m|200Mi|1|2Gi|
+|knative-serving|activator|1|activator|gcr.io/knative-releases/knative.dev/serving/cmd/activator:v0.14.3|300m|60Mi|1000m|600Mi|
+| |autoscaler|1|autoscaler|gcr.io/knative-releases/knative.dev/serving/cmd/autoscaler:v0.14.3|30m|40Mi|300m|400Mi|
+| |istio-webhook|1|webhook|gcr.io/knative-releases/knative.dev/net-istio/cmd/webhook:v0.14.1|20m|20Mi|200m|200Mi|
+| |controller|1|controller|gcr.io/knative-releases/knative.dev/serving/cmd/controller:v0.14.3|100m|100Mi|1|1000Mi|
+| |networking-istio|1|networking-istio|gcr.io/knative-releases/knative.dev/net-istio/cmd/controller:v0.14.1|30m|40Mi|300|400Mi|
+| |webhook|1|webhook|gcr.io/knative-releases/knative.dev/serving/cmd/webhook:v0.14.3|20m|20Mi|200m|200Mi|
+
 
 
 
