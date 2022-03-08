@@ -83,7 +83,7 @@
         $ wget https://github.com/kubeflow/kfctl/releases/download/v1.2.0/kfctl_v1.2.0-0-gbc038f9_linux.tar.gz
         ```
 3. 앞으로의 진행
-    * Step 0 ~ 5 중 Step 0, 2, 3, 5은 비고를 참고하여 진행한다. 나머지는 그대로 진행하면 된다.
+    * Step 0 ~ 6 중 Step 0, 2, 3, 5은 비고를 참고하여 진행한다. 나머지는 그대로 진행하면 된다.
 
 ## Install Steps
 0. [kfctl 설치](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-0-kfctl-%EC%84%A4%EC%B9%98)
@@ -92,6 +92,7 @@
 3. [Kubeflow 배포](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-3-kubeflow-%EB%B0%B0%ED%8F%AC)
 4. [배포 확인 및 기타 작업](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-4-%EB%B0%B0%ED%8F%AC-%ED%99%95%EC%9D%B8-%EB%B0%8F-%EA%B8%B0%ED%83%80-%EC%9E%91%EC%97%85)
 5. [Structural Schema 적용](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-5-structural-schema-%EC%A0%81%EC%9A%A9)
+6. [HyperAuth 연동](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-5-structural-schema-%EC%A0%81%EC%9A%A9)
 
 ## Step 0. kfctl 설치
 * 목적 : `Kubeflow component를 배포 및 관리하기 위한 커맨드 라인툴인 kfctl을 설치한다.`
@@ -197,6 +198,27 @@
         ``` bash
         $ ./structural_schema_ko-en.sh
         ```        
+## Step 6. HyperAuth 연동
+* 목적 : `Notebook과 Hyperauth 연동을 통해 OIDC 인증관리를 적용한다.`
+* 생성 순서 : 
+    * HyperAuth에서 Client를 생성하고 관련 설정을 진행한다. 
+        * hyperauth에서 client 생성    
+            * Client ID = notebook-gatekeeper           
+            * Client protocol = openid-connect
+            * Access type = confidential        
+            * Valid Redirect URIs: '*'
+        * Client > notebook-gatekeeper > Credentials > client_secret을 notebook-controller-config.yaml 파일의 CLIENT_SECRET 필드에 복사한다.
+        * Client > notebook-gatekeeper > Roles > add role로 'notebook-gatekeeper-manager' role 생성
+        * Client > notebook-gatekeeper > Mappers > create로 mapper 생성
+            * Name = notebook-gatekeeper
+            * Mapper Type = Audience
+            * Included Client Audience = notebook-gatekeeper
+        * notebook을 사용하고자 하는 사용자의 계정의 Role Mappings 설정에서 notebook-gatekeeper-manager Client role을 할당한다.
+    * notebook-controller-config.yaml 파일에서 ai-devops 설치 환경에 맞게 congfig data 값들을 수정한다. 
+        * CLIENT_SECRET = 위의 단계에서 복사한 notebook-gatekeeper 클라이언트의 시크릿 값
+        * DISCOVERY_URL = https://{{HyperAuth_URL}}/auth/realms/tmax
+            * {{HyperAuth_URL}} 부분에 환경에 맞는 하이퍼어쓰 주소를 입력한다.
+        * CUSTOM_DOMAIN = 인그레스로 접근할수 있도록 환경에 맞는 커스텀 도메인 주소를 입력한다. EX) tmaxcloud.org
 
 ## 기타1 : kubeflow 삭제
 * 목적 : `kubeflow 설치 시에 배포된 모든 리소스를 삭제 한다.`

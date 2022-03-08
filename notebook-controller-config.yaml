@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+data:
+  CLIENT_SECRET: {{CLIENT_SECRET}}
+  DISCOVERY_URL: {{DISCOVERY_URL}}
+  CUSTOM_DOMAIN: {{CUSTOM_DOMAIN}}
+kind: ConfigMap
+metadata:
+  labels:
+    app: notebook-controller
+    app.kubernetes.io/component: notebook-controller
+    app.kubernetes.io/name: notebook-controller
+    kustomize.component: notebook-controller
+  name: notebook-controller-config
+  namespace: kubeflow
