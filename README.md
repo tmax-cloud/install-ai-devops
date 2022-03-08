@@ -83,16 +83,16 @@
         $ wget https://github.com/kubeflow/kfctl/releases/download/v1.2.0/kfctl_v1.2.0-0-gbc038f9_linux.tar.gz
         ```
 3. 앞으로의 진행
-    * Step 0 ~ 6 중 Step 0, 2, 3, 5은 비고를 참고하여 진행한다. 나머지는 그대로 진행하면 된다.
+    * Step 0 ~ 6 중 Step 0, 2, 3, 5, 6은 비고를 참고하여 진행한다. 나머지는 그대로 진행하면 된다.
 
 ## Install Steps
 0. [kfctl 설치](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-0-kfctl-%EC%84%A4%EC%B9%98)
 1. [설치 디렉토리 생성](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-1-%EC%84%A4%EC%B9%98-%EB%94%94%EB%A0%89%ED%86%A0%EB%A6%AC-%EC%83%9D%EC%84%B1)
 2. [Kustomize 리소스 생성](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-2-kustomize-%EB%A6%AC%EC%86%8C%EC%8A%A4-%EC%83%9D%EC%84%B1)
-3. [HyperAuth 연동](https://github.com/tmax-cloud/install-ai-devops#step-6-hyperauth-%EC%97%B0%EB%8F%99)
-4. [Kubeflow 배포](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-3-kubeflow-%EB%B0%B0%ED%8F%AC)
-5. [배포 확인 및 기타 작업](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-4-%EB%B0%B0%ED%8F%AC-%ED%99%95%EC%9D%B8-%EB%B0%8F-%EA%B8%B0%ED%83%80-%EC%9E%91%EC%97%85)
-6. [Structural Schema 적용](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-5-structural-schema-%EC%A0%81%EC%9A%A9)
+3. [HyperAuth 연동](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-3-hyperauth-%EC%97%B0%EB%8F%99)
+4. [Kubeflow 배포](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-4-kubeflow-%EB%B0%B0%ED%8F%AC)
+5. [배포 확인 및 기타 작업](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-5-%EB%B0%B0%ED%8F%AC-%ED%99%95%EC%9D%B8-%EB%B0%8F-%EA%B8%B0%ED%83%80-%EC%9E%91%EC%97%85)
+6. [Structural Schema 적용](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-6-structural-schema-%EC%A0%81%EC%9A%A9)
 
 
 ## Step 0. kfctl 설치
