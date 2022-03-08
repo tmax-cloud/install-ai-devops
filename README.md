@@ -197,16 +197,8 @@
         ``` bash
         $ ./structural_schema_ko-en.sh
         ```        
-## 기타1 : notebook ingress 추가
-* 목적 : `api gateway 연동 console에서 connect 버튼을 통해 노트북 접속시 404 error가 발생한다면 다음 ingress를 apply하여 해결한다.`
-* 생성 순서 : 
-    * notebook-ingress.yaml 내의 custome_domain 부분을 해당 환경에 맞게 수정한후 다음 명령어를 통해 apply 한다.
-        ```bash
-        $ kubectl apply -f notebook-ingress.yaml
-        ```
-    - 참고 : [notebook-ingress.yaml](./notebook-ingress.yaml)    
 
-## 기타2 : kubeflow 삭제
+## 기타1 : kubeflow 삭제
 * 목적 : `kubeflow 설치 시에 배포된 모든 리소스를 삭제 한다.`
 * 생성 순서 : 
     * 아래 명령어를 수행하여 kubeflow 모듈을 삭제한다.
@@ -227,7 +219,7 @@
       ![스크린샷, 2021-07-08 10-31-59](https://user-images.githubusercontent.com/77767091/124864928-b9f83d80-dff4-11eb-9001-4cbdf7dbaed5.png)  
       ![스크린샷, 2021-07-08 10-34-05](https://user-images.githubusercontent.com/77767091/124864860-9a611500-dff4-11eb-84af-68a9dde419ee.png)
   
-## 기타3 : HyperCloud5.0 ai-devops Spec 정보
+## 기타2 : HyperCloud5.0 ai-devops Spec 정보
 |Namespace|Pod|Container 수|Container|Container image|Request| |Limit| |
 |:----|:----|:----|:----|:----|:----|:----|:----|:----|
 | | | | | |cpu|memory|cpu|memory|
