@@ -33,12 +33,7 @@ spec:
       repoRef:
         name: manifests
         path: stacks/ibm/application/katib
-    name: katib  
-  - kustomizeConfig:
-      repoRef:
-        name: manifests
-        path: stacks/ibm/application/argo
-    name: argo  
+    name: katib    
   - kustomizeConfig:
       repoRef:
         name: manifests

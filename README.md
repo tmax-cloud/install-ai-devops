@@ -89,10 +89,11 @@
 0. [kfctl 설치](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-0-kfctl-%EC%84%A4%EC%B9%98)
 1. [설치 디렉토리 생성](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-1-%EC%84%A4%EC%B9%98-%EB%94%94%EB%A0%89%ED%86%A0%EB%A6%AC-%EC%83%9D%EC%84%B1)
 2. [Kustomize 리소스 생성](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-2-kustomize-%EB%A6%AC%EC%86%8C%EC%8A%A4-%EC%83%9D%EC%84%B1)
-3. [Kubeflow 배포](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-3-kubeflow-%EB%B0%B0%ED%8F%AC)
-4. [배포 확인 및 기타 작업](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-4-%EB%B0%B0%ED%8F%AC-%ED%99%95%EC%9D%B8-%EB%B0%8F-%EA%B8%B0%ED%83%80-%EC%9E%91%EC%97%85)
-5. [Structural Schema 적용](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-5-structural-schema-%EC%A0%81%EC%9A%A9)
-6. [HyperAuth 연동](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-5-structural-schema-%EC%A0%81%EC%9A%A9)
+3. [HyperAuth 연동](https://github.com/tmax-cloud/install-ai-devops#step-6-hyperauth-%EC%97%B0%EB%8F%99)
+4. [Kubeflow 배포](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-3-kubeflow-%EB%B0%B0%ED%8F%AC)
+5. [배포 확인 및 기타 작업](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-4-%EB%B0%B0%ED%8F%AC-%ED%99%95%EC%9D%B8-%EB%B0%8F-%EA%B8%B0%ED%83%80-%EC%9E%91%EC%97%85)
+6. [Structural Schema 적용](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-5-structural-schema-%EC%A0%81%EC%9A%A9)
+
 
 ## Step 0. kfctl 설치
 * 목적 : `Kubeflow component를 배포 및 관리하기 위한 커맨드 라인툴인 kfctl을 설치한다.`
@@ -131,14 +132,59 @@
     * 폐쇄망 환경일 경우 설치 디렉토리 ${KF_DIR}에 미리 다운로드받은 sed.sh, kustomize_local.tar.gz 파일을 옮긴다.
     * 아래 명령어를 통해 Kustomize 리소스의 압축을 풀고 yaml 파일들에서 이미지들을 pull 받을 registry를 바꿔준다.
     * 그 후 registry를 바꿔준 kustomize 리소스를 tar.gz 형식으로 재압축한다.
+        * 비고 
+            * 다음단계인 hyperauth 연동을 진행할 예정이라면 아래 명령어 중 3번째까지만 실행하고 다음 단계로 넘어간다.
         ```bash            
         $ tar xvfz kustomize_local.tar.gz  
         $ chmod +x ./sed.sh
         $ ./sed.sh ${REGISTRY_ADDRESS} ${KF_DIR}/kustomize
         $ tar -zcvf kustomize_local.tar.gz ${KF_DIR}/kustomize
         ```
-
-## Step 3. Kubeflow 배포
+## Step 3. HyperAuth 연동
+* 목적 : `Notebook과 Hyperauth 연동을 통해 OIDC 인증관리를 적용한다.`
+* 생성 순서 : 
+    * HyperAuth에서 Client를 생성하고 관련 설정을 진행한다. Client가 이미 생성되어있는 경우에는 생성단계를 건너뛰고 config 수정 단계부터 진행한다.
+        * hyperauth에서 client 생성    
+            * Client ID = notebook-gatekeeper           
+            * Client protocol = openid-connect
+            * Access type = confidential        
+            * Valid Redirect URIs: '*'
+        * Client > notebook-gatekeeper > Credentials > client_secret 확인
+        * Client > notebook-gatekeeper > Roles > add role로 'notebook-gatekeeper-manager' role 생성
+        * Client > notebook-gatekeeper > Mappers > create로 mapper 생성
+            * Name = notebook-gatekeeper
+            * Mapper Type = Audience
+            * Included Client Audience = notebook-gatekeeper
+        * notebook을 사용하고자 하는 사용자의 계정의 Role Mappings 설정에서 notebook-gatekeeper-manager Client role을 할당한다.
+    * config 수정) 아래의 command를 수정하여 환경에 맞는 config 정보에 맞게 수정한다. 
+        * 비고
+            * CLIENT_SECRET = 위의 단계에서 확인한 notebook-gatekeeper 클라이언트의 시크릿 값 
+            * DISCOVERY_URL = https://{{HyperAuth_URL}}/auth/realms/tmax
+                * {{HyperAuth_URL}} 부분에 환경에 맞는 하이퍼어쓰 주소를 입력한다.
+            * CUSTOM_DOMAIN = 인그레스로 접근할수 있도록 환경에 맞는 커스텀 도메인 주소를 입력한다. EX) tmaxcloud.org
+        ```bash            
+        $ export CLIENT_SECRET=client-secret
+        $ sed -i 's/{CLIENT_SECRET}/'${CLIENT_SECRET}'/g' ${KF_DIR}/.cache/manifests/kubeflow-manifests-ai_devops.v1.2.5.0/jupyter/notebook-controller/base/params.env   
+        $ export DISCOVERY_URL=https://{{HyperAuth_URL}}/auth/realms/tmax
+        $ sed -i 's/{DISCOVERY_URL}/'${DISCOVERY_URL}'/g' ${KF_DIR}/.cache/manifests/kubeflow-manifests-ai_devops.v1.2.5.0/jupyter/notebook-controller/base/params.env
+        $ export CUSTOM_DOMAIN=tmaxcloud.org
+        $ sed -i 's/{CLIENT_SECRET}/'${CLIENT_SECRET}'/g' ${KF_DIR}/.cache/manifests/kubeflow-manifests-ai_devops.v1.2.5.0/jupyter/notebook-controller/base/params.env     
+        ``` 
+* 비고 : 
+    * 폐쇄망 환경일 경우 위 단계에서 registry를 바꿔준 상태
+    * 아래 명령어를 통해 notebook-controlller의 parameter 값들을 환경에 맞게 수정한다.
+    * 그 후 registry를 바꿔준 kustomize 리소스를 tar.gz 형식으로 재압축한다.        
+        ```bash            
+        $ export CLIENT_SECRET=client-secret
+        $ sed -i 's/{CLIENT_SECRET}/'${CLIENT_SECRET}'/g' ${KF_DIR}/kustomize/jupyter/notebook-controller/base/params.env   
+        $ export DISCOVERY_URL=https://{{HyperAuth_URL}}/auth/realms/tmax
+        $ sed -i 's/{DISCOVERY_URL}/'${DISCOVERY_URL}'/g' ${KF_DIR}/kustomize/jupyter/notebook-controller/base/params.env  
+        $ export CUSTOM_DOMAIN=tmaxcloud.org
+        $ sed -i 's/{CLIENT_SECRET}/'${CLIENT_SECRET}'/g' ${KF_DIR}/kustomize/jupyter/notebook-controller/base/params.env    
+        $ tar -zcvf kustomize_local.tar.gz ${KF_DIR}/kustomize   
+        ```           
+    
+## Step 4. Kubeflow 배포
 * 목적 : `Kustomize 리소스를 apply하여 Kubeflow를 배포한다.`
 * 생성 순서 : 
     * 아래 명령어를 수행하여 Kubeflow를 배포한다.
@@ -158,7 +204,7 @@
         $ kfctl apply -V -f ${CONFIG_FILE}        
         ```
    
-## Step 4. 배포 확인 및 기타 작업
+## Step 5. 배포 확인 및 기타 작업
 * 목적 : `Kubeflow 배포를 확인하고 문제가 있을 경우 정상화한다.`
 * 생성 순서 : 
     * 아래 명령어를 수행하여 kubeflow namespace의 모든 pod가 정상적인지 확인한다.
@@ -169,7 +215,7 @@
 * 참고 :
     * KFServing과 Istio 1.5.1과의 호환을 위해 istio namespace의 mtls를 disable처리 하였음.    
 
-## Step 5. Structural Schema 적용
+## Step 6. Structural Schema 적용
 * 목적 : `Hypercloud Console의 form editor기능과 다국어 지원을 위해 Structural Schema를 적용한다.`
 * 생성 순서 : 
     * form editor 사용을 원한다면 아래 명령어를 수행하여 기존 crd를 삭제하고 새로운 crd schema를 create 한다.
@@ -198,28 +244,6 @@
         ``` bash
         $ ./structural_schema_ko-en.sh
         ```        
-## Step 6. HyperAuth 연동
-* 목적 : `Notebook과 Hyperauth 연동을 통해 OIDC 인증관리를 적용한다.`
-* 생성 순서 : 
-    * HyperAuth에서 Client를 생성하고 관련 설정을 진행한다. 
-        * hyperauth에서 client 생성    
-            * Client ID = notebook-gatekeeper           
-            * Client protocol = openid-connect
-            * Access type = confidential        
-            * Valid Redirect URIs: '*'
-        * Client > notebook-gatekeeper > Credentials > client_secret을 notebook-controller-config.yaml 파일의 CLIENT_SECRET 필드에 복사한다.
-        * Client > notebook-gatekeeper > Roles > add role로 'notebook-gatekeeper-manager' role 생성
-        * Client > notebook-gatekeeper > Mappers > create로 mapper 생성
-            * Name = notebook-gatekeeper
-            * Mapper Type = Audience
-            * Included Client Audience = notebook-gatekeeper
-        * notebook을 사용하고자 하는 사용자의 계정의 Role Mappings 설정에서 notebook-gatekeeper-manager Client role을 할당한다.
-    * notebook-controller-config.yaml 파일에서 ai-devops 설치 환경에 맞게 congfig data 값들을 수정한다. 
-        * CLIENT_SECRET = 위의 단계에서 복사한 notebook-gatekeeper 클라이언트의 시크릿 값
-        * DISCOVERY_URL = https://{{HyperAuth_URL}}/auth/realms/tmax
-            * {{HyperAuth_URL}} 부분에 환경에 맞는 하이퍼어쓰 주소를 입력한다.
-        * CUSTOM_DOMAIN = 인그레스로 접근할수 있도록 환경에 맞는 커스텀 도메인 주소를 입력한다. EX) tmaxcloud.org
-
 ## 기타1 : kubeflow 삭제
 * 목적 : `kubeflow 설치 시에 배포된 모든 리소스를 삭제 한다.`
 * 생성 순서 : 
@@ -247,7 +271,6 @@
 | | | | | |cpu|memory|cpu|memory|
 |istio-system|cluster-local-gateway|1|istio-proxy|istio/proxyv2:1.3.1|10m|40Mi|1|128Mi|
 |kubeflow|application-controller|1|manager|gcr.io/kubeflow-images-public/kubernetes-sigs/application:1.0-beta|70m|200Mi|1|2Gi|
-| |argo-server|1|argo-server|argoproj/argocli:v2.12.10|20m|200Mi|1|2Gi|
 | |katib-controller|1|katib-controller|docker.io/kubeflowkatib/katib-controller:v0.11.0|30m|400Mi|1|4Gi|
 | |katib-db-manager|1|katib-db-manager|docker.io/kubeflowkatib/katib-db-manager:v0.11.0|20m|100Mi|1|2Gi|
 | |katib-mysql|1|katib-mysql|mysql:8.0.27|1|2Gi|1|4Gi|
@@ -260,7 +283,6 @@
 | | | |kfam|gcr.io/kubeflow-images-public/kfam:vmaster-g9f3bfd00|20m|250Mi|1|2.5Gi|
 | |pytorch-operator|1|pytorch-operator|gcr.io/kubeflow-images-public/pytorch-operator:vmaster-g518f9c76|20m|150Mi|1|1.5Gi|
 | |tf-job-operator|1|tf-job-operator|gcr.io/kubeflow-images-public/tf_operator:vmaster-gda226016|20m|150Mi|1|1.5Gi|
-| |workflow-controller|1|workflow-controller|argoproj/workflow-controller:v2.12.10|20m|200Mi|1|2Gi|
 |knative-serving|activator|1|activator|gcr.io/knative-releases/knative.dev/serving/cmd/activator:v0.14.3|300m|60Mi|1000m|600Mi|
 | |autoscaler|1|autoscaler|gcr.io/knative-releases/knative.dev/serving/cmd/autoscaler:v0.14.3|30m|40Mi|300m|400Mi|
 | |istio-webhook|1|webhook|gcr.io/knative-releases/knative.dev/net-istio/cmd/webhook:v0.14.1|20m|20Mi|200m|200Mi|
