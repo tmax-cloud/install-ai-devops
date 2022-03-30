@@ -1,6 +1,6 @@
 # Kale Distributed Training Guide & Demo Scenario
 
-- `docker.io/tmaxcloudck/kale-tekton-standalone:211227` 이미지로 생성된 kale 노트북에서는 `tf.distribute.experimental.MultiWorkerMirroredStrategy`를 통한 분산 훈련을 지원한다.
+- `docker.io/tmaxcloudck/kale-tekton-standalone:220207` 이미지로 생성된 kale 노트북에서는 `tf.distribute.experimental.MultiWorkerMirroredStrategy`를 통한 분산 훈련을 지원한다.
 - 아래에서 그 사용 방법을 소개한다.
 
 ## 1. distributed training을 위한 kale 노트북 생성
@@ -32,18 +32,22 @@
   - 이때 docker image로는 해당 kale 노트북과 동일한 image를 사용하는 것을 권장한다.
 - kale이 enable된 상태에서 노트북 각 cell의 우측 상단 버튼을 사용하여 type, name, dependency를 설정한다.
 
-## 3. text editor로 ipynb 파일 수정
+~~## 3. text editor로 ipynb 파일 수정~~
 
-- 좌측 메뉴에서 탐색기(File Browser)를 열고, 코드 작성 및 kale 설정이 끝난 ipynb 파일을 우클릭하여 Open With > Editor 를 선택하면, json 형식으로 되어있는 파일 정보를 열람하거나 수정할 수 있다.
-  - 파일 정보 텍스트 속에는 metadata와 cell들에 대한 정보가 들어있으며, kale을 통해 설정된 정보도 여기에 포함되어 있다.
-    - kale panel에서 설정한 내용(name, description, image)은 아래에 저장되어 있다.
-      - metadata > kubeflow_노트북 > pipeline_name, pipeline_description, docker_image
-    - cell들에 대해 설정한 내용(type, name, dependency)은 아래에 저장되어 있다.
-      - cells > metadata > tags
-- distributed training이 필요한 cell의 metadata > tags에 "distribute", "workers:n" 태그를 추가한 후 저장한다.
-  - "distribute" 태그를 가진 cell은 "workers:n" 태그도 가져야 한다.
-  - "workers:n" 태그는 해당 cell에 유일해야 하며, n은 positive integer이어야 한다.
-- Editor에서 ipynb 파일을 수정하고 저장한 후, 노트북에서 해당 ipynb 파일을 사용하다 보면 '디스크에서 파일이 변경되었다'는 메세지가 뜰 수 있는데, 이때 "Revert"를 선택하여야 Editor에서 수정한 내용이 유지된다.
+~~- 좌측 메뉴에서 탐색기(File Browser)를 열고, 코드 작성 및 kale 설정이 끝난 ipynb 파일을 우클릭하여 Open With > Editor 를 선택하면, json 형식으로 되어있는 파일 정보를 열람하거나 수정할 수 있다.~~
+  ~~- 파일 정보 텍스트 속에는 metadata와 cell들에 대한 정보가 들어있으며, kale을 통해 설정된 정보도 여기에 포함되어 있다.~~
+    ~~- kale panel에서 설정한 내용(name, description, image)은 아래에 저장되어 있다.~~
+      ~~- metadata > kubeflow_노트북 > pipeline_name, pipeline_description, docker_image~~
+    ~~- cell들에 대해 설정한 내용(type, name, dependency)은 아래에 저장되어 있다.~~
+      ~~- cells > metadata > tags~~
+~~- distributed training이 필요한 cell의 metadata > tags에 "distribute", "workers:n" 태그를 추가한 후 저장한다.~~
+  ~~- "distribute" 태그를 가진 cell은 "workers:n" 태그도 가져야 한다.~~
+  ~~- "workers:n" 태그는 해당 cell에 유일해야 하며, n은 positive integer이어야 한다.~~
+~~- Editor에서 ipynb 파일을 수정하고 저장한 후, 노트북에서 해당 ipynb 파일을 사용하다 보면 '디스크에서 파일이 변경되었다'는 메세지가 뜰 수 있는데, 이때 "Revert"를 선택하여야 Editor에서 수정한 내용이 유지된다.~~
+
+## 3. MultiWorkerMirroredStrategy
+
+- MultiWorkerMirroredStrategy가 필요한 셀에 버튼 UI와 팝업을 통해 관련 태그를 설정한다. 사용 요령은 GPU 설정과 같다.
 
 ## 4. pipeline run 생성 및 결과 확인
 
