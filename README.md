@@ -73,7 +73,7 @@
 2. Yaml 파일 및 script 파일 준비
     * AI-devops 설치와 삭제에 필요한 manifest/ 디렉토리의 모든 파일을 다운로드 받는다.
 3. 앞으로의 진행
-    * Step 0 ~ 6 중 Step 0, 2, 3, 5, 6은 비고를 참고하여 진행한다. 나머지는 그대로 진행하면 된다.
+    * Step 1의 비고를 꼭 확인하여 아래 가이드에 맞게 진행한다.
 
 ## Install Steps
 0. [HyperAuth 연동](https://github.com/tmax-cloud/install-ai-devops/tree/5.1#step-0-hyperauth-%EC%97%B0%EB%8F%99)
