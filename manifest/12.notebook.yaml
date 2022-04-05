@@ -3766,7 +3766,7 @@ metadata:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: service-account-token
+  name: notebook-controller-service-account-token
   namespace: kubeflow
   annotations:
     kubernetes.io/service-account.name: notebook-controller-service-account
@@ -3958,36 +3958,65 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: deployment
   labels:
-    notebook: controller
+    app: notebook-controller
+    app.kubernetes.io/component: notebook-controller
+    app.kubernetes.io/name: notebook-controller
+    kustomize.component: notebook-controller
     name: notebook-controller-deployment
+    notebook: controller
+  name: notebook-controller-deployment
+  namespace: kubeflow
 spec:
   replicas: 1
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
+      app: notebook-controller
+      app.kubernetes.io/component: notebook-controller
+      app.kubernetes.io/name: notebook-controller
+      kustomize.component: notebook-controller
       notebook: controller
+  strategy:
+    type: Recreate
   template:
     metadata:
-      name: notebook-controller
       labels:
+        app: notebook-controller
+        app.kubernetes.io/component: notebook-controller
+        app.kubernetes.io/name: notebook-controller
+        kustomize.component: notebook-controller
         notebook: controller
+      name: notebook-controller
     spec:
       containers:
-      - name: notebook-controller
-        image: tmaxcloudck/notebook-controller-go:b0.2.1 
+      - env:
+        - name: CLIENT_SECRET
+          valueFrom:
+            configMapKeyRef:
+              key: CLIENT_SECRET
+              name: notebook-controller-config
+        - name: DISCOVERY_URL
+          valueFrom:
+            configMapKeyRef:
+              key: DISCOVERY_URL
+              name: notebook-controller-config
+        - name: CUSTOM_DOMAIN
+          valueFrom:
+            configMapKeyRef:
+              key: CUSTOM_DOMAIN
+              name: notebook-controller-config
+        image: docker.io/tmaxcloudck/notebook-controller-go:b0.2.1
         imagePullPolicy: Always
+        name: notebook-controller
         volumeMounts:
-        - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        - mountPath: "/var/run/secrets/kubernetes.io/serviceaccount"
           name: notebook-controller-service-account-token
           readOnly: true
       volumes:
       - name: notebook-controller-service-account-token
         secret:
           defaultMode: 420
-          secretName: notebook-controller-service-account-token 
+          secretName: notebook-controller-service-account-token
 ---
 apiVersion: app.k8s.io/v1beta1
 kind: Application

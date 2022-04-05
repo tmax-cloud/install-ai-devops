@@ -13,7 +13,7 @@ if [ $REGISTRY != "{REGISTRY}" ]; then
   echo "REGISTRY = $REGISTRY"
 fi
 
-sed -i 's/{DISCOVERY_URL}/'${DISCOVERY_URL}'/g' 12.notebook.yaml
+sed -i 's@{DISCOVERY_URL}@'${DISCOVERY_URL}'@g' 12.notebook.yaml
 sed -i 's/{CLIENT_SECRET}/'${CLIENT_SECRET}'/g' 12.notebook.yaml
 sed -i 's/{CUSTOM_DOMAIN}/'${CUSTOM_DOMAIN}'/g' 12.notebook.yaml
 
@@ -93,7 +93,7 @@ kubectl apply -f 3.add-anonymous-user-filter.yaml
 echo "---4. Install application---"
 kubectl apply -f 4.application.yaml
 
-while [ \"$({{ bin_dir }}/kubectl get crd | grep applications.app.k8s.io  | wc -l)\" == \"0\" ]
+while [ \"$(kubectl get crd | grep applications.app.k8s.io  | wc -l)\" == \"0\" ]
 do 
 echo 'CRD Interceptor is not registered yet' 
 sleep 2s

@@ -76,13 +76,10 @@
     * Step 0 ~ 6 중 Step 0, 2, 3, 5, 6은 비고를 참고하여 진행한다. 나머지는 그대로 진행하면 된다.
 
 ## Install Steps
-0. [HyperAuth 연동](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-0-kfctl-%EC%84%A4%EC%B9%98)
-1. [ai-devops.config 설정](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-1-%EC%84%A4%EC%B9%98-%EB%94%94%EB%A0%89%ED%86%A0%EB%A6%AC-%EC%83%9D%EC%84%B1)
-2. [Kustomize 리소스 생성](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-2-kustomize-%EB%A6%AC%EC%86%8C%EC%8A%A4-%EC%83%9D%EC%84%B1)
-3. [HyperAuth 연동](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-3-hyperauth-%EC%97%B0%EB%8F%99)
-4. [Kubeflow 배포](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-4-kubeflow-%EB%B0%B0%ED%8F%AC)
-5. [배포 확인 및 기타 작업](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-5-%EB%B0%B0%ED%8F%AC-%ED%99%95%EC%9D%B8-%EB%B0%8F-%EA%B8%B0%ED%83%80-%EC%9E%91%EC%97%85)
-6. [Structural Schema 적용](https://github.com/tmax-cloud/install-ai-devops/tree/5.0#step-6-structural-schema-%EC%A0%81%EC%9A%A9)
+0. [HyperAuth 연동](https://github.com/tmax-cloud/install-ai-devops/tree/5.1#step-0-hyperauth-%EC%97%B0%EB%8F%99)
+1. [ai-devops.config 설정](https://github.com/tmax-cloud/install-ai-devops/tree/5.1#step-1-ai-devopsconfig-%EC%84%A4%EC%A0%95)
+2. [installer 실행](https://github.com/tmax-cloud/install-ai-devops/tree/5.1#step-2-installer-%EC%8B%A4%ED%96%89)
+3. [배포 확인 및 기타 작업](https://github.com/tmax-cloud/install-ai-devops/tree/5.1#step-3-%EB%B0%B0%ED%8F%AC-%ED%99%95%EC%9D%B8-%EB%B0%8F-%EA%B8%B0%ED%83%80-%EC%9E%91%EC%97%85)
 
 ## Step 0. HyperAuth 연동
 * 목적 : `Notebook과 Hyperauth 연동을 통해 OIDC 인증관리를 적용한다.`
@@ -104,13 +101,14 @@
 ## Step 1. ai-devops.config 설정
 * 목적 : `manifest/ai-devops.config 파일에 설치에 필요한 환경 정보를 작성한다.`
 * 생성 순서 : ai-devops가 설치되는 환경에 따라 알맞은 config 파일을 작성한다.        
-    * CLIENT_SECRET = 위의 단계에서 확인한 notebook-gatekeeper 클라이언트의 시크릿 값 
+    * CLIENT_SECRET = 위의 단계에서 확인한 notebook-gatekeeper 클라이언트의 시크릿 값 EX) bac5oef-d3fjief-gjeifsjle-dj457f
     * DISCOVERY_URL = https://{{HyperAuth_URL}}/auth/realms/tmax
         * {{HyperAuth_URL}} 부분에 환경에 맞는 하이퍼어쓰 주소를 입력한다.
+        * EX) https://hyperauth.tmaxcloud.org/auth/realms/tmax
     * CUSTOM_DOMAIN = 인그레스로 접근할수 있도록 환경에 맞는 커스텀 도메인 주소를 입력한다. EX) tmaxcloud.org
     * REGISTRY = 폐쇄망 설치시 앞서 설치한 Image repository 주소
         * 중요) 설치 환경이 폐쇄망이 아닐시 {REGISTRY} 값을 수정하지 않는다.
-        * ex) 172.2.2.6:5000
+        * EX) 172.2.2.6:5000
 * 비고
     * 재강조) 폐쇄망 환경일 경우 {REGISTRY} 값을 수정하지 않는다.         
 
@@ -124,7 +122,7 @@
         ```   
    
 ## Step 3. 배포 확인 및 기타 작업
-* 목적 : `Kubeflow 배포를 확인하고 문제가 있을 경우 정상화한다.`
+* 목적 : `AI-devops 배포를 확인하고 문제가 있을 경우 정상화한다.`
 * 생성 순서 : 
     * 아래 명령어를 수행하여 kubeflow namespace와 knative-serving namespace의 모든 pod가 정상적인지 확인한다.
         ```bash
