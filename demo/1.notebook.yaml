@@ -11,7 +11,7 @@ spec:
       containers:
       - env: []
         ## notebook image 정의
-        image: 'tmaxcloudck/kale-tekton-standalone:211231'
+        image: 'brightfly/kubeflow-jupyter-lab:tf2.0-cpu'
         name: demo
         resources:
           ## notebook 사양 정의
