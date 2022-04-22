@@ -10,44 +10,35 @@
 
 ## 2. kale 노트북에서 코드 작성 및 kale 설정
 
-- 노트북에 접속하여 [kale-distributed-training-demo.ipynb](./examples/kale-distributed-training-demo.ipynb) 파일을 업로드하거나, 해당 파일을 참고하여 새로운 ipynb 파일을 작성한다.
+- 노트북에 접속하여 [kale-distributed-training-demo.ipynb](./examples/kale-distributed-training-demo.ipynb) 파일을 업로드하거나, 이를 참고하여 새로운 ipynb 파일을 작성한다.
   - distributed training이 필요한 부분은 별도의 cell로 분리하여 작성한다.
   - 현재 MultiWorkerMirroredStrategy만 지원하며, 해당 strategy를 사용하는 방법은 위 kale-distributed-training-demo.ipynb 파일과 아래 내용을 참고한다.
     - 참고자료
-      - TensorFlow Core > Guide > [Distributed training with TensorFlow](https://www.tensorflow.org/guide/distributed_training?hl=ko)
-      - TensorFlow Core > Tutorials > [Multi-worker training with Keras](https://www.tensorflow.org/tutorials/distribute/multi_worker_with_keras?hl=ko)
-      - TensorFlow Core > API Docs > [tf.distribute.experimental.MultiWorkerMirroredStrategy](https://www.tensorflow.org/api_docs/python/tf/distribute/experimental/MultiWorkerMirroredStrategy?hl=ko)
-    - 참고사항
+      - https://www.tensorflow.org/guide/distributed_training?hl=ko)
+      - https://www.tensorflow.org/tutorials/distribute/multi_worker_with_keras?hl=ko
+      - https://www.tensorflow.org/api_docs/python/tf/distribute/experimental/MultiWorkerMirroredStrategy?hl=ko
+    - 기타 참고사항
       - worker들을 생성하고 TF_CONFIG를 설정하는 것은 kale에서 pipeline run 생성 시 자동으로 수행된다.
         (아래 \[4. pipeline run 생성 및 결과 확인\]에 첨부된 이미지 참고)
       - 모델 구성과 `model.compile()` 호출은 `strategy.scope()` 안에서 일어나야 한다.
-      - 코드에서 batch size를 지정할 때 worker 개수를 고려한다. (`GLOBAL_BATCH_SIZE = BATCH_SIZE * NUM_WORKERS` 이다.)
-        - worker 개수는 다음 단계에서 text editor를 통해서 설정하게 된다.
+      - 코드에서 batch size를 지정할 때 worker 개수를 고려한다. (`GLOBAL_BATCH_SIZE = BATCH_SIZE * NUM_WORKERS`)
+    - 추후 ParameterServerStrategy를 사용하게 될 경우 참고자료
+      - https://www.tensorflow.org/tutorials/distribute/parameter_server_training
+      - https://www.tensorflow.org/api_docs/python/tf/distribute/experimental/ParameterServerStrategy
+      - https://www.kubeflow.org/docs/components/notebooks/container-images (tensorflow 버전이 더 높은 kubeflow 이미지들)
   - kale-distributed-training-demo.ipynb 파일은 [Simple MNIST convnet](https://keras.io/examples/vision/mnist_convnet/)를 참고하여 작성되었다.
   - model 및 tensorflow class들은 pipeline에서 저장 및 전달이 안 되기도 한다.
     따라서, model을 저장할 때는 변수 대신 `model.save`와 `tf.keras.models.load_model`을 사용하는 것을 권장한다.
-    - TensorFlow Core > Guide > [Save and load Keras models](https://www.tensorflow.org/guide/keras/save_and_serialize?hl=ko)
-    - TensorFlow Core > API Docs > [tf.keras.models.load_model](https://www.tensorflow.org/api_docs/python/tf/keras/models/load_model?hl=ko)
+    - https://www.tensorflow.org/guide/keras/save_and_serialize?hl=ko
+    - https://www.tensorflow.org/api_docs/python/tf/keras/models/load_model?hl=ko
 - 코드 작성이 끝나면, 좌측 메뉴에서 kale panel(Kubeflow Pipelines Deployment Panel)을 열고 enable한 후, Pipeline Name, Pipeline Description, Advanced Settings > Docker Image를 설정한다.
   - 이때 docker image로는 해당 kale 노트북과 동일한 image를 사용하는 것을 권장한다.
 - kale이 enable된 상태에서 노트북 각 cell의 우측 상단 버튼을 사용하여 type, name, dependency를 설정한다.
 
-~~## 3. text editor로 ipynb 파일 수정~~
-
-~~- 좌측 메뉴에서 탐색기(File Browser)를 열고, 코드 작성 및 kale 설정이 끝난 ipynb 파일을 우클릭하여 Open With > Editor 를 선택하면, json 형식으로 되어있는 파일 정보를 열람하거나 수정할 수 있다.~~
-  ~~- 파일 정보 텍스트 속에는 metadata와 cell들에 대한 정보가 들어있으며, kale을 통해 설정된 정보도 여기에 포함되어 있다.~~
-    ~~- kale panel에서 설정한 내용(name, description, image)은 아래에 저장되어 있다.~~
-      ~~- metadata > kubeflow_노트북 > pipeline_name, pipeline_description, docker_image~~
-    ~~- cell들에 대해 설정한 내용(type, name, dependency)은 아래에 저장되어 있다.~~
-      ~~- cells > metadata > tags~~
-~~- distributed training이 필요한 cell의 metadata > tags에 "distribute", "workers:n" 태그를 추가한 후 저장한다.~~
-  ~~- "distribute" 태그를 가진 cell은 "workers:n" 태그도 가져야 한다.~~
-  ~~- "workers:n" 태그는 해당 cell에 유일해야 하며, n은 positive integer이어야 한다.~~
-~~- Editor에서 ipynb 파일을 수정하고 저장한 후, 노트북에서 해당 ipynb 파일을 사용하다 보면 '디스크에서 파일이 변경되었다'는 메세지가 뜰 수 있는데, 이때 "Revert"를 선택하여야 Editor에서 수정한 내용이 유지된다.~~
-
 ## 3. MultiWorkerMirroredStrategy
 
-- MultiWorkerMirroredStrategy가 필요한 셀에 버튼 UI와 팝업을 통해 관련 태그를 설정한다. 사용 요령은 GPU 설정과 같다.
+- MultiWorkerMirroredStrategy가 필요한 셀에 버튼 UI와 팝업을 통해 태그를 설정한다. 사용 요령은 GPU 설정과 같다.
+  이 레포지토리의 [kale-distributed-training-demo.ipynb](./examples/kale-distributed-training-demo.ipynb) 파일에는 이미 설정되어 있다.
 
 ## 4. pipeline run 생성 및 결과 확인
 
