@@ -1,28 +1,26 @@
-apiVersion: apiextensions.k8s.io/v1beta1  
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
     cert-manager.io/inject-ca-from: kubeflow/serving-cert
-    controller-gen.kubebuilder.io/version: v0.3.1-0.20200528125929-5c0c6ae3b64b
+    controller-gen.kubebuilder.io/version: v0.4.0
   labels:
-    app: kfserving
-    app.kubernetes.io/component: kfserving
-    app.kubernetes.io/name: kfserving
-    kustomize.component: kfserving
-  name: inferenceservices.serving.kubeflow.org
+    app: kserve
+    app.kubernetes.io/name: kserve
+  name: inferenceservices.serving.kserve.io
 spec:
   conversion:
-    conversionReviewVersions:
-    - v1alpha2
-    - v1beta1
     strategy: Webhook
-    webhookClientConfig:
-      caBundle: Cg==
-      service:
-        name: kfserving-webhook-server-service
-        namespace: kubeflow
-        path: /convert
-  group: serving.kubeflow.org
+    webhook:
+      clientConfig:
+        caBundle: Cg==
+        service:
+          name: kserve-webhook-server-service
+          namespace: kubeflow
+          path: /convert
+      conversionReviewVersions:
+      - v1beta1
+  group: serving.kserve.io
   names:
     kind: InferenceService
     listKind: InferenceServiceList
@@ -32,9 +30,6 @@ spec:
     singular: inferenceservice
   preserveUnknownFields: false
   scope: Namespaced
-  subresources:
-    status: {}
-  version: v1beta1
   versions:
   - additionalPrinterColumns:
     - JSONPath: .status.url
@@ -20025,6 +20020,8 @@ spec:
         type: object
     served: true
     storage: false    
+    subresources:
+      status: {}  
 status:
   acceptedNames:
     kind: ""
