@@ -10,7 +10,7 @@ spec:
     spec:
       containers:
       - env: []
-        image: 'docker.io/tmaxcloudck/kale-tekton-standalone:211227'
+        image: 'docker.io/tmaxcloudck/kale-tekton-standalone:220207'
         imagePullPolicy: Always
         name: kale-distribute-demo
         resources:
