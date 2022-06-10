@@ -1,6 +1,9 @@
 
 # Kubeflow 설치 가이드
 
+## 개요
+ai-devops is a machine learning toolkit on top of Kubernetes. And translates steps in your ml workflow into Kubernetes jobs, providing the cloud-native interface for your ML libraries, frameworks, pipelines and notebooks
+
 ## 구성 요소 및 버전
 * Kubeflow v1.0.2 (https://github.com/kubeflow/kubeflow)
 * Argo v2.8 (https://github.com/argoproj/argo)
