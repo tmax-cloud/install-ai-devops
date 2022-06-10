@@ -3,6 +3,9 @@
 * 폐쇄망과 인터넷 연결망에서의 설치가 완전히 분리되어 가이드되어 있으니 참고한다.
 * 폐쇄망 설치 guide는 아직 완전히 작성되지 않았음
 
+## 개요
+ai-devops is a machine learning toolkit on top of Kubernetes. And translates steps in your ml workflow into Kubernetes jobs, providing the cloud-native interface for your ML libraries, frameworks, pipelines and notebooks
+
 ## 구성 요소 및 버전
 * Kubeflow v1.2.0 (https://github.com/kubeflow/kubeflow)
 * Argo v2.12.10 (https://github.com/argoproj/argo)
