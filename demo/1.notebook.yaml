@@ -22,8 +22,7 @@ spec:
         - mountPath: /home/jovyan
           name: demo-pvc
         - mountPath: /dev/shm
-          name: dshm
-      serviceAccountName: default-editor
+          name: dshm      
       ## 사용할 volume 정의
       volumes:
       - name: demo-pvc

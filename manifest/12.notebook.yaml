@@ -4005,7 +4005,7 @@ spec:
             configMapKeyRef:
               key: CUSTOM_DOMAIN
               name: notebook-controller-config
-        image: docker.io/tmaxcloudck/notebook-controller-go:b0.2.1
+        image: docker.io/tmaxcloudck/notebook-controller-go:b0.2.2
         imagePullPolicy: Always
         name: notebook-controller
         volumeMounts:
@@ -4094,8 +4094,7 @@ spec:
             - mountPath: /home/jovyan
               name: demo-pvc
             - mountPath: /dev/shm
-              name: dshm
-          serviceAccountName: default-editor
+              name: dshm          
           volumes:
           - name: demo-pvc
             persistentVolumeClaim:
