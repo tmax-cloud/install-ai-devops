@@ -2,6 +2,8 @@
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
+  annotations:
+    "api-approved.kubernetes.io": "unapproved"
   creationTimestamp:
   labels:
     app.kubernetes.io/component: kubeflow
@@ -17,6 +19,7 @@ spec:
   - name: v1beta1
     schema:
       openAPIV3Schema:
+        type: object
         properties:
           apiVersion:
             type: string
@@ -236,6 +239,9 @@ spec:
                 format: int64
                 type: integer
             type: object  
+    served: true
+    storage: true
+
 ---  
 apiVersion: v1
 kind: ServiceAccount

@@ -5,17 +5,26 @@ metadata:
   name: add-user-filter
   namespace: istio-system
 spec:
-  workloadLabels:
-    app: istio-ingressgateway
-  filters:
-  - listenerMatch:
-      listenerType: GATEWAY
-    filterName: envoy.lua
-    filterType: HTTP
-    insertPosition:
-      index: FIRST
-    filterConfig:
-      inlineCode: |
-        function envoy_on_request(request_handle)
-            request_handle:headers():add("kubeflow-userid","anonymous@kubeflow.org")
-        end
+  workloadSelector:
+    labels:
+      app: istio-ingressgateway
+  configPatches:
+  - applyTo: HTTP_FILTER
+    match:
+      context: GATEWAY
+      listener:
+        filterChain:
+          filter:
+            name: "envoy.http_connection_manager"
+            subFilter:
+              name: "envoy.router"
+    patch:
+      operation: INSERT_BEFORE
+      value:
+       name: envoy.lua
+       typed_config:
+         "@type": "type.googleapis.com/envoy.config.filter.http.lua.v2.Lua"
+         inlineCode: |
+            function envoy_on_request(request_handle)
+                request_handle:headers():add("kubeflow-userid","anonymous@kubeflow.org")
+            end

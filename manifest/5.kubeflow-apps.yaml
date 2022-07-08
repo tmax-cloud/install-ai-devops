@@ -37,7 +37,6 @@ spec:
       app.kubernetes.io/part-of: kubeflow
       app.kubernetes.io/version: v0.7.0
 ---
-
 aggregationRule:
   clusterRoleSelectors:
   - matchLabels:
@@ -47,9 +46,7 @@ kind: ClusterRole
 metadata:
   name: kubeflow-admin
 rules: []
-
 ---
-
 aggregationRule:
   clusterRoleSelectors:
   - matchLabels:
@@ -57,44 +54,17 @@ aggregationRule:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
+  labels:
+    rbac.authorization.kubeflow.org/aggregate-to-kubeflow-admin: "true"
   name: kubeflow-edit
-  labels:
-    rbac.authorization.kubeflow.org/aggregate-to-kubeflow-admin: "true"
-rules: 
-- apiGroups:
-  - tekton.dev
-  resources:
-  - tasks
-  - taskruns
-  - pipelines
-  - pipelineruns
-  - pipelineresources
-  - conditions
-  verbs:
-  - '*'
-
----
-
-aggregationRule:
-  clusterRoleSelectors:
-  - matchLabels:
-      rbac.authorization.kubeflow.org/aggregate-to-kubeflow-view: "true"
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: kubeflow-view
-  labels:
-    rbac.authorization.kubeflow.org/aggregate-to-kubeflow-edit: "true"
 rules: []
-
 ---
-
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: kubeflow-kubernetes-admin
   labels:
     rbac.authorization.kubeflow.org/aggregate-to-kubeflow-admin: "true"
+  name: kubeflow-kubernetes-admin
 rules:
 - apiGroups:
   - authorization.k8s.io
@@ -116,9 +86,7 @@ rules:
   - patch
   - update
   - watch
-
 ---
-
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -145,17 +113,6 @@ rules:
   - serviceaccounts
   verbs:
   - impersonate
-- apiGroups:
-  - tekton.dev
-  resources:
-  - tasks
-  - taskruns
-  - pipelines
-  - pipelineruns
-  - pipelineresources
-  - conditions
-  verbs:
-  - '*' 
 - apiGroups:
   - ""
   resources:
@@ -265,9 +222,7 @@ rules:
   - deletecollection
   - patch
   - update
-
 ---
-
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -394,14 +349,29 @@ rules:
   - list
   - watch
 ---
+aggregationRule:
+  clusterRoleSelectors:
+  - matchLabels:
+      rbac.authorization.kubeflow.org/aggregate-to-kubeflow-view: "true"
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    rbac.authorization.kubeflow.org/aggregate-to-kubeflow-edit: "true"
+  name: kubeflow-view
+rules: []
+---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.0
-  creationTimestamp: null
+  labels:
+    kustomize.component: profiles
   name: profiles.kubeflow.org
 spec:
+  conversion:
+    strategy: None
   group: kubeflow.org
   names:
     kind: Profile
@@ -651,9 +621,58 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   labels:
-    app.kubernetes.io/component: profiles
-    app.kubernetes.io/name: profiles
     kustomize.component: profiles
+  name: profiles-controller-service-account
+  namespace: kubeflow
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    kustomize.component: profiles
+  name: profiles-leader-election-role
+  namespace: kubeflow
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - configmaps/status
+  verbs:
+  - get
+  - update
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    kustomize.component: profiles
+  name: profiles-leader-election-rolebinding
+  namespace: kubeflow
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: profiles-leader-election-role
+subjects:
+- kind: ServiceAccount
   name: profiles-controller-service-account
   namespace: kubeflow
 ---
@@ -661,8 +680,6 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   labels:
-    app.kubernetes.io/component: profiles
-    app.kubernetes.io/name: profiles
     kustomize.component: profiles
   name: profiles-cluster-role-binding
 roleRef:
@@ -676,40 +693,49 @@ subjects:
 ---
 apiVersion: v1
 data:
-  cluster-name: ""
-  clusterDomain: cluster.local
-  istio-namespace: istio-system
-  userid-header: kubeflow-userid
-  userid-prefix: ""
+  namespace-labels.yaml: |
+    # Below is a list of labels to be set by default.
+    #
+    # To add a namespace label, use `key: 'value'`, for example:
+    # istio.io/rev: 'asm-191-1'
+    #
+    # To remove a namespace label, use `key: ''`. For example:
+    # istio-injection: ''
+    #
+    # Profile controller will not replace a namespace label if its key already
+    # exists. If you want to override the value of a previously applied label, you
+    # need to:
+    # 1. Remove the label by using `key: ''` and deploy.
+    # 2. Add the label by using `key: 'value'` and deploy.
+    #
+    katib.kubeflow.org/metrics-collector-injection: "enabled"
+    serving.kubeflow.org/inferenceservice: "enabled"
+    pipelines.kubeflow.org/enabled: "true"
+    app.kubernetes.io/part-of: "kubeflow-profile"
 kind: ConfigMap
 metadata:
   labels:
-    app.kubernetes.io/component: profiles
-    app.kubernetes.io/name: profiles
     kustomize.component: profiles
-  name: profiles-kubeflow-config-mb6ktt4hf9
+  name: namespace-labels-data-4df5t8mdgf
   namespace: kubeflow
 ---
 apiVersion: v1
 data:
-  admin: example@kubeflow.org
-  gcp-sa: ""
+  ADMIN: ""
+  USERID_HEADER: kubeflow-userid
+  USERID_PREFIX: ""
+  WORKLOAD_IDENTITY: ""
 kind: ConfigMap
 metadata:
-  annotations: {}
   labels:
-    app.kubernetes.io/component: profiles
-    app.kubernetes.io/name: profiles
     kustomize.component: profiles
-  name: profiles-profiles-config-52bcf9k8h9
+  name: profiles-config-46c7tgh6fd
   namespace: kubeflow
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app.kubernetes.io/component: profiles
-    app.kubernetes.io/name: profiles
     kustomize.component: profiles
   name: profiles-kfam
   namespace: kubeflow
@@ -717,16 +743,12 @@ spec:
   ports:
   - port: 8081
   selector:
-    app.kubernetes.io/component: profiles
-    app.kubernetes.io/name: profiles
     kustomize.component: profiles
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app.kubernetes.io/component: profiles
-    app.kubernetes.io/name: profiles
     kustomize.component: profiles
   name: profiles-deployment
   namespace: kubeflow
@@ -734,87 +756,27 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/component: profiles
-      app.kubernetes.io/name: profiles
       kustomize.component: profiles
   template:
     metadata:
       annotations:
-        sidecar.istio.io/inject: "false"
+        sidecar.istio.io/inject: "true"
       labels:
-        app.kubernetes.io/component: profiles
-        app.kubernetes.io/name: profiles
         kustomize.component: profiles
     spec:
       containers:
-      - args: []
-        command:
-        - /manager
-        - -userid-header
-        - $(USERID_HEADER)
-        - -userid-prefix
-        - $(USERID_PREFIX)
-        - -workload-identity
-        - $(WORKLOAD_IDENTITY)
-        env:
-        - name: USERID_HEADER
-          valueFrom:
-            configMapKeyRef:
-              key: userid-header
-              name: profiles-kubeflow-config-mb6ktt4hf9
-        - name: USERID_PREFIX
-          valueFrom:
-            configMapKeyRef:
-              key: userid-prefix
-              name: profiles-kubeflow-config-mb6ktt4hf9
-        - name: WORKLOAD_IDENTITY
-          valueFrom:
-            configMapKeyRef:
-              key: gcp-sa
-              name: profiles-profiles-config-52bcf9k8h9
-        image: gcr.io/kubeflow-images-public/profile-controller:vmaster-ga49f658f
-        imagePullPolicy: Always
-        livenessProbe:
-          httpGet:
-            path: /metrics
-            port: 8080
-          initialDelaySeconds: 30
-          periodSeconds: 30
-        name: manager
-        ports:
-        - containerPort: 8080
-          name: manager-http
-          protocol: TCP
-        volumeMounts:
-        - mountPath: "/var/run/secrets/kubernetes.io/serviceaccount"
-          name: profiles-controller-service-account-token
-          readOnly: true  
-      - args: []
-        command:
+      - command:
         - /access-management
         - -cluster-admin
-        - $(CLUSTER_ADMIN)
-        - -userid-prefix
-        - $(USERID_PREFIX)
+        - $(ADMIN)
         - -userid-header
         - $(USERID_HEADER)
-        env:
-        - name: USERID_HEADER
-          valueFrom:
-            configMapKeyRef:
-              key: userid-header
-              name: profiles-kubeflow-config-mb6ktt4hf9
-        - name: USERID_PREFIX
-          valueFrom:
-            configMapKeyRef:
-              key: userid-prefix
-              name: profiles-kubeflow-config-mb6ktt4hf9
-        - name: CLUSTER_ADMIN
-          valueFrom:
-            configMapKeyRef:
-              key: admin
-              name: profiles-profiles-config-52bcf9k8h9
-        image: gcr.io/kubeflow-images-public/kfam:vmaster-g9f3bfd00
+        - -userid-prefix
+        - $(USERID_PREFIX)
+        envFrom:
+        - configMapRef:
+            name: profiles-config-46c7tgh6fd
+        image: public.ecr.aws/j1r0q0g6/notebooks/access-management:v1.5.0
         imagePullPolicy: Always
         livenessProbe:
           httpGet:
@@ -830,8 +792,42 @@ spec:
         volumeMounts:
         - mountPath: "/var/run/secrets/kubernetes.io/serviceaccount"
           name: profiles-controller-service-account-token
+          readOnly: true
+      - command:
+        - /manager
+        - -userid-header
+        - $(USERID_HEADER)
+        - -userid-prefix
+        - $(USERID_PREFIX)
+        - -workload-identity
+        - $(WORKLOAD_IDENTITY)
+        envFrom:
+        - configMapRef:
+            name: profiles-config-46c7tgh6fd
+        image: public.ecr.aws/j1r0q0g6/notebooks/profile-controller:v1.5.0
+        imagePullPolicy: Always
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        name: manager
+        ports:
+        - containerPort: 8080
+          name: manager-http
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /etc/profile-controller
+          name: namespace-labels
+          readOnly: true
+        - mountPath: "/var/run/secrets/kubernetes.io/serviceaccount"
+          name: profiles-controller-service-account-token
           readOnly: true  
       volumes:
+      - configMap:
+          name: namespace-labels-data-4df5t8mdgf
+        name: namespace-labels
       - name: profiles-controller-service-account-token
         secret:
           defaultMode: 420
@@ -844,4 +840,50 @@ metadata:
     kubernetes.io/service-account.name: profiles-controller-service-account
   name: profiles-controller-service-account-token
   namespace: kubeflow
-type: kubernetes.io/service-account-token          
+type: kubernetes.io/service-account-token    
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  labels:
+    kustomize.component: profiles
+  name: profiles-kfam
+  namespace: kubeflow
+spec:
+  gateways:
+  - kubeflow-gateway
+  hosts:
+  - '*'
+  http:
+  - headers:
+      request:
+        add:
+          x-forwarded-prefix: /kfam
+    match:
+    - uri:
+        prefix: /kfam/
+    rewrite:
+      uri: /kfam/
+    route:
+    - destination:
+        host: profiles-kfam.kubeflow.svc.cluster.local
+        port:
+          number: 8081
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  labels:
+    kustomize.component: profiles
+  name: profiles-kfam
+  namespace: kubeflow
+spec:
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/kubeflow/sa/centraldashboard
+  selector:
+    matchLabels:
+      kustomize.component: profiles
