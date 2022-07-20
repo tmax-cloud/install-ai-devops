@@ -8,6 +8,8 @@ source ./ai-devops.config
 echo "DISCOVERY_URL = $DISCOVERY_URL"
 echo "CLIENT_SECRET = $CLIENT_SECRET"
 echo "CUSTOM_DOMAIN = $CUSTOM_DOMAIN"
+echo "GATEKEEPER_VERSION = $GATEKEEPER_VERSION"
+echo "LOG_LEVEL = $LOG_LEVEL"
 
 if [ $REGISTRY != "{REGISTRY}" ]; then
   echo "REGISTRY = $REGISTRY"
@@ -16,6 +18,8 @@ fi
 sed -i 's@{DISCOVERY_URL}@'${DISCOVERY_URL}'@g' 12.notebook.yaml
 sed -i 's/{CLIENT_SECRET}/'${CLIENT_SECRET}'/g' 12.notebook.yaml
 sed -i 's/{CUSTOM_DOMAIN}/'${CUSTOM_DOMAIN}'/g' 12.notebook.yaml
+sed -i 's/{GATEKEEPER_VERSION}/'${GATEKEEPER_VERSION}'/g' 12.notebook.yaml
+sed -i 's/{LOG_LEVEL}/'${LOG_LEVEL}'/g' 12.notebook.yaml
 
 
 if [ $REGISTRY != "{REGISTRY}" ]; then
