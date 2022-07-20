@@ -109,6 +109,9 @@ ai-devops is a machine learning toolkit on top of Kubernetes. And translates ste
         * {{HyperAuth_URL}} 부분에 환경에 맞는 하이퍼어쓰 주소를 입력한다.
         * EX) https://hyperauth.tmaxcloud.org/auth/realms/tmax
     * CUSTOM_DOMAIN = 인그레스로 접근할수 있도록 환경에 맞는 커스텀 도메인 주소를 입력한다. EX) tmaxcloud.org
+    * GATEKEEPER_VERSION = 사용할 Gatekeeper의 이미지 버전 EX) v1.0.2
+    * LOG_LEVEL = Gatekeeper에서 설정할 로그 레벨 EX) error
+        * debug, info, warn, error, fatal, panic 의 6단계로 설정 가능
     * REGISTRY = 폐쇄망 설치시 앞서 설치한 Image repository 주소
         * 중요) 설치 환경이 폐쇄망이 아닐시 {REGISTRY} 값을 수정하지 않는다.
         * EX) 172.2.2.6:5000
@@ -156,7 +159,7 @@ ai-devops is a machine learning toolkit on top of Kubernetes. And translates ste
 | |katib-db-manager|1|katib-db-manager|docker.io/kubeflowkatib/katib-db-manager:v0.11.0|20m|100Mi|1|2Gi|
 | |katib-mysql|1|katib-mysql|mysql:8.0.27|1|2Gi|1|4Gi|
 | |katib-ui|1|katib-ui|docker.io/kubeflowkatib/katib-ui:v0.11.0|20m|100Mi|1|1Gi|
-| |kfserving-controller-manager|2|manager|gcr.io/kfserving/kfserving-controller:v0.5.1|100m|200Mi|100m|300Mi|
+| |kfserving-controller-manager|2|manager|docker.io/kfserving/kfserving-controller:v0.5.1|100m|200Mi|100m|300Mi|
 | | | |kube-rbac-proxy|gcr.io/kubebuilder/kube-rbac-proxy:v0.4.0|10m|40Mi|1|400Mi|
 | |minio|1|minio|gcr.io/ml-pipeline/minio:RELEASE.2019-08-14T20-37-41Z-license-compliance|20m|100Mi|1|1Gi|
 | |notebook-controller-deployment|1|notebook-controller|tmaxcloudck/notebook-controller-go:b0.1.0|20m|300Mi|1|3Gi|
