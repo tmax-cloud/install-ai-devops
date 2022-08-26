@@ -242,6 +242,11 @@ pip install --upgrade kubernetes
 ```
 *serving 같은 경우 kfp python module을 사용하여 image로 만들고, 이를 task로 이용하여 생성하였다. 참고 : KFServing-fairing.ipynb
 
+*v1beta1 모듈을 찾을 수 없다는 에러가 뜬다면, 다음 커맨드를 입력하여 kfserving을 업데이트하자.
+```
+pip install --upgrade kfserving==0.5.0
+```
+
 ## 기타. kfserving을 통한 multi model serving 시나리오
   * 목적 : `하나의 ml 서버에서 여러 모델들을 추론할 수 있는 multi-model ml service를 생성한다.`
   참고 사항 : 
