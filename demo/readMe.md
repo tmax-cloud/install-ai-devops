@@ -117,6 +117,20 @@ cp $HOME/.docker/config.json /home/jovyan/.docker/config.json
 pip install kubeflow-fairing --upgrade
 ```
 
+*kubeflow-fairing 업데이트 시 ray\[serve\] 관련 에러가 뜬다면, 다음 커맨드를 입력하여 pip를 업데이트하자.
+```
+pip install --upgrade pip
+```
+
+*docker image pull 권한 에러가 뜬다면, 다음 커맨드를 입력하여 service account에 docker image secret을 넣자.
+```
+kubectl -n demo create secret generic demo-secret \\
+    --from-file=.dockerconfigjson=~/.docker/config.json \\
+    --type=kubernetes.io/dockerconfigjson
+
+kubectl -n demo patch serviceaccount default -p '{"imagePullSecrets": [{"name": "demo-secret"}]}'
+```
+
 *실행이 잘 되지 않는다면, pythonNotebook의 kernel을 리셋 후 다시 code run을 진행하자. (code run 옆에 커널 새로고침 버튼 클릭)
 
   - 아래와 같이 docker hub에 rhojw/sample-job:3C8CE2EE 의 image가 배포된 것을 확인할 수 있다. 이후 Step에서 사용할 image이다. 
@@ -186,6 +200,7 @@ pip install kubeflow-fairing --upgrade
 
 ![5.curl.PNG](./img/5.curl.PNG)
 
+*istio-ca-root-cert configmap을 찾지 못하는 에러가 뜬다면, istiod pod를 재부팅하고 진행하며 생성한 모든 리소스를 삭제하고 다시 시도하자.
 
 ### 간단한 웹앱을 통한 inference service 확인
   - 위의 inference service가 실제 어플리케이션에서 어떻게 활용되는지 확인할 수 있다.
@@ -204,6 +219,11 @@ kubectl get service -n istio-system istio-ingressgateway
 
 ![5.web.PNG](./img/5.web.PNG)
 
+*master node에 docker가 없다면 다음 커맨드를 입력하여 pod로 띄워 확인하자.
+```
+kubectl run demo-webui -n demo --image=brightfly/fminst-webui:latest --port=5000 --hostport=19000
+```
+
 ## Step 6. process 자동화를 위한 pipeline 생성하기 (tekton)
   - 실제 운영과정에서는 새로운 데이터를 통해 모델을 다시 학습하고 배포하는 일련의 작업들을 해야할 경우가 생기는데, 이를 자동화 해주는 메뉴이다.
   - 코드 Run을 통해 생성된 fmnist_pipeline.yaml을 통해 pipelinerun을 배포한다. : [6.workflow_tekton.yaml](6.workflow_tekton.yaml)    
@@ -221,6 +241,11 @@ pip install kfp_tekton
 pip install --upgrade kubernetes
 ```
 *serving 같은 경우 kfp python module을 사용하여 image로 만들고, 이를 task로 이용하여 생성하였다. 참고 : KFServing-fairing.ipynb
+
+*v1beta1 모듈을 찾을 수 없다는 에러가 뜬다면, 다음 커맨드를 입력하여 kfserving을 업데이트하자.
+```
+pip install --upgrade kfserving==0.5.0
+```
 
 ## 기타. kfserving을 통한 multi model serving 시나리오
   * 목적 : `하나의 ml 서버에서 여러 모델들을 추론할 수 있는 multi-model ml service를 생성한다.`
