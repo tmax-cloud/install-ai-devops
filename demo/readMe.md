@@ -122,8 +122,6 @@ pip install kubeflow-fairing --upgrade
 pip install --upgrade pip
 ```
 
-
-
 *docker image pull 권한 에러가 뜬다면, 다음 커맨드를 입력하여 service account에 docker image secret을 넣자.
 ```
 kubectl -n demo create secret generic demo-secret \\
