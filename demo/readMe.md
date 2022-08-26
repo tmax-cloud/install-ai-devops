@@ -221,7 +221,7 @@ kubectl get service -n istio-system istio-ingressgateway
 
 *master node에 docker가 없다면 다음 커맨드를 입력하여 pod로 띄워 확인하자.
 ```
-kubectl run --image=brightfly/fminst-webui:latest --port=5000 --hostport=19000
+kubectl run demo-webui -n demo --image=brightfly/fminst-webui:latest --port=5000 --hostport=19000
 ```
 
 ## Step 6. process 자동화를 위한 pipeline 생성하기 (tekton)
