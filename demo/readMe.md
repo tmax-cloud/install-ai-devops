@@ -122,6 +122,15 @@ pip install kubeflow-fairing --upgrade
 pip install --upgrade pip
 ```
 
+*docker image pull 권한 에러가 뜬다면, 다음 커맨드를 입력하여 service account에 docker image secret을 넣자.
+```
+kubectl -n demo create secret generic demo-secret \\
+    --from-file=.dockerconfigjson=~/.docker/config.json \\
+    --type=kubernetes.io/dockerconfigjson
+
+kubectl -n demo patch serviceaccount default -p '{"imagePullSecrets": [{"name": "demo-secret"}]}'
+```
+
 *실행이 잘 되지 않는다면, pythonNotebook의 kernel을 리셋 후 다시 code run을 진행하자. (code run 옆에 커널 새로고침 버튼 클릭)
 
   - 아래와 같이 docker hub에 rhojw/sample-job:3C8CE2EE 의 image가 배포된 것을 확인할 수 있다. 이후 Step에서 사용할 image이다. 
