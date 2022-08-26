@@ -117,6 +117,11 @@ cp $HOME/.docker/config.json /home/jovyan/.docker/config.json
 pip install kubeflow-fairing --upgrade
 ```
 
+*kubeflow-fairing 업데이트 시 ray\[serve\] 관련 에러가 뜬다면, 다음 커맨드를 입력하여 pip를 업데이트하자.
+```
+pip install --upgrade pip
+```
+
 *실행이 잘 되지 않는다면, pythonNotebook의 kernel을 리셋 후 다시 code run을 진행하자. (code run 옆에 커널 새로고침 버튼 클릭)
 
   - 아래와 같이 docker hub에 rhojw/sample-job:3C8CE2EE 의 image가 배포된 것을 확인할 수 있다. 이후 Step에서 사용할 image이다. 
