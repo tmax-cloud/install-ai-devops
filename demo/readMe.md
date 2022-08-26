@@ -122,10 +122,7 @@ pip install kubeflow-fairing --upgrade
 pip install --upgrade pip
 ```
 
-*AWS AccessKeyId 에러가 뜬다면 다음 커맨드를 입력하여 azure 패키지를 업데이트하고 노트북을 재시작하여 다시 시도하자.
-```
-pip install --upgrade azure
-```
+
 
 *docker image pull 권한 에러가 뜬다면, 다음 커맨드를 입력하여 service account에 docker image secret을 넣자.
 ```
