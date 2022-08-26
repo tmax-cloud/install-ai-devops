@@ -219,6 +219,11 @@ kubectl get service -n istio-system istio-ingressgateway
 
 ![5.web.PNG](./img/5.web.PNG)
 
+*master node에 docker가 없다면 다음 커맨드를 입력하여 pod로 띄워 확인하자.
+```
+kubectl run --image=brightfly/fminst-webui:latest --port=5000 --hostport=19000
+```
+
 ## Step 6. process 자동화를 위한 pipeline 생성하기 (tekton)
   - 실제 운영과정에서는 새로운 데이터를 통해 모델을 다시 학습하고 배포하는 일련의 작업들을 해야할 경우가 생기는데, 이를 자동화 해주는 메뉴이다.
   - 코드 Run을 통해 생성된 fmnist_pipeline.yaml을 통해 pipelinerun을 배포한다. : [6.workflow_tekton.yaml](6.workflow_tekton.yaml)    
