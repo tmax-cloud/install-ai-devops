@@ -200,6 +200,7 @@ kubectl -n demo patch serviceaccount default -p '{"imagePullSecrets": [{"name": 
 
 ![5.curl.PNG](./img/5.curl.PNG)
 
+*istio-ca-root-cert configmap을 찾지 못하는 에러가 뜬다면, istiod pod를 재부팅하고 진행하며 생성한 모든 리소스를 삭제하고 다시 시도하자.
 
 ### 간단한 웹앱을 통한 inference service 확인
   - 위의 inference service가 실제 어플리케이션에서 어떻게 활용되는지 확인할 수 있다.
