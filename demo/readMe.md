@@ -38,16 +38,19 @@ Fashion-MNIST 데이터를 활용하여 Image가 어떤 Fashion Item인지 추�
   - UI의 Import YAML 버튼을 활용하여 demo profile을 생성한다. 
 ![0.profile.PNG](./img/0.profile.PNG) 
   - 참고 : [0.profile.yaml](./0.profile.yaml)
-
+<!--
   - 본 시나리오의 작업을 위해 demo-pvc(readWriteMany)를 생성한다.
+
 
 ![0.pvc.PNG](./img/0.pvc.PNG)  
   - 참고 : [0.pvc.yaml](./0.pvc.yaml)
+-->
 
 ## Step 1. python 코드 작성을 위한 notebook 만들기 (Notebook Server 메뉴)
   - ai-devops에서는 ML Model 코딩을 위한 web 기반의 python IDE인 JupyterNotebook을 사용할 수 있다.
+<!--
   - 위에서 생성한 demo-pvc를 마운트하는 demo-notebook을 생성한다. 
-
+-->
 ![1.notebook.PNG](./img/1.notebook.PNG)
   - 참고 : [1.notebook.yaml](./1.notebook.yaml)
   - 폐쇄망 환경의 경우 : [1.notebook_closednw.yaml](./1.notebook_closednw.yaml)
