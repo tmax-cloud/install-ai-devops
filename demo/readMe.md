@@ -56,6 +56,8 @@ Fashion-MNIST 데이터를 활용하여 Image가 어떤 Fashion Item인지 추�
   - 폐쇄망 환경의 경우 : [1.notebook_closednw.yaml](./1.notebook_closednw.yaml)
     * 폐쇄망 환경의 경우에는 1.notebook_closednw.yaml 파일의 image registry 부분을 수정한다.(필수)
 
+*--disable-admission-plugins=ServiceAccount 보안설정 적용을 통한 서비스어카운트토큰 수동 mount가 필요한 환경이 아니라면 [1.notebook_with_sa_name.yaml](./1.notebook_with_sa_name.yaml), 폐쇄망 환경의 경우에는 [1.notebook_closednw_with_sa_name.yaml](./1.notebook_with_sa_name.yaml)을 사용하여 notebook을 생성한다.
+
 *시나리오에서는 여러 커스텀 패키지가 포함된 custom jupyterNotebook image를 사용하였다. (brightfly/kubeflow-jupyter-lab:tf2.0-gpu)
 
 *폐쇄망 환경의 경우 시나리오에서 사용되는 파이썬 패키지가 포함되어 있고 fairing 코드가 수정된 custom jupyterNotebook image를 사용하였다. (tmaxcloudck/kubeflow-jupyter-lab:v0.1)

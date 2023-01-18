@@ -25,17 +25,40 @@ spec:
             - mountPath: /home/jovyan
               name: demo-pvc
             - mountPath: /dev/shm
-              name: dshm
-      serviceAccountName: default-editor
+              name: dshm      
+      ## 사용할 volume 정의
+      volumeMounts:
+        - mountPath: /home/jovyan
+          name: demo-pvc
+        - mountPath: /dev/shm
+          name: dshm
+        - mountPath: "/var/run/secrets/kubernetes.io/serviceaccount"
+          name: default-editor-token
+          readOnly: true
       ## 사용할 volume 정의
       volumes:
-        - name: demo-pvc
-          persistentVolumeClaim:
-            claimName: demo-pvc
-        - emptyDir:
-            medium: Memory
-          name: dshm
-  ## 사용할 volumeClaim 정의 : 없으면 새로 pvc를 생성
+      - name: demo-pvc
+        persistentVolumeClaim:
+          claimName: demo-pvc
+      - emptyDir:
+          medium: Memory
+        name: dshm
+      - name: default-editor-token
+        secret:
+          defaultMode: 420
+          secretName: default-editor-token
+  ## 사용할 volumeClaim 정의 : 없으면 새로 pvc를 생성      
   volumeClaim:
-    - name: demo-pvc
-      size: 10Gi
+  - name: demo-pvc
+    size: 10Gi
+---
+## serviceaccount token 수동마운트를 위한(secret name 난수 x) secret 수동 생성
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    kubernetes.io/service-account.name: default-editor
+  name: default-editor-token
+  ## profile로 생성한 namespace와 동일해야함
+  namespace: demo
+type: kubernetes.io/service-account-token
