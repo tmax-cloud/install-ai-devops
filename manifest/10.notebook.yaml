@@ -3786,7 +3786,6 @@ metadata:
     kustomize.component: notebook-controller
     rbac.authorization.kubeflow.org/aggregate-to-kubeflow-admin: "true"
   name: notebook-controller-kubeflow-notebooks-admin
-rules: []
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole

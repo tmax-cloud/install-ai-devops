@@ -19748,7 +19748,6 @@ metadata:
     app.kubernetes.io/name: kserve
     rbac.authorization.kubeflow.org/aggregate-to-kubeflow-admin: "true"
   name: kubeflow-kserve-admin
-rules: []
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
