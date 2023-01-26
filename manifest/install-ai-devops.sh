@@ -15,11 +15,11 @@ if [ $REGISTRY != "{REGISTRY}" ]; then
   echo "REGISTRY = $REGISTRY"
 fi
 
-sed -i 's@{DISCOVERY_URL}@'${DISCOVERY_URL}'@g' 12.notebook.yaml
-sed -i 's/{CLIENT_SECRET}/'${CLIENT_SECRET}'/g' 12.notebook.yaml
-sed -i 's/{CUSTOM_DOMAIN}/'${CUSTOM_DOMAIN}'/g' 12.notebook.yaml
-sed -i 's/{GATEKEEPER_VERSION}/'${GATEKEEPER_VERSION}'/g' 12.notebook.yaml
-sed -i 's/{LOG_LEVEL}/'${LOG_LEVEL}'/g' 12.notebook.yaml
+sed -i 's@{DISCOVERY_URL}@'${DISCOVERY_URL}'@g' 10.notebook.yaml
+sed -i 's/{CLIENT_SECRET}/'${CLIENT_SECRET}'/g' 10.notebook.yaml
+sed -i 's/{CUSTOM_DOMAIN}/'${CUSTOM_DOMAIN}'/g' 10.notebook.yaml
+sed -i 's/{GATEKEEPER_VERSION}/'${GATEKEEPER_VERSION}'/g' 10.notebook.yaml
+sed -i 's/{LOG_LEVEL}/'${LOG_LEVEL}'/g' 10.notebook.yaml
 
 
 if [ $REGISTRY != "{REGISTRY}" ]; then
@@ -94,19 +94,10 @@ echo "---2. Install kubeflow-istio-resource---"
 kubectl apply -f 2.kubeflow-istio-resource.yaml
 echo "---3. Install add-anonymous-user-filter.yaml---"
 kubectl apply -f 3.add-anonymous-user-filter.yaml
-echo "---4. Install application---"
-kubectl apply -f 4.application.yaml
-
-while [ \"$(kubectl get crd | grep applications.app.k8s.io  | wc -l)\" == \"0\" ]
-do 
-echo 'CRD Interceptor is not registered yet' 
-sleep 2s
-done 
-echo 'CRD is registered' 
-sleep 5s
-
-echo "---5. Install kubeflow-apps---"
-kubectl apply -f 5.kubeflow-apps.yaml
+echo "---4. Install profile-kfam---"
+kubectl apply -f 4.profile-kfam.yaml
+echo "---5. Install kubeflow-roles---"
+kubectl apply -f 5.kubeflow-roles.yaml
 echo "---6. Install katib---"
 kubectl create -f 6.katib.yaml
 echo "---7. Install kfserving---"
@@ -115,11 +106,10 @@ echo "---8. Install minio---"
 kubectl apply -f 8.minio.yaml
 echo "---9. Install knative---"
 kubectl apply -f 9.knative.yaml
-echo "---10. Install pytorch-operator---"
-kubectl create -f 10.pytorchjob.yaml
-echo "---11. Install tf-operator---"
-kubectl create -f 11.tfjob.yaml
-echo "---12. Install notebook-controller---"
-kubectl create -f 12.notebook.yaml
+echo "---10. Install notebook---"
+kubectl create -f 10.notebook.yaml
+echo "---11. Install training-operator---"
+kubectl create -f 11.training-operator.yaml
+
 
 

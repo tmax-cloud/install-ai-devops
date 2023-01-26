@@ -87,7 +87,7 @@ spec:
             secretKeyRef:
               key: secretkey
               name: mlpipeline-minio-artifact
-        image: gcr.io/ml-pipeline/minio:RELEASE.2019-08-14T20-37-41Z-license-compliance
+        image: docker.io/minio/minio:RELEASE.2023-01-20T02-05-44Z
         name: minio
         ports:
         - containerPort: 9000
@@ -99,35 +99,4 @@ spec:
       - name: data
         persistentVolumeClaim:
           claimName: minio-pvc
----          
-apiVersion: app.k8s.io/v1beta1
-kind: Application
-metadata:
-  labels:
-    app.kubernetes.io/component: minio
-    app.kubernetes.io/name: minio
-  name: minio
-  namespace: kubeflow
-spec:
-  addOwnerRef: true
-  componentKinds:
-  - group: core
-    kind: ConfigMap
-  - group: apps
-    kind: Deployment
-  descriptor:
-    description: ''
-    keywords:
-    - minio
-    - kubeflow
-    links:
-    - description: About
-      url: ''
-    maintainers: []
-    owners: []
-    type: minio
-    version: v1beta1
-  selector:
-    matchLabels:
-      app.kubernetes.io/component: minio
-      app.kubernetes.io/name: minio
+
