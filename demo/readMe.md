@@ -233,6 +233,7 @@ kubectl run demo-webui -n demo --image=brightfly/fminst-webui:latest --port=5000
   - 실제 운영과정에서는 새로운 데이터를 통해 모델을 다시 학습하고 배포하는 일련의 작업들을 해야할 경우가 생기는데, 이를 자동화 해주는 메뉴이다.
   - 코드 Run을 통해 생성된 fmnist_pipeline.yaml을 통해 pipelinerun을 배포한다. : [6.workflow_tekton.yaml](6.workflow_tekton.yaml)    
 ![6.tekton-pipeline.PNG](./img/6.tekton-pipeline.PNG)
+  - 참고: 생성된 pipelinerun yaml파일은 namespace가 지정되어있지 않기 때문에 파이프라인 정의시에 명시한 namespace (ex)demo에 pipelinerun을 배포하여야한다.    
 
 *demo 네임스페이스의 service account가 isvc를 생성할수 있도록 다음 yaml을 이용하여 rolebinding을 적용한다.
 참고 : [6.kfserving-rolebinding.yaml](./6.kfserving-rolebinding.yaml)
