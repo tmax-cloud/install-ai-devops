@@ -93,7 +93,7 @@ kubectl apply -f 1.cluster-local-gateway.yaml
 echo "---2. Install kubeflow-istio-resource---"
 kubectl apply -f 2.kubeflow-istio-resource.yaml
 echo "---3. Install training-operator---"
-kubectl apply -f 3.training-operator.yaml
+kubectl create -f 3.training-operator.yaml
 echo "---4. Install profile-kfam---"
 kubectl apply -f 4.profile-kfam.yaml
 echo "---5. Install kubeflow-roles---"
@@ -107,7 +107,7 @@ kubectl apply -f 8.minio.yaml
 echo "---9. Install knative---"
 kubectl apply -f 9.knative.yaml
 echo "---10. Install notebook---"
-kubectl create -f 10.notebook.yaml
+kubectl install -f 10.notebook.yaml
 
 
 

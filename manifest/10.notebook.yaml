@@ -4012,50 +4012,6 @@ spec:
         name: notebook-controller
       serviceAccountName: notebook-controller-service-account
 ---
-apiVersion: app.k8s.io/v1beta1
-kind: Application
-metadata:
-  labels:
-    app.kubernetes.io/component: notebook-controller
-    app.kubernetes.io/name: notebook-controller
-  name: notebook-controller
-  namespace: kubeflow
-spec:
-  addOwnerRef: true
-  componentKinds:
-  - group: core
-    kind: Service
-  - group: apps
-    kind: Deployment
-  - group: core
-    kind: ServiceAccount
-  descriptor:
-    description: Notebooks controller allows users to create a custom resource \"Notebook\" (jupyter notebook).
-    keywords:
-    - jupyter
-    - notebook
-    - notebook-controller
-    - jupyterhub
-    links:
-    - description: About
-      url: https://github.com/tmax-cloud/notebook-controller-go
-    maintainers:
-    - email: jeongwan_rho@tmax.co.kr
-      name: tmaxcloudck
-    owners:
-    - email: seungjin_lee2@tmax.co.kr
-      name: Seungjin Lee
-    type: notebook-controller
-    version: v1beta1
-  selector:
-    matchLabels:
-      app.kubernetes.io/component: notebook-controller-go
-      app.kubernetes.io/instance: notebook-controller-go-b0.0.2
-      app.kubernetes.io/managed-by: kfctl
-      app.kubernetes.io/name: notebook-controller
-      app.kubernetes.io/part-of: hyperflow
-      app.kubernetes.io/version: b0.0.2
----
 apiVersion: console.tmax.io/v1
 kind: ConsoleYAMLSample
 metadata:
@@ -4096,6 +4052,7 @@ spec:
           - emptyDir:
               medium: Memory
             name: dshm
+          serviceAccountName: default-editor  
       volumeClaim:
       - name: demo-pvc
         size: 10Gi
