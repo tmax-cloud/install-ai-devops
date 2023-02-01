@@ -92,8 +92,8 @@ echo "---1. Install cluster-local-gateway---"
 kubectl apply -f 1.cluster-local-gateway.yaml
 echo "---2. Install kubeflow-istio-resource---"
 kubectl apply -f 2.kubeflow-istio-resource.yaml
-echo "---3. Install add-anonymous-user-filter.yaml---"
-kubectl apply -f 3.add-anonymous-user-filter.yaml
+echo "---3. Install training-operator---"
+kubectl apply -f 3.training-operator.yaml
 echo "---4. Install profile-kfam---"
 kubectl apply -f 4.profile-kfam.yaml
 echo "---5. Install kubeflow-roles---"
@@ -108,8 +108,7 @@ echo "---9. Install knative---"
 kubectl apply -f 9.knative.yaml
 echo "---10. Install notebook---"
 kubectl create -f 10.notebook.yaml
-echo "---11. Install training-operator---"
-kubectl create -f 11.training-operator.yaml
+
 
 
 

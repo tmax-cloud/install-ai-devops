@@ -5530,7 +5530,7 @@ data:
     # `gateway.{{gateway_namespace}}.{{gateway_name}}: "{{ingress_name}}.{{ingress_namespace}}.svc.cluster.local"`.
     # The {{gateway_namespace}} is optional; when it is omitted, the system will search for
     # the gateway in the serving system namespace `knative-serving`
-    gateway.knative-serving.knative-ingress-gateway: "istio-ingressgateway.istio-system.svc.cluster.local"
+    gateway.knative-serving.knative-ingress-gateway: "ingressgateway.istio-system.svc.cluster.local"
 
     # A cluster local gateway to allow pods outside of the mesh to access
     # Services and Routes not exposing through an ingress.  If the users
@@ -5559,7 +5559,7 @@ data:
     # endpoint readiness. Otherwise, probe as usual.
     # NOTE: This feature is currently experimental and should not be used in production.
     enable-virtualservice-status: "false"
-  gateway.kubeflow.kubeflow-gateway: istio-ingressgateway.istio-system.svc.cluster.local
+  gateway.kubeflow.kubeflow-gateway: ingressgateway.istio-system.svc.cluster.local
 kind: ConfigMap
 metadata:
   labels:
@@ -6187,15 +6187,6 @@ spec:
     targetPort: 8443
   selector:
     role: webhook
----          
-apiVersion: v1
-kind: Secret
-metadata:
-  annotations:
-    kubernetes.io/service-account.name: controller
-  name: controller-token
-  namespace: knative-serving
-type: kubernetes.io/service-account-token
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -6289,16 +6280,8 @@ spec:
             - all
           readOnlyRootFilesystem: true
           runAsNonRoot: true
-        volumeMounts:
-        - mountPath: "/var/run/secrets/kubernetes.io/serviceaccount"
-          name: controller-token
-          readOnly: true        
-      terminationGracePeriodSeconds: 600
-      volumes:
-      - name: controller-token
-        secret:
-          defaultMode: 420
-          secretName: controller-token
+      serviceAccountName: controller  
+      terminationGracePeriodSeconds: 600      
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -6396,15 +6379,7 @@ spec:
             - all
           readOnlyRootFilesystem: true
           runAsNonRoot: true
-        volumeMounts:
-        - mountPath: "/var/run/secrets/kubernetes.io/serviceaccount"
-          name: controller-token
-          readOnly: true              
-      volumes:
-      - name: controller-token
-        secret:
-          defaultMode: 420
-          secretName: controller-token
+      serviceAccountName: controller
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -6478,15 +6453,7 @@ spec:
             - all
           readOnlyRootFilesystem: true
           runAsNonRoot: true
-        volumeMounts:
-        - mountPath: "/var/run/secrets/kubernetes.io/serviceaccount"
-          name: controller-token
-          readOnly: true              
-      volumes:
-      - name: controller-token
-        secret:
-          defaultMode: 420
-          secretName: controller-token 
+      serviceAccountName: controller
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -6556,15 +6523,7 @@ spec:
             - all
           readOnlyRootFilesystem: true
           runAsNonRoot: true
-        volumeMounts:
-        - mountPath: "/var/run/secrets/kubernetes.io/serviceaccount"
-          name: controller-token
-          readOnly: true              
-      volumes:
-      - name: controller-token
-        secret:
-          defaultMode: 420
-          secretName: controller-token
+      serviceAccountName: controller
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -6662,16 +6621,7 @@ spec:
             - all
           readOnlyRootFilesystem: true
           runAsNonRoot: true
-        volumeMounts:
-        - mountPath: "/var/run/secrets/kubernetes.io/serviceaccount"
-          name: controller-token
-          readOnly: true        
-      terminationGracePeriodSeconds: 300
-      volumes:
-      - name: controller-token
-        secret:
-          defaultMode: 420
-          secretName: controller-token      
+      serviceAccountName: controller     
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -6733,15 +6683,7 @@ spec:
             - all
           readOnlyRootFilesystem: true
           runAsNonRoot: true
-        volumeMounts:
-        - mountPath: "/var/run/secrets/kubernetes.io/serviceaccount"
-          name: controller-token
-          readOnly: true    
-      volumes:
-      - name: controller-token
-        secret:
-          defaultMode: 420
-          secretName: controller-token
+      serviceAccountName: controller
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -6804,15 +6746,7 @@ spec:
             memory: 20Mi
         securityContext:
           allowPrivilegeEscalation: false
-        volumeMounts:
-        - mountPath: "/var/run/secrets/kubernetes.io/serviceaccount"
-          name: controller-token
-          readOnly: true              
-      volumes:
-      - name: controller-token
-        secret:
-          defaultMode: 420
-          secretName: controller-token
+      serviceAccountName: controller  
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -6912,16 +6846,7 @@ spec:
             - all
           readOnlyRootFilesystem: true
           runAsNonRoot: true
-        volumeMounts:
-        - mountPath: "/var/run/secrets/kubernetes.io/serviceaccount"
-          name: controller-token
-          readOnly: true        
-      terminationGracePeriodSeconds: 300
-      volumes:
-      - name: controller-token
-        secret:
-          defaultMode: 420
-          secretName: controller-token
+      serviceAccountName: controller
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget

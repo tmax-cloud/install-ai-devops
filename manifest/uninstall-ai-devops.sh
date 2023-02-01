@@ -10,8 +10,8 @@ echo "---1. Delete cluster-local-gateway---"
 kubectl delete -f 1.cluster-local-gateway.yaml
 echo "---2. Delete kubeflow-istio-resource---"
 kubectl delete -f 2.kubeflow-istio-resource.yaml
-echo "---3. Delete add-anonymous-user-filter.yaml---"
-kubectl delete -f 3.add-anonymous-user-filter.yaml
+echo "---3. Delete training-operator---"
+kubectl delete -f 3.training-operator.yaml
 echo "---4. Delete profile-kfam---"
 kubectl delete -f 4.profile-kfam.yaml
 echo "---5. Delete kubeflow-roles---"
@@ -26,7 +26,6 @@ echo "---9. Delete knative---"
 kubectl delete -f 9.knative.yaml
 echo "---10. Delete notebook---"
 kubectl delete -f 10.notebook.yaml
-echo "---11. Delete training-operator---"
-kubectl delete -f 11.training-operator.yaml
+
 
 

@@ -284,10 +284,8 @@ spec:
           readOnly: true
         - mountPath: /etc/istio/ingressgateway-ca-certs
           name: ingressgateway-ca-certs
-          readOnly: true
-        - mountPath: "/var/run/secrets/kubernetes.io/serviceaccount"
-          name: cluster-local-gateway-service-account-token
-          readOnly: true  
+          readOnly: trues    
+      serviceAccountName: cluster-local-gateway-service-account        
       securityContext:
         fsGroup: 1337
         runAsGroup: 1337
@@ -332,11 +330,7 @@ spec:
       - name: ingressgateway-ca-certs
         secret:
           optional: true
-          secretName: istio-ingressgateway-ca-certs
-      - name: cluster-local-gateway-service-account-token
-        secret:
-          defaultMode: 420
-          secretName: cluster-local-gateway-service-account-token  
+          secretName: istio-ingressgateway-ca-certs      
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
@@ -370,12 +364,4 @@ spec:
     matchLabels:
       app: cluster-local-gateway
       istio: cluster-local-gateway
----          
-apiVersion: v1
-kind: Secret
-metadata:
-  annotations:
-    kubernetes.io/service-account.name: cluster-local-gateway-service-account
-  name: cluster-local-gateway-service-account-token
-  namespace: istio-system
-type: kubernetes.io/service-account-token  
+

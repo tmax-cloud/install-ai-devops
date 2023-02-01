@@ -3761,16 +3761,7 @@ metadata:
     app.kubernetes.io/name: notebook-controller
     kustomize.component: notebook-controller
   name: notebook-controller-service-account
-  namespace: kubeflow
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: notebook-controller-service-account-token
-  namespace: kubeflow
-  annotations:
-    kubernetes.io/service-account.name: notebook-controller-service-account
-type: kubernetes.io/service-account-token  
+  namespace: kubeflow 
 ---
 aggregationRule:
   clusterRoleSelectors:
@@ -4019,15 +4010,7 @@ spec:
         image: docker.io/tmaxcloudck/notebook-controller-go:b0.2.7
         imagePullPolicy: Always
         name: notebook-controller
-        volumeMounts:
-        - mountPath: "/var/run/secrets/kubernetes.io/serviceaccount"
-          name: notebook-controller-service-account-token
-          readOnly: true
-      volumes:
-      - name: notebook-controller-service-account-token
-        secret:
-          defaultMode: 420
-          secretName: notebook-controller-service-account-token
+      serviceAccountName: notebook-controller-service-account
 ---
 apiVersion: app.k8s.io/v1beta1
 kind: Application
