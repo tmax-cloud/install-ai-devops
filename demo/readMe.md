@@ -81,8 +81,8 @@
   - 실제 운영에 쓰일 model을 기반으로 server를 만들고, inference service를 제공한다.
   - 위 단계에서 PVC에 저장된 모델을 이용하여 아래 그림과 같이 추론 서비스를 생성한다.
 
-![5.create_isvc_1](./img/5.create_isvc_1)
-![5.create_isvc_2](./img/5.create_isvc_2)
+![5.create_isvc_1.png](./img/5.create_isvc_1.png)
+![5.create_isvc_2.png](./img/5.create_isvc_2.png)
   - 참고 : [5.kserve-inferenceservice.yaml](5.kserve-inferenceservice.yaml)  
   - 하이퍼파라미터 튜닝 예시와 같이 리소스 상태도 콘솔 화면에서 조회 가능하다.
 
