@@ -1,11 +1,13 @@
 apiVersion: serving.kubeflow.org/v1beta1
 kind: InferenceService
 metadata:
-  name: demo-inferenceservice
+  annotations:
+      sidecar.istio.io/inject: "false"
+  name: mnist-e2e
   namespace: demo
 spec:
   predictor:
   ## inference server 정의
     tensorflow:      
       ## Model 위치 설정
-      storageUri: pvc://demo-pvc/saved_model
+      storageUri: pvc://end-to-end-pipeline-model-volume/

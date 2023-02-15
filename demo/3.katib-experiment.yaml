@@ -1,64 +1,85 @@
-apiVersion: "kubeflow.org/v1beta1"
+apiVersion: kubeflow.org/v1beta1
 kind: Experiment
-metadata:
-  namespace: demo
-  name: demo-experiment
+metadata:  
+  name: mnist-e2e
+  namespace: demo  
 spec:
-  objective:
-    type: maximize
-    goal: 0.99
-    objectiveMetricName: Validation-accuracy
-    additionalMetricNames:
-      - Train-accuracy      
-      - loss
-      - Validation-loss
-  metricsCollectorSpec:
-    source:
-      fileSystemPath:
-        path: "/result/mnist.log"
-        kind: File
-    collector:
-      kind: File    
   algorithm:
     algorithmName: random
-  parallelTrialCount: 3
-  maxTrialCount: 12
   maxFailedTrialCount: 3
+  maxTrialCount: 5
+  metricsCollectorSpec:
+    collector:
+      kind: StdOut
+  objective:
+    goal: 0.001
+    metricStrategies:
+    - name: loss
+      value: min
+    objectiveMetricName: loss
+    type: minimize
+  parallelTrialCount: 2
   parameters:
-    - name: --learning_rate
-      parameterType: double
-      feasibleSpace:
-        min: "0.01"
-        max: "0.03"
-    - name: --dropout_rate
-      parameterType: double
-      feasibleSpace:
-        min: "0.1"
-        max: "0.9"
+  - feasibleSpace:
+      max: "0.05"
+      min: "0.01"
+    name: learning_rate
+    parameterType: double
+  - feasibleSpace:
+      max: "100"
+      min: "80"
+    name: batch_size
+    parameterType: int
+  resumePolicy: LongRunning
   trialTemplate:
-    primaryContainerName: training-container
+    failureCondition: status.conditions.#(type=="Failed")#|#(status=="True")#
+    primaryContainerName: tensorflow
+    primaryPodLabels:
+      training.kubeflow.org/job-role: master
+    successCondition: status.conditions.#(type=="Succeeded")#|#(status=="True")#
     trialParameters:
-      - name: learningRate
-        description: Learning rate for the training model
-        reference: --learning_rate
-      - name: dropoutRate
-        description: Dropout rate for the training model
-        reference: --dropout_rate         
+    - description: Learning rate for the training model
+      name: learningRate
+      reference: learning_rate
+    - description: Batch size for the model
+      name: batchSize
+      reference: batch_size
     trialSpec:
-      apiVersion: batch/v1
-      kind: Job
+      apiVersion: kubeflow.org/v1
+      kind: TFJob
       spec:
-        template:
-          metadata:
-            annotations:
-              sidecar.istio.io/inject: "false"
-          spec:
-            containers:
-              - name: training-container
-                image: docker.io/rhojw/sample-job:3C8CE2EE
-                command:
-                  - "python"
-                  - "/app/fmnist-save-model-renew.py"    
-                  - "--learning_rate=${trialParameters.learningRate}"
-                  - "--dropout_rate=${trialParameters.dropoutRate}"              
-            restartPolicy: Never
+        tfReplicaSpecs:
+          Chief:
+            replicas: 1
+            restartPolicy: OnFailure
+            template:
+              metadata:
+                annotations:
+                  sidecar.istio.io/inject: "false"
+              spec:
+                containers:
+                - command:
+                  - python
+                  - /opt/model.py
+                  - --tf-train-steps=200
+                  - --tf-learning-rate=${trialParameters.learningRate}
+                  - --tf-batch-size=${trialParameters.batchSize}
+                  image: docker.io/liuhougangxa/tf-estimator-mnist
+                  name: tensorflow
+          Worker:
+            replicas: 1
+            restartPolicy: OnFailure
+            template:
+              metadata:
+                annotations:
+                  sidecar.istio.io/inject: "false"
+              spec:
+                containers:
+                - command:
+                  - python
+                  - /opt/model.py
+                  - --tf-train-steps=200
+                  - --tf-learning-rate=${trialParameters.learningRate}
+                  - --tf-batch-size=${trialParameters.batchSize}
+                  image: docker.io/liuhougangxa/tf-estimator-mnist
+                  name: tensorflow
