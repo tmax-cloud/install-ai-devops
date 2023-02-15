@@ -1,11 +1,13 @@
 # ai-devops를 사용한 AI 개발 시나리오 가이드
 
 ## 시나리오 소개 
+  ai-devops를 활용한 ai 개발 시나리오는 아래와 같이 5가지로 나누어 제공하고 있다.
   1. Kubeflow-fairing 라이브러리를 활용한 분산 트레이닝 및 서빙 시나리오
   2. Tekton을 활용한 ML pipeline 생성 시나리오
   3. KServe를 활용한 Multi model serving 시나리오
   4. KALE 기본 시나리오
   5. KALE을 활용한 분산 학습 시나리오
+  각 시나리오의 디렉토리로 들어가면 해당 시나리오 수행에 필요한 자세한 정보를 확인할수 있다.
 
 
 ### 시나리오에 활용한 AI-DEVOPS 컴포넌트 버전 정보  
