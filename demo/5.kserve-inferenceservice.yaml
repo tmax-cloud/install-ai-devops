@@ -1,8 +1,6 @@
-apiVersion: serving.kubeflow.org/v1beta1
+apiVersion: serving.kserve.io/v1beta1
 kind: InferenceService
-metadata:
-  annotations:
-      sidecar.istio.io/inject: "false"
+metadata:  
   name: mnist-e2e
   namespace: demo
 spec:
