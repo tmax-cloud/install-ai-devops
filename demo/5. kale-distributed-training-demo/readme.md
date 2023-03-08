@@ -52,3 +52,8 @@
 
 - docker image build 시 `{project_dir}/docker/jupyterlab/test` 에서 하여야 하며, 이때 `--no-cache` flag를 사용하여야 한다.
 - 테스트 시, 기존 노트북에서 kale panel > advanced settings > docker image 만 수정하는 것이 아니라, kale 노트북부터 새로운 이미지로 생성하고 진행하는 것을 권장한다.
+- 위의 4. pipelinerun 생성 및 결과 확인 단계를 진행시 1) docker limit 에러가 발생하거나, 2)폐쇄망 환경인 경우에는 아래 그림과 같이 Compile and Save 버튼을 통해 pipelinerun yaml 파일만을 생성한 후, 해당 yaml 파일 내에서 이미지 경로를 수정한다.
+- 수정후 아래 명령어를 이용하거나 console의 yaml import버튼을 통해 pipelinerun 리소스를 수동으로 생성한다.
+```
+kubectl create -f {name}.pipelinerun.yaml
+``` 
