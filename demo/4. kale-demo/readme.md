@@ -67,6 +67,14 @@ spec:
 
 ## kale panel에서 compile and run
 
+- complie and run 실행시 pipelinerun 리소스 생성을 위해 kale 노트북의 SA인 default-editor에 권한을 부여한다
+  - example 디렉토리내의 clusterrole-sample.yaml 및 rolebinding-sample.yaml을 참고하여 clusterrole과 rolebinding 리소스를 생성한다.
+  - [clusterrole-sample.yaml](./examples/clusterrole-sample.yaml), [rolebinding-sample.yaml](./examples/rolebinding-sample.yaml)
+  - 아래 명령어를 통해 생성하거나 hypercloud console의 yaml import 버튼을 통해 리소스들을 create 한다.
+  ```
+  kubectl create -f ./examples/clusterrole-sample.yaml
+  kubectl create -f ./examples/rolebinding-sample.yaml
+  ```
 - kale panel을 열고 enable한다.
 - code cell 우측의 수정 버튼을 사용해 step 이름과 dependency를 수정한다.
   (cifar10_classification의 경우에는 아래와 같이 고친다.)

@@ -1,0 +1,8 @@
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: kale-tekton-pipelines-clusterrole  
+rules:  
+  - apiGroups: ["tekton.dev"]
+    resources: ["tasks", "clustertasks", "taskruns", "pipelines", "pipelineruns", "pipelineresources", "conditions", "runs"]
+    verbs: ["get", "list", "create", "update", "delete", "patch", "watch"]
