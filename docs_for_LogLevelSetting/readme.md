@@ -54,7 +54,7 @@ Log level setting for AI-DEVOPS
     $ mysql -uroot -p
     $ test
     $ show variables like 'log%'; //log error verbosity 확인
-    $ SET GLOBAL log_error_verbosity = 3; //log error verbosity setting, 기본값은 3, 1(errors only), 2(errors and warnings), 3(errors, warnings, and notes)
+    $ SET GLOBAL log_error_verbosity = 3; //log error verbosity setting, 기본값은 2, 1(errors only), 2(errors and warnings), 3(errors, warnings, and notes)
     ```
 
 ## kserve
