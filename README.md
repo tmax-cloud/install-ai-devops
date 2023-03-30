@@ -79,10 +79,10 @@ ai-devops is a machine learning toolkit on top of Kubernetes. And translates ste
     * Step 1의 비고를 꼭 확인하여 아래 가이드에 맞게 진행한다.
 
 ## Install Steps
-0. [HyperAuth 연동](https://github.com/tmax-cloud/install-ai-devops/tree/5.1#step-0-hyperauth-%EC%97%B0%EB%8F%99)
-1. [ai-devops.config 설정](https://github.com/tmax-cloud/install-ai-devops/tree/5.1#step-1-ai-devopsconfig-%EC%84%A4%EC%A0%95)
-2. [installer 실행](https://github.com/tmax-cloud/install-ai-devops/tree/5.1#step-2-installer-%EC%8B%A4%ED%96%89)
-3. [배포 확인 및 기타 작업](https://github.com/tmax-cloud/install-ai-devops/tree/5.1#step-3-%EB%B0%B0%ED%8F%AC-%ED%99%95%EC%9D%B8-%EB%B0%8F-%EA%B8%B0%ED%83%80-%EC%9E%91%EC%97%85)
+0. [HyperAuth 연동](https://github.com/tmax-cloud/install-ai-devops#step-0-hyperauth-%EC%97%B0%EB%8F%99)
+1. [ai-devops.config 설정](https://github.com/tmax-cloud/install-ai-devops#step-1-ai-devopsconfig-%EC%84%A4%EC%A0%95)
+2. [installer 실행](https://github.com/tmax-cloud/install-ai-devops#step-2-installer-%EC%8B%A4%ED%96%89)
+3. [배포 확인 및 기타 작업](https://github.com/tmax-cloud/install-ai-devops#step-3-%EB%B0%B0%ED%8F%AC-%ED%99%95%EC%9D%B8-%EB%B0%8F-%EA%B8%B0%ED%83%80-%EC%9E%91%EC%97%85)
 
 ## Step 0. HyperAuth 연동
 * 목적 : `Notebook과 Hyperauth 연동을 통해 OIDC 인증관리를 적용한다.`
