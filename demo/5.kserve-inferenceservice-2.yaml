@@ -8,4 +8,4 @@ spec:
     model:
       modelFormat:
         name: tensorflow
-      storageUri: pvc://test/
+      storageUri: pvc://end-to-end-pipeline-model-volume/
