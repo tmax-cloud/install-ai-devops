@@ -48,6 +48,7 @@ Log level setting for AI-DEVOPS
         * (참고)kubeflowkatib/katib-db-manager 이미지의 코드를 수정하였음(tmaxcloudck/katib-db-manager:v0.14-lls)  
     ![katib-db-manager.png](./IMG/katib-db-manager.png)      
 3. katib-mysql
+    * (참고) 최신 argo installer용 katib-mysql은 readiness probe를 통해 주기적으로 설정한 로그레벨으로 아래 명령어를 자동 실행하게 되어있음
     * (예시) 아래 명령어를 수행하여 mysql의 admin 권한을 가진 계정으로 접속 후 variable setting
     ```bash
     $ kubectl -n kubeflow exec -it {katib-mysql POD 이름} /bin/sh
@@ -62,7 +63,7 @@ Log level setting for AI-DEVOPS
     * kfserving-controller는 zap logging library를 이용하여 로그를 저장하며 다음과 같은 log level을 사용할 수 있다.    
     * debug, info, error, integer value (>0)    
     * 다음 이미지와 같이 kserve-controller-manager deployment에 컨테이너 args를 추가하여 로그 레벨을 설정한다.
-        * (참고)kserve/kserve-controller 이미지의 zap.Options.Development 설정을 false 처리하였음(tmaxcloudck/kserve-controller-manager:b0.10.0-tw2-lls2)       
+        * (참고)kserve/kserve-controller 이미지의 zap.Options.Development 설정을 false 처리하였음(tmaxcloudck/kserve-controller-manager:b0.10.0-tw2-lls3)       
         * (참고)위의 tmaxcloudck/kserve-controller-manager:b0.10.0-tw2-lls2 이미지는 trainedmodel validating webhook 추가 이미지임
     ![kserve-controller-manager.png](./IMG/kserve-controller-manager.png)  
 2. kube-rbac-proxy    

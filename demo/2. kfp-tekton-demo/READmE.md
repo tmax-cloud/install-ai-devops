@@ -2,7 +2,7 @@
 
 Version Details of the ai-devops used in scenario
 - katib v0.14.0
-- kserve v0.10.0
+- kserve v0.8.0
 - knative-serving v1.2.5
 - training-operator v1.5.0
 - notebook-controller b0.2.8

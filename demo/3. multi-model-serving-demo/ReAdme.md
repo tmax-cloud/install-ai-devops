@@ -2,7 +2,7 @@
 
   * 목적 : `하나의 ml 서버에서 여러 모델들을 추론할 수 있는 multi-model ml service를 생성한다.`
   참고 사항 : 
-   - kserve 0.10 version 기준 multi-model inferenceservice agent에서 pvc를 지원하지 않아 minio storage server 사용
+   - kserve 0.8 version 기준 multi-model inferenceservice agent에서 pvc를 지원하지 않아 minio storage server 사용
    - 참고: 지원 프로토콜로는 s3, gs ,https, http가 있다.
    - 본 시나리오에서는 Tensorflow의 savedmodel 방식 사용
   * 순서 

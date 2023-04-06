@@ -1,0 +1,11 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:  
+  name: mnist-e2e
+  namespace: demo
+spec:
+  predictor:
+    model:
+      modelFormat:
+        name: tensorflow
+      storageUri: pvc://test/

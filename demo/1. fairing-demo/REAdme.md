@@ -1,7 +1,7 @@
 ## Kubeflow Fairing 라이브러리를 활용한 분산학습 및 서빙 시나리오
 
 Version Details of the ai-devops used in scenario
-- kserve v0.10.0
+- kserve v0.8.0
 - knative-serving v1.2.5
 - training-operator v1.5.0
 - notebook-controller b0.2.8

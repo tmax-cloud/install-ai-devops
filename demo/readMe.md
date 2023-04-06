@@ -13,7 +13,7 @@
 
 ### 시나리오에 활용한 AI-DEVOPS 컴포넌트 버전 정보  
   - katib v0.14.0
-  - kserve v0.10.0
+  - kserve v0.8.0
   - knative-serving v1.2.5
   - training-operator v1.5.0
   - notebook-controller b0.2.8
@@ -23,14 +23,19 @@
 
 ### 작업을 위한 namespace 및 notebook 생성(1~3번 시나리오 공통 사항)
   - 4,5번 시나리오는 각 시나리오별 가이드를 참고하여 생성한다.
-  1. Profile 생성
+  1. Profile 생성 
   - ai-devops에서는 작업하려는 namespace를 profile이라는 crd를 통해 관리한다.
   - ai-devops 기능을 사용하기 위한 role, rolebinding등의 k8s리소스 배포 뿐만아니라 istio-injection 활성화와 같은 작업을 자동으로 진행한다.
   - UI의 Import YAML 버튼을 활용하여 demo profile을 생성한다. 
 ![0.profile.png](./img/0.profile.png) 
   - 참고 : [0.profile.yaml](./0.profile.yaml)
 
-  2. Notebook 생성
+  2. Authorizationpolicy 생성
+  - profile을 이용하여 ns를 생성하면 자동으로 해당 네임스페이스에 authorizationpolicy가 배포되는데 해당 rbac로는 시나리오 진행시 403 error가 발생하는 경우가 있으므로 UI의 Import YAML 버튼을 활용하여 아래의 authorizationpolicy를 배포한다.
+![1.authorizationpolicy.png](./img/1.authorizationpolicy.png) 
+  - 참고 : [1.authorizationpolicy.yaml](./1.authorizationpolicy.yaml)  
+
+  3. Notebook 생성
   - ai-devops에서는 ML Model 코딩을 위한 web 기반의 python IDE인 JupyterNotebook을 사용할 수 있다.
   - 아래 그림과 같이 노트북 서버를 생성한다.
 ![1.create_notebook_1.png](./img/1.create_notebook_1.png)
@@ -86,7 +91,7 @@
 
 ![5.create_isvc_1.png](./img/5.create_isvc_1.png)
 ![5.create_isvc_2.png](./img/5.create_isvc_2.png)
-  - 참고 : [5.kserve-inferenceservice.yaml](5.kserve-inferenceservice.yaml)  
+  - 참고 : 다음 두가지 스키마로 추론서비스 배포가 가능하다. [5.kserve-inferenceservice.yaml](5.kserve-inferenceservice.yaml), [5.kserve-inferenceservice-2.yaml](5.kserve-inferenceservice-2.yaml) 
   - 하이퍼파라미터 튜닝 예시와 같이 리소스 상태도 콘솔 화면에서 조회 가능하다.
 
 *istio-ca-root-cert configmap을 찾지 못하는 에러가 뜬다면, istiod pod를 재부팅하고 진행하며 생성한 모든 리소스를 삭제하고 다시 시도하자.
