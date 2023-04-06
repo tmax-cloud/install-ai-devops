@@ -99,10 +99,10 @@
   4. 생성된 추론서비스 정상응답 확인
   - 아래 명령어를 통해 생성된 추론서비스의 정상응답 여부를 확인할수 있다.
   - 해당 명령어를 통해서는 모델의 state/version/status 만 확인하고 추론 서비스 이용시에는 추론에 사용할 이미지 전처리를 위해 2.kfp-tekton-demo의 마지막 단계를 활용한다.
-  - 참고: istio-system의 istio-ingressgateway service가 LB가 아닌경우에는 svc type을 LB로 수정하거나 해당 서비스의 주소(노드포트 등)을 CLUSTER_IP로 사용한다.
+  - 참고: istio-system의 ingressgateway service가 LB가 아닌경우에는 svc type을 LB로 수정하거나 해당 서비스의 주소(노드포트 등)을 CLUSTER_IP로 사용한다.
   ```
   MODEL_NAME=mnist-e2e
-  CLUSTER_IP=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  CLUSTER_IP=$(kubectl -n istio-system get service ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
   SERVICE_HOSTNAME=$(kubectl get inferenceservice ${MODEL_NAME} -n demo -o jsonpath='{.status.url}' | cut -d "/" -f 3)
   curl -v -H "Host: ${SERVICE_HOSTNAME}" http://$CLUSTER_IP/v1/models/$MODEL_NAME
   ```
