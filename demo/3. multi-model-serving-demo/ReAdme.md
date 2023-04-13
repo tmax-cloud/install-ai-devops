@@ -57,7 +57,7 @@ chmod +x mc
 ```bash
 # INGRESS에서 인식할 수 있도록 SERVICE_HOSTNAME 설정
 SERVICE_HOSTNAME=$(kubectl get inferenceservices triton-mms -o jsonpath='{.status.url}' -n mms | cut -d "/" -f 3)
-CLUSTER_IP=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+CLUSTER_IP=$(kubectl -n istio-system get service ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 ```
 
    - Request가 정상적으로 가는지 확인
