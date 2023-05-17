@@ -1128,6 +1128,84 @@ spec:
     subresources:
       status: {}
 ---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: suggestions.kubeflow.org
+spec:
+  group: kubeflow.org
+  names:
+    categories:
+    - all
+    - kubeflow
+    - katib
+    kind: Suggestion
+    plural: suggestions
+    singular: suggestion
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.conditions[-1:].type
+      name: Type
+      type: string
+    - jsonPath: .status.conditions[-1:].status
+      name: Status
+      type: string
+    - jsonPath: .spec.requests
+      name: Requested
+      type: string
+    - jsonPath: .status.suggestionCount
+      name: Assigned
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1beta1
+    schema:
+      openAPIV3Schema:
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
+    served: true
+    storage: true
+    subresources:
+      status: {}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: trials.kubeflow.org
+spec:
+  group: kubeflow.org
+  names:
+    categories:
+    - all
+    - kubeflow
+    - katib
+    kind: Trial
+    plural: trials
+    singular: trial
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.conditions[-1:].type
+      name: Type
+      type: string
+    - jsonPath: .status.conditions[-1:].status
+      name: Status
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1beta1
+    schema:
+      openAPIV3Schema:
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
+    served: true
+    storage: true
+    subresources:
+      status: {}
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -1142,39 +1220,93 @@ rules:
 - apiGroups:
   - ""
   resources:
-  - configmaps
-  - serviceaccounts
   - services
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
+- apiGroups:
+  - ""
+  resources:
   - events
-  - namespaces
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - serviceaccounts
   - persistentvolumes
   - persistentvolumeclaims
-  - pods
-  - pods/log
-  - pods/status
-  - secrets
   verbs:
-  - '*'
+  - get
+  - list
+  - watch
+  - create
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - pods/status
+  verbs:
+  - get
 - apiGroups:
   - apps
   resources:
   - deployments
   verbs:
-  - '*'
+  - get
+  - list
+  - watch
+  - create
+  - delete
 - apiGroups:
   - rbac.authorization.k8s.io
   resources:
   - roles
   - rolebindings
   verbs:
-  - '*'
+  - get
+  - create
+  - list
+  - watch
 - apiGroups:
   - batch
   resources:
   - jobs
   - cronjobs
   verbs:
-  - '*'
+  - get
+  - list
+  - watch
+  - create
+  - delete
+- apiGroups:
+  - kubeflow.org
+  resources:
+  - tfjobs
+  - pytorchjobs
+  - mpijobs
+  - xgboostjobs
+  - mxjobs
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
 - apiGroups:
   - kubeflow.org
   resources:
@@ -1187,11 +1319,6 @@ rules:
   - suggestions
   - suggestions/status
   - suggestions/finalizers
-  - tfjobs
-  - pytorchjobs
-  - mpijobs
-  - xgboostjobs
-  - mxjobs
   verbs:
   - '*'
 ---
@@ -1205,6 +1332,7 @@ metadata:
   labels:
     rbac.authorization.kubeflow.org/aggregate-to-kubeflow-admin: "true"
   name: kubeflow-katib-admin
+rules: []
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -1229,6 +1357,18 @@ rules:
   - deletecollection
   - patch
   - update
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - pods/log
+  verbs:
+  - get
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -1266,19 +1406,19 @@ data:
   early-stopping: |-
     {
       "medianstop": {
-        "image": "docker.io/kubeflowkatib/earlystopping-medianstop:v0.14.0"
+        "image": "docker.io/kubeflowkatib/earlystopping-medianstop:v0.15.0"
       }
     }
   metrics-collector-sidecar: |-
     {
       "StdOut": {
-        "image": "docker.io/kubeflowkatib/file-metrics-collector:v0.14.0"
+        "image": "docker.io/kubeflowkatib/file-metrics-collector:v0.15.0"
       },
       "File": {
-        "image": "docker.io/kubeflowkatib/file-metrics-collector:v0.14.0"
+        "image": "docker.io/kubeflowkatib/file-metrics-collector:v0.15.0"
       },
       "TensorFlowEvent": {
-        "image": "docker.io/kubeflowkatib/tfevent-metrics-collector:v0.14.0",
+        "image": "docker.io/kubeflowkatib/tfevent-metrics-collector:v0.15.0",
         "resources": {
           "limits": {
             "memory": "1Gi"
@@ -1289,31 +1429,31 @@ data:
   suggestion: |-
     {
       "random": {
-        "image": "docker.io/kubeflowkatib/suggestion-hyperopt:v0.14.0"
+        "image": "docker.io/kubeflowkatib/suggestion-hyperopt:v0.15.0"
       },
       "tpe": {
-        "image": "docker.io/kubeflowkatib/suggestion-hyperopt:v0.14.0"
+        "image": "docker.io/kubeflowkatib/suggestion-hyperopt:v0.15.0"
       },
       "grid": {
-        "image": "docker.io/kubeflowkatib/suggestion-chocolate:v0.14.0"
+        "image": "docker.io/kubeflowkatib/suggestion-optuna:v0.15.0"
       },
       "hyperband": {
-        "image": "docker.io/kubeflowkatib/suggestion-hyperband:v0.14.0"
+        "image": "docker.io/kubeflowkatib/suggestion-hyperband:v0.15.0"
       },
       "bayesianoptimization": {
-        "image": "docker.io/kubeflowkatib/suggestion-skopt:v0.14.0"
+        "image": "docker.io/kubeflowkatib/suggestion-skopt:v0.15.0"
       },
       "cmaes": {
-        "image": "docker.io/kubeflowkatib/suggestion-goptuna:v0.14.0"
+        "image": "docker.io/kubeflowkatib/suggestion-goptuna:v0.15.0"
       },
       "sobol": {
-        "image": "docker.io/kubeflowkatib/suggestion-goptuna:v0.14.0"
+        "image": "docker.io/kubeflowkatib/suggestion-goptuna:v0.15.0"
       },
       "multivariate-tpe": {
-        "image": "docker.io/kubeflowkatib/suggestion-optuna:v0.14.0"
+        "image": "docker.io/kubeflowkatib/suggestion-optuna:v0.15.0"
       },
       "enas": {
-        "image": "docker.io/kubeflowkatib/suggestion-enas:v0.14.0",
+        "image": "docker.io/kubeflowkatib/suggestion-enas:v0.15.0",
         "resources": {
           "limits": {
             "memory": "200Mi"
@@ -1321,10 +1461,10 @@ data:
         }
       },
       "darts": {
-        "image": "docker.io/kubeflowkatib/suggestion-darts:v0.14.0"
+        "image": "docker.io/kubeflowkatib/suggestion-darts:v0.15.0"
       },
       "pbt": {
-        "image": "docker.io/kubeflowkatib/suggestion-pbt:v0.14.0",
+        "image": "docker.io/kubeflowkatib/suggestion-pbt:v0.15.0",
         "persistentVolumeClaimSpec": {
           "accessModes": [
             "ReadWriteMany"
@@ -1352,7 +1492,7 @@ data:
         spec:
           containers:
             - name: training-container
-              image: docker.io/kubeflowkatib/mxnet-mnist:v0.14.0
+              image: docker.io/kubeflowkatib/mxnet-mnist:v0.15.0
               command:
                 - "python3"
                 - "/opt/mxnet-mnist/mnist.py"
@@ -1369,7 +1509,7 @@ data:
         spec:
           containers:
             - name: training-container
-              image: docker.io/kubeflowkatib/enas-cnn-cifar10-cpu:v0.14.0
+              image: docker.io/kubeflowkatib/enas-cnn-cifar10-cpu:v0.15.0
               command:
                 - python3
                 - -u
@@ -1390,7 +1530,7 @@ data:
             spec:
               containers:
                 - name: pytorch
-                  image: docker.io/kubeflowkatib/pytorch-mnist-cpu:v0.14.0
+                  image: docker.io/kubeflowkatib/pytorch-mnist-cpu:v0.15.0
                   command:
                     - "python3"
                     - "/opt/pytorch-mnist/mnist.py"
@@ -1404,7 +1544,7 @@ data:
             spec:
               containers:
                 - name: pytorch
-                  image: docker.io/kubeflowkatib/pytorch-mnist-cpu:v0.14.0
+                  image: docker.io/kubeflowkatib/pytorch-mnist-cpu:v0.15.0
                   command:
                     - "python3"
                     - "/opt/pytorch-mnist/mnist.py"
@@ -1447,6 +1587,9 @@ spec:
   - name: metrics
     port: 8080
     targetPort: 8080
+  - name: healthz
+    port: 18080
+    targetPort: 18080
   selector:
     katib.kubeflow.org/component: controller
 ---
@@ -1517,6 +1660,7 @@ spec:
     spec:
       containers:
       - args:
+        - --zap-log-level=error
         - --webhook-port=8443
         - --trial-resources=Job.v1.batch
         - --trial-resources=TFJob.v1.kubeflow.org
@@ -1531,7 +1675,11 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: docker.io/kubeflowkatib/katib-controller:v0.14.0
+        image: docker.io/tmaxcloudck/katib-controller:v0.15-lls
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: healthz
         name: katib-controller
         ports:
         - containerPort: 8443
@@ -1540,31 +1688,23 @@ spec:
         - containerPort: 8080
           name: metrics
           protocol: TCP
+        - containerPort: 18080
+          name: healthz
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: healthz
         volumeMounts:
         - mountPath: /tmp/cert
           name: cert
           readOnly: true
-        - mountPath: "/var/run/secrets/kubernetes.io/serviceaccount"
-          name: katib-controller-token
-          readOnly: true
+      serviceAccountName: katib-controller
       volumes:
       - name: cert
         secret:
           defaultMode: 420
           secretName: katib-webhook-cert
-      - name: katib-controller-token
-        secret:
-          defaultMode: 420
-          secretName: katib-controller-token    
----          
-apiVersion: v1
-kind: Secret
-metadata:
-  annotations:
-    kubernetes.io/service-account.name: katib-controller
-  name: katib-controller-token
-  namespace: kubeflow
-type: kubernetes.io/service-account-token          
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1588,6 +1728,8 @@ spec:
       containers:
       - command:
         - ./katib-db-manager
+        args:
+        - --log-level=error
         env:
         - name: DB_NAME
           value: mysql
@@ -1596,7 +1738,7 @@ spec:
             secretKeyRef:
               key: MYSQL_ROOT_PASSWORD
               name: katib-mysql-secrets
-        image: docker.io/kubeflowkatib/katib-db-manager:v0.14.0
+        image: tmaxcloudck/katib-db-manager:v0.15-lls
         livenessProbe:
           exec:
             command:
@@ -1664,8 +1806,7 @@ spec:
             command:
             - /bin/bash
             - -c
-            - mysql -D ${MYSQL_DATABASE} -u root -p${MYSQL_ROOT_PASSWORD} -e 'SELECT
-              1'
+            - mysql -D ${MYSQL_DATABASE} -u root -p${MYSQL_ROOT_PASSWORD} -e 'SET GLOBAL log_error_verbosity = info;'
           failureThreshold: 10
           initialDelaySeconds: 10
           periodSeconds: 5

@@ -3,6 +3,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.8.0
+  creationTimestamp: null
   labels:
     kustomize.component: profiles
   name: profiles.kubeflow.org
@@ -472,9 +473,10 @@ spec:
       labels:
         kustomize.component: profiles
     spec:
-      containers:
+      containers:      
       - command:
         - /access-management
+        - -log-level=ERROR
         - -cluster-admin
         - $(ADMIN)
         - -userid-header
@@ -484,8 +486,8 @@ spec:
         envFrom:
         - configMapRef:
             name: profiles-config-46c7tgh6fd
-        image: docker.io/kubeflownotebookswg/kfam:v1.6.1
-        imagePullPolicy: Always
+        image: docker.io/tmaxcloudck/kfam:v1.7.0-lls
+        imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
             path: /metrics
@@ -497,7 +499,9 @@ spec:
         - containerPort: 8081
           name: kfam-http
           protocol: TCP
-      - command:
+      - args:
+        - --zap-log-level=error    
+        command:
         - /manager
         - -userid-header
         - $(USERID_HEADER)
@@ -508,8 +512,8 @@ spec:
         envFrom:
         - configMapRef:
             name: profiles-config-46c7tgh6fd
-        image: docker.io/kubeflownotebookswg/profile-controller:v1.6.1
-        imagePullPolicy: Always
+        image: docker.io/tmaxcloudck/profiles-controller:v1.7.0-lls
+        imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
             path: /healthz
@@ -530,10 +534,10 @@ spec:
           name: namespace-labels
           readOnly: true
       serviceAccountName: profiles-controller-service-account
-      volumes:      
+      volumes:
       - configMap:
           name: namespace-labels-data-4df5t8mdgf
-        name: namespace-labels            
+        name: namespace-labels
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService

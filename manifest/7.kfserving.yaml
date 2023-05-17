@@ -20176,6 +20176,7 @@ spec:
         - args:
             - --metrics-addr=127.0.0.1:8080
             - --leader-elect
+            - --zap-log-level=error
           command:
             - /manager
           env:
@@ -20185,7 +20186,7 @@ spec:
                   fieldPath: metadata.namespace
             - name: SECRET_NAME
               value: kserve-webhook-server-cert
-          image: kserve/kserve-controller:v0.10.0
+          image: tmaxcloudck/kserve-controller-manager:b0.10.0-tw2-lls3
           imagePullPolicy: Always
           name: manager
           ports:

@@ -4034,7 +4034,7 @@ spec:
         spec:
           containers:
           - env: []
-            image: docker.io/tmaxcloudck/kale-tekton-standalone:220207 
+            image: docker.io/tmaxcloudck/kale-tekton-standalone:230329 
             name: demo
             resources:
               requests:

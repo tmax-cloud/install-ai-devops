@@ -1,13 +1,3 @@
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  labels:
-    control-plane: kubeflow
-    istio-injection: enabled
-    katib-metricscollector-injection: enabled
-  name: kubeflow
----
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -130,45 +120,8 @@ spec:
     spec:
       affinity:
         nodeAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - preference:
-              matchExpressions:
-              - key: kubernetes.io/arch
-                operator: In
-                values:
-                - amd64
-            weight: 2
-          - preference:
-              matchExpressions:
-              - key: kubernetes.io/arch
-                operator: In
-                values:
-                - arm64
-            weight: 2
-          - preference:
-              matchExpressions:
-              - key: kubernetes.io/arch
-                operator: In
-                values:
-                - ppc64le
-            weight: 2
-          - preference:
-              matchExpressions:
-              - key: kubernetes.io/arch
-                operator: In
-                values:
-                - s390x
-            weight: 2
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: kubernetes.io/arch
-                operator: In
-                values:
-                - amd64
-                - arm64
-                - ppc64le
-                - s390x
+          preferredDuringSchedulingIgnoredDuringExecution: null
+          requiredDuringSchedulingIgnoredDuringExecution: null
       containers:
       - args:
         - proxy
@@ -213,7 +166,9 @@ spec:
               apiVersion: v1
               fieldPath: status.hostIP
         - name: SERVICE_ACCOUNT
-          value: cluster-local-gateway-service-account
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.serviceAccountName
         - name: ISTIO_META_WORKLOAD_NAME
           value: cluster-local-gateway
         - name: ISTIO_META_OWNER
@@ -226,8 +181,7 @@ spec:
           value: "true"
         - name: ISTIO_META_CLUSTER_ID
           value: Kubernetes
-        image: docker.io/istio/proxyv2:1.14.1
-        imagePullPolicy: IfNotPresent
+        image: docker.io/istio/proxyv2:1.16.0
         name: istio-proxy
         ports:
         - containerPort: 15020
@@ -264,6 +218,8 @@ spec:
         volumeMounts:
         - mountPath: /var/run/secrets/workload-spiffe-uds
           name: workload-socket
+        - mountPath: /var/run/secrets/credential-uds
+          name: credential-socket
         - mountPath: /var/run/secrets/workload-spiffe-credentials
           name: workload-certs
         - mountPath: /etc/istio/proxy
@@ -284,16 +240,18 @@ spec:
           readOnly: true
         - mountPath: /etc/istio/ingressgateway-ca-certs
           name: ingressgateway-ca-certs
-          readOnly: true   
-      serviceAccountName: cluster-local-gateway-service-account        
+          readOnly: true
       securityContext:
         fsGroup: 1337
         runAsGroup: 1337
         runAsNonRoot: true
-        runAsUser: 1337      
+        runAsUser: 1337
+      serviceAccountName: cluster-local-gateway-service-account
       volumes:
       - emptyDir: {}
         name: workload-socket
+      - emptyDir: {}
+        name: credential-socket
       - emptyDir: {}
         name: workload-certs
       - configMap:
@@ -330,7 +288,26 @@ spec:
       - name: ingressgateway-ca-certs
         secret:
           optional: true
-          secretName: istio-ingressgateway-ca-certs      
+          secretName: istio-ingressgateway-ca-certs
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  labels:
+    app: cluster-local-gateway
+    install.operator.istio.io/owning-resource: unknown
+    istio: cluster-local-gateway
+    istio.io/rev: default
+    operator.istio.io/component: IngressGateways
+    release: istio
+  name: cluster-local-gateway
+  namespace: istio-system
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: cluster-local-gateway
+      istio: cluster-local-gateway
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
@@ -364,4 +341,3 @@ spec:
     matchLabels:
       app: cluster-local-gateway
       istio: cluster-local-gateway
-

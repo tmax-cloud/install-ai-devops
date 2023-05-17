@@ -32164,6 +32164,7 @@ metadata:
   labels:
     rbac.authorization.kubeflow.org/aggregate-to-kubeflow-admin: "true"
   name: kubeflow-training-admin
+rules: []
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -32181,6 +32182,7 @@ rules:
   - pytorchjobs
   - mxjobs
   - xgboostjobs
+  - paddlejobs
   verbs:
   - create
   - delete
@@ -32197,6 +32199,7 @@ rules:
   - pytorchjobs/status
   - mxjobs/status
   - xgboostjobs/status
+  - paddlejobs/status
   verbs:
   - get
 ---
@@ -32215,6 +32218,7 @@ rules:
   - pytorchjobs
   - mxjobs
   - xgboostjobs
+  - paddlejobs
   verbs:
   - get
   - list
@@ -32227,6 +32231,7 @@ rules:
   - pytorchjobs/status
   - mxjobs/status
   - xgboostjobs/status
+  - paddlejobs/status
   verbs:
   - get
 ---
@@ -32245,11 +32250,19 @@ rules:
   - mxjobs
   - pytorchjobs
   - xgboostjobs
+  - paddlejobs
   - mpijobs/status
   - tfjobs/status
   - pytorchjobs/status
   - mxjobs/status
   - xgboostjobs/status
+  - paddlejobs/status
+  - mpijobs/finalizers
+  - tfjobs/finalizers
+  - pytorchjobs/finalizers
+  - mxjobs/finalizers
+  - xgboostjobs/finalizers
+  - paddlejobs/finalizers
   verbs:
   - create
   - delete
@@ -32303,6 +32316,18 @@ rules:
   - update
 - apiGroups:
   - scheduling.volcano.sh
+  resources:
+  - podgroups
+  verbs:
+  - '*'
+- apiGroups:
+  - autoscaling
+  resources:
+  - horizontalpodautoscalers
+  verbs:
+  - '*'
+- apiGroups:
+  - scheduling.sigs.k8s.io
   resources:
   - podgroups
   verbs:
@@ -32365,6 +32390,8 @@ spec:
       containers:
       - command:
         - /manager
+        args:
+        - --zap-log-level=error
         env:
         - name: MY_POD_NAMESPACE
           valueFrom:
@@ -32374,7 +32401,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: kubeflow/training-operator:v1-e1434f6
+        image: tmaxcloudck/training-operator:v1.6-lls
         livenessProbe:
           httpGet:
             path: /healthz
@@ -32392,31 +32419,7 @@ spec:
           initialDelaySeconds: 10
           periodSeconds: 15
           timeoutSeconds: 3
-        resources:
-          limits:
-            cpu: 100m
-            memory: 30Mi
-          requests:
-            cpu: 100m
-            memory: 20Mi
         securityContext:
-          allowPrivilegeEscalation: false    
-        volumeMounts:
-        - mountPath: "/var/run/secrets/kubernetes.io/serviceaccount"
-          name: training-operator-token
-          readOnly: true    
+          allowPrivilegeEscalation: false
+      serviceAccountName: training-operator
       terminationGracePeriodSeconds: 10
-      volumes:
-      - name: training-operator-token
-        secret:
-          defaultMode: 420
-          secretName: training-operator-token
----          
-apiVersion: v1
-kind: Secret
-metadata:
-  annotations:
-    kubernetes.io/service-account.name: training-operator
-  name: training-operator-token
-  namespace: kubeflow
-type: kubernetes.io/service-account-token      
