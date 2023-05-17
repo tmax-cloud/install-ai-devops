@@ -5,14 +5,12 @@
 ai-devops is a machine learning toolkit on top of Kubernetes. And translates steps in your ml workflow into Kubernetes jobs, providing the cloud-native interface for your ML libraries, frameworks, pipelines and notebooks
 
 ## 구성 요소 및 버전
-* Kubeflow v1.2.0 (https://github.com/kubeflow/kubeflow)
+* Kubeflow v1.7.0 (https://github.com/kubeflow/kubeflow)
 * Jupyter (https://github.com/jupyter/notebook)
-* Katib v0.11.0 (https://github.com/kubeflow/katib)
-* KFServing v0.5.1 (https://github.com/kubeflow/kfserving)
-* Training Job
-    * TFJob v1.0.0 (https://github.com/kubeflow/tf-operator)
-    * PytorchJob v1.0.0 (https://github.com/kubeflow/pytorch-operator)
-* Notebook-controller b0.2.1 (https://github.com/tmax-cloud/notebook-controller-go)
+* Katib v0.15.0 (https://github.com/kubeflow/katib)
+* KFServing v0.10.0 (https://github.com/kserve/kserve)
+* Training Job(https://github.com/kubeflow/training-operator)    
+* Notebook-controller b0.2.8 (https://github.com/tmax-cloud/notebook-controller-go)
 * ...
 
 ## Prerequisites
@@ -49,8 +47,8 @@ ai-devops is a machine learning toolkit on top of Kubernetes. And translates ste
         ```
     * 아래 명령어를 수행하여 Kubeflow 설치 시 필요한 이미지들을 위에서 구축한 registry에 push하고 이미지들을 tar 파일로 저장한다. tar 파일은 images 디렉토리에 저장된다.
         ```bash
-        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/5.1/image-push.sh
-        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/5.1/imagelist
+        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/5.2/image-push.sh
+        $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/5.2/imagelist
         $ chmod +x ./image-push.sh
         $ ./image-push.sh ${REGISTRY_ADDRESS}
         ```
@@ -62,7 +60,7 @@ ai-devops is a machine learning toolkit on top of Kubernetes. And translates ste
     * (Optional) 만약 설치에 필요한 이미지들을 pull받아서 tar 파일로 저장하는 작업과 로드하여 push하는 작업을 따로 수행하고자 한다면 image-push.sh이 아니라 image-save.sh, image-load.sh를 각각 실행하면 된다. 
        * image-save.sh을 실행하면 설치에 필요한 이미지들을 pull 받아서 images 디렉토리에 tar 파일로 저장한다.
            ```bash
-           $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/5.1/image-save.sh
+           $ wget https://raw.githubusercontent.com/tmax-cloud/install-ai-devops/5.2/image-save.sh
            $ chmod +x ./image-save.sh
            $ ./image-save.sh
            $ ls ./images
@@ -79,10 +77,10 @@ ai-devops is a machine learning toolkit on top of Kubernetes. And translates ste
     * Step 1의 비고를 꼭 확인하여 아래 가이드에 맞게 진행한다.
 
 ## Install Steps
-0. [HyperAuth 연동](https://github.com/tmax-cloud/install-ai-devops#step-0-hyperauth-%EC%97%B0%EB%8F%99)
-1. [ai-devops.config 설정](https://github.com/tmax-cloud/install-ai-devops#step-1-ai-devopsconfig-%EC%84%A4%EC%A0%95)
-2. [installer 실행](https://github.com/tmax-cloud/install-ai-devops#step-2-installer-%EC%8B%A4%ED%96%89)
-3. [배포 확인 및 기타 작업](https://github.com/tmax-cloud/install-ai-devops#step-3-%EB%B0%B0%ED%8F%AC-%ED%99%95%EC%9D%B8-%EB%B0%8F-%EA%B8%B0%ED%83%80-%EC%9E%91%EC%97%85)
+0. [HyperAuth 연동](https://github.com/tmax-cloud/install-ai-devops/tree/5.2#step-0-hyperauth-%EC%97%B0%EB%8F%99)
+1. [ai-devops.config 설정](https://github.com/tmax-cloud/install-ai-devops/tree/5.2#step-1-ai-devopsconfig-%EC%84%A4%EC%A0%95)
+2. [installer 실행](https://github.com/tmax-cloud/install-ai-devops/tree/5.2#step-2-installer-%EC%8B%A4%ED%96%89)
+3. [배포 확인 및 기타 작업](https://github.com/tmax-cloud/install-ai-devops/tree/5.2#step-3-%EB%B0%B0%ED%8F%AC-%ED%99%95%EC%9D%B8-%EB%B0%8F-%EA%B8%B0%ED%83%80-%EC%9E%91%EC%97%85)
 
 ## Step 0. HyperAuth 연동
 * 목적 : `Notebook과 Hyperauth 연동을 통해 OIDC 인증관리를 적용한다.`
@@ -135,9 +133,7 @@ ai-devops is a machine learning toolkit on top of Kubernetes. And translates ste
         $ kubectl get pod -n kubeflow
         $ kubectl get pod -n knative-serving
         ```
-    * katib-db-manager와 katib-mysql pod만 running 상태가 아니라면 10분가량 시간을 두고 기다리면 running 상태도 바뀔 가능성이 높음 (내부 liveness probe 로직 문제로 여러번 restarts)  
-* 참고 :
-    * KFServing과 Istio 1.5.1과의 호환을 위해 istio namespace의 mtls를 disable처리 하였음.    
+    * katib-db-manager와 katib-mysql pod만 running 상태가 아니라면 10분가량 시간을 두고 기다리면 running 상태도 바뀔 가능성이 높음 (내부 liveness probe 로직 문제로 여러번 restarts)     
 
 ## 기타1 : AI-devops 삭제
 * 목적 : `AI-devops 설치 시에 배포된 모든 리소스를 삭제 한다.`
@@ -149,7 +145,7 @@ ai-devops is a machine learning toolkit on top of Kubernetes. And translates ste
         ```
 
   
-## 기타2 : HyperCloud5.1 ai-devops Spec 정보
+## 기타2 : HyperCloud5.2 ai-devops Spec 정보
 |Namespace|Pod|Container 수|Container|Container image|Request| |Limit| |
 |:----|:----|:----|:----|:----|:----|:----|:----|:----|
 | | | | | |cpu|memory|cpu|memory|
