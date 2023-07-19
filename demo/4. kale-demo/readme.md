@@ -32,7 +32,7 @@ spec:
   template:
     spec:
       containers:
-      - image: 'docker.io/tmaxcloudck/jupyterlab-kale:b1.0.0'
+      - image: 'docker.io/tmaxcloudck/kale-tekton-standalone:230329'
         imagePullPolicy: Always
         name: kale-demo
         resources:
