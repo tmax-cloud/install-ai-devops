@@ -20,6 +20,8 @@
       - multi-model serving을 위한 inference server 생성
       - 기존의 inferenceservice와 달리 storageuri 제거 및 s3 endpoint 연동
       - READY가 True 상태라면 정상동작 하는 것이고 생성시 5분가량 시간이 소요될 수 있다. 
+      - inferenceservice의 상태가 unknown 혹은 false 인경우 리소스 업데이트 과정에서의 동시성 충돌로 인한 문제일 수 있음
+      - knative controller 로그를 확인했을때 "object has been modified"와 같은 에러 발생시 동시성 문제가 발생한 것이므로 해당 inferenceservice POD를 재시작한다.
   ![7.inferenceservice.PNG](./img/7.inferenceservice.PNG) 
   참고 : [7.inferenceservice.yaml](./7.inferenceservice.yaml)        
     4. minio storage server에 업로드

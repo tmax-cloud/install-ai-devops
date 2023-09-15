@@ -6,15 +6,11 @@ metadata:
 spec:
   predictor:
     serviceAccountName: minio-serviceaccount
-    triton:
+    model:
       args:
       - --log-verbose=1
       - --strict-model-config=false
-      resources:
-        limits:
-          cpu: "1"
-          memory: 8Gi
-        requests:
-          cpu: "1"
-          memory: 8Gi
+      modelFormat:
+        name: triton
+      runtime: kserve-tritonserver
 
