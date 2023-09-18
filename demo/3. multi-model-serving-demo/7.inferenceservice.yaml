@@ -9,8 +9,16 @@ spec:
     model:
       args:
       - --log-verbose=1
-      - --strict-model-config=false
+      - --strict-model-config=false      
       modelFormat:
         name: triton
+      resources:
+        limits:
+          cpu: "1"
+          memory: 8Gi
+        requests:
+          cpu: "1"
+          memory: 8Gi  
       runtime: kserve-tritonserver
+      
 
