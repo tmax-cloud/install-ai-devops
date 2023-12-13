@@ -57,13 +57,12 @@ chmod +x mc
     - InferenceService로 request를 위한 환경 변수 설정 (master node에서 진행)
 
 ```bash
-# INGRESS에서 인식할 수 있도록 SERVICE_HOSTNAME 설정
+#knative-local-gateway 사용
 SERVICE_HOSTNAME=$(kubectl get inferenceservices triton-mms -o jsonpath='{.status.url}' -n mms | cut -d "/" -f 3)
-CLUSTER_IP=$(kubectl -n istio-system get service ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+CLUSTER_IP=$(kubectl get svc knative-local-gateway -n istio-system -o jsonpath='{.spec.clusterIP}')
 ```
 
-   - Request가 정상적으로 가는지 확인
-     - 정상적으로 가지 않거나 다음과 같이 서버의 metadata가 나오지 않는다면 InferenceService pod의 `ClusterIP` 또는  service를 통해서 expose해서 해당 url을 사용해야함 (endpoint는 동일)
+   
 
 ```bash
 curl -v -H "Host: ${SERVICE_HOSTNAME}" http://${CLUSTER_IP}/v2
